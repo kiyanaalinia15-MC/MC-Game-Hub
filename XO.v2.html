@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-80">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>XO v.2</title>
+
+</head>
+
+<body>
+    
+    <h1>XO v.2</v></h1>
+
+    <div id="players">
+
+    <div class="playerBox">
+
+        <h2>PLAYER X</h2>
+
+        <input
+            type="text"
+            id="Player X"
+            placeholder="Enter Player X Name"
+        >
+
+    </div>
+
+
+    <div class="playerBox">
+
+        <h2>PLAYER O</h2>
+
+        <input
+            type="text"
+            id="Player O"
+            placeholder="Enter Player O Name"
+        >
+
+    </div>
+
+</div>
+
+    <H2>Rounds</H2>
+
+    <select id="Rounds">
+
+        <option value="1">1 Round</option>
+        <option value="2">2 Rounds</option>
+        <option value="3">3 Rounds</option>
+        <option value="4">4 Rounds</option>
+        <option value="5">5 Rounds</option>
+
+    </select>
+
+    <h2>Score</h2>
+
+    <div id="scoreBoard">
+
+     <div class="scoreBox">
+        
+        <h3>Player X</h3>
+       
+        <span id="scoreX">0</span>
+     
+    </div>
+        
+    <div class="scoreBox">
+        
+        <h3>Draw</h3>
+
+        <span id="draw">0</span>
+
+    </div>
+
+    <div class="scoreBox">
+
+        <h3>Player O</h3>
+
+        <span id="scoreO">0</span>
+
+    </div>
+
+
+    </div>
+
+    <h2 id="roundDisplay">Round 1/1</h2>
+    <h2 id="turn">Turn:X</h2>
+   
+    <div id="board">
+
+    <button class="cell"></button>
+    <button class="cell"></button>
+    <button class="cell"></button>
+
+    <button class="cell"></button>
+    <button class="cell"></button>
+    <button class="cell"></button>
+
+    <button class="cell"></button>
+    <button class="cell"></button>
+    <button class="cell"></button>
+
+    </div>
+
+    <br>
+
+    <button id="restart">Restart Match</button>
+
+    <button id="newGame">New Game</button>
+
+    <h2 id="winner"></h2>
+    
+    </body>
+
+    <style>
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: #000;
+        color: white;
+        font-family: Tahoma, sans-serif;
+        text-align: center;
+        min-height: 100vh;
+        padding: 30px;
+        background: #000;
+        color: white;
+        font-family: Tahoma, sans-serif;
+        text-align: center;
+        min-height: 100vh;
+        padding: 30px;
+
+        border: 2px solid rgba(64, 224, 208, 0.65);
+        box-shadow: inset 0 0 30px rgba(64, 224, 208, 0.12);
+    }
+
+    h1 {
+        color: turquoise;
+        font-size: 50px;
+        margin-bottom: 30px;
+        text-shadow: 0 0 20px turquoise;
+    }
+
+    h2 {
+        color: turquoise;
+        margin: 15px 0;
+    }
+
+    input,
+    select {
+        background: #111;
+        color: white;
+        border: 2px solid turquoise;
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 16px;
+        outline: none;
+    }
+
+    input:focus,
+    select:focus {
+        box-shadow: 0 0 15px turquoise;
+    }
+
+    #board {
+        width: 390px;
+        margin: 30px auto;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .cell {
+        width: 125px;
+        height: 125px;
+        background: #111;
+        color: turquoise;
+        border: 2px solid turquoise;
+        border-radius: 8px;
+        font-size: 60px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .cell:hover {
+        background: #151515;
+        box-shadow: 0 0 20px turquoise;
+        transform: scale(1.03);
+    }
+
+    #restart,
+    #newGame {
+        background: #111;
+        color: turquoise;
+        border: 2px solid turquoise;
+        border-radius: 8px;
+        padding: 12px 25px;
+        margin: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    #restart:hover,
+    #newGame:hover {
+        background: turquoise;
+        color: black;
+        box-shadow: 0 0 20px turquoise;
+    }
+
+    #winner {
+        margin-top: 25px;
+        color: turquoise;
+        text-shadow: 0 0 15px turquoise;
+    }
+
+.cell.winner {
+    background: #1faaa3;
+    color: black;
+    animation: winnerSequence 1.2s infinite;
+}
+
+@keyframes winnerSequence {
+
+    0% {
+        background: #679693;
+        box-shadow: 0 0 5px turquoise;
+    }
+
+    20% {
+        background: turquoise;
+        box-shadow: 0 0 20px turquoise;
+    }
+
+    40% {
+        background: #679693;
+        box-shadow: 0 0 5px turquoise;
+    }
+
+    100% {
+        background: #679693;
+        box-shadow: 0 0 5px turquoise;
+    }
+}
+
+#scoreBoard {
+
+    display: flex ;
+    justify-content: center;
+    gap: 20px;
+    margin: 25px auto;
+    flex-wrap: wrap;
+
+}
+
+.scoreBox {
+
+    width: 150px;
+    padding: 20px;
+    background: #111;
+    border: 2px solid turquoise;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(64, 224, 208, 0.4);
+    transition: 0.3s;
+}
+
+.scoreBox:hover{
+
+        transform: translateY(-5px);
+        box-shadow: 0 0 18px rgba(64, 224, 208, 0.7);
+}
+
+.scoreBox h3{
+
+    color: turquoise;
+    font-size: 16px;
+    margin-bottom: 10px;
+
+}
+
+.scoreBox span {
+
+    color: white;
+    font-size: 35px;
+    font-weight: bold;
+
+}
+
+#roundDisplay {
+
+    color: white;
+    font-size: 24px;
+    margin-top: 10px;
+    text-shadow: 0 0 8px turquoise;
+
+}
+
+#winner.matchWinner { 
+
+    font-size: 32px;
+    animation: finalwinner 1s infinite alternate;
+
+}
+
+@keyframes finalwinner {
+
+    from{
+
+        transform: scale(1);
+        text-shadow: 0 0 8px turquoise;
+    }
+
+    to{
+
+        transform: scale(1.08);
+        text-shadow: 0 0 20px turquoise;
+
+    }
+
+
+
+}
+
+@media (max-width: 500px) {
+
+    body {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 38px;
+    }
+
+    #board {
+
+        width: 300px;
+        gap: 5px;
+    }
+
+    .cell {
+
+        width: 96px;
+        height: 96px;
+        font-size: 35px;
+
+    }
+
+    .scoreBox {
+
+        width: 110px;
+        padding: 15px;
+    }
+
+    .scoreBox span {
+
+        font-size: 28px;
+    }
+
+    #winner {
+
+        font-size: 24px;
+    }
+    
+}
+#players {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 25px auto;
+    flex-wrap: wrap;
+}
+
+.playerBox {
+    width: 220px;
+    padding: 20px;
+    background: #111;
+    border: 2px solid turquoise;
+    border-radius: 12px;
+
+    box-shadow: 0 0 8px rgba(64, 224, 208, 0.35);
+
+    transition: 0.3s;
+}
+
+.playerBox:hover {
+    transform: translateY(-5px);
+
+    box-shadow:
+        0 0 18px rgba(64, 224, 208, 0.7);
+}
+
+.playerBox h2 {
+    color: turquoise;
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.playerBox input {
+    width: 100%;
+    background: #080808;
+    color: white;
+
+    border: 2px solid turquoise;
+    border-radius: 8px;
+
+    padding: 12px;
+
+    font-size: 15px;
+
+    outline: none;
+
+    transition: 0.3s;
+}
+
+.playerBox input:focus {
+    box-shadow: 0 0 12px rgba(64, 224, 208, 0.6);
+}
+
+</style>
+
+<script>
+
+const cells = document.querySelectorAll(".cell");
+
+let currentPlayer = "X";
+let gameOver = false;
+
+let scoreX = 0;
+let scoreO = 0;
+let draws = 0;
+
+let currentRound = 1;
+
+
+const winningCombinations = [
+
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+
+    [0, 4, 8],
+    [2, 4, 6]
+
+];
+
+
+// گرفتن اسم بازیکن
+function getPlayerName(player) {
+
+    if (player === "X") {
+
+        const input = document.getElementById("Player X");
+
+        if (input && input.value.trim() !== "") {
+            return input.value.trim();
+        }
+
+        return "Player X";
+
+    } else {
+
+        const input = document.getElementById("Player O");
+
+        if (input && input.value.trim() !== "") {
+            return input.value.trim();
+        }
+
+        return "Player O";
+    }
+
+}
+
+function checkPlayerNames() {
+
+    const playerX =
+        document.getElementById("Player X").value.trim();
+
+    const playerO =
+        document.getElementById("Player O").value.trim();
+
+
+    if (playerX === "" || playerO === "") {
+
+        alert("Please enter both player names!");
+
+        return false;
+    }
+
+
+    return true;
+}
+// گرفتن تعداد راندها
+function getTotalRounds() {
+
+    const rounds =
+        document.getElementById("Rounds");
+
+    return parseInt(rounds.value);
+
+}
+
+
+// کلیک روی خانه‌ها
+cells.forEach(function(cell) {
+
+    cell.addEventListener("click", function() {
+
+        // اگر خانه پر باشد یا بازی تمام شده باشد
+        if (cell.textContent !== "" || gameOver) {
+            return;
+        }
+        if (!checkPlayerNames()) {
+            return;
+}
+
+        // قرار دادن X یا O
+        cell.textContent = currentPlayer;
+
+
+        // بررسی برد
+        checkWinner();
+
+
+        // اگر بازی تمام نشده، نوبت عوض شود
+        if (!gameOver) {
+
+            if (currentPlayer === "X") {
+
+                currentPlayer = "O";
+
+            } else {
+
+                currentPlayer = "X";
+
+            }
+
+
+            document.getElementById("turn").textContent =
+                "Turn: " + getPlayerName(currentPlayer);
+
+        }
+
+    });
+
+});
+
+
+// بررسی برنده
+function checkWinner() {
+
+    for (let combination of winningCombinations) {
+
+        const a =
+            cells[combination[0]].textContent;
+
+        const b =
+            cells[combination[1]].textContent;
+
+        const c =
+            cells[combination[2]].textContent;
+
+
+        // اگر سه خانه برابر باشند
+        if (a !== "" && a === b && b === c) {
+
+            gameOver = true;
+
+
+            // مشخص کردن خانه‌های برنده
+            combination.forEach(function(index, position) {
+
+              cells[index].classList.add("winner");
+
+                 cells[index].style.animationDelay =
+                
+                 (position * 0.5) + "s";
+
+        });
+
+            // گرفتن اسم برنده
+            const winnerName =
+                getPlayerName(currentPlayer);
+
+
+            // نمایش پیام برد
+            document.getElementById("winner").textContent =
+                "🏆 " +
+                winnerName +
+                " Wins Round " +
+                currentRound +
+                "!";
+
+
+            // اضافه کردن امتیاز
+            if (currentPlayer === "X") {
+
+                scoreX++;
+
+            } else {
+
+                scoreO++;
+
+            }
+
+
+            updateScore();
+
+
+            // اسکرول به پیام برد
+            document.getElementById("winner").scrollIntoView({
+
+                behavior: "smooth",
+
+                block: "center"
+
+            });
+
+
+            // رفتن به راند بعد
+            setTimeout(function() {
+
+                nextRound();
+
+            }, 2000);
+
+
+            return;
+
+        }
+
+    }
+
+
+    // بررسی مساوی
+    let boardFull = true;
+
+
+    cells.forEach(function(cell) {
+
+        if (cell.textContent === "") {
+
+            boardFull = false;
+
+        }
+
+    });
+
+
+    if (boardFull) {
+
+        gameOver = true;
+
+        draws++;
+
+
+        document.getElementById("winner").textContent =
+            "🤝 Round " +
+            currentRound +
+            " Draw!";
+
+
+        updateScore();
+
+
+        // اسکرول به پیام مساوی
+        document.getElementById("winner").scrollIntoView({
+
+            behavior: "smooth",
+
+            block: "center"
+
+        });
+
+
+        // رفتن به راند بعد
+        setTimeout(function() {
+
+            nextRound();
+
+        }, 2000);
+
+    }
+
+}
+
+
+// آپدیت امتیاز
+function updateScore() {
+
+    document.getElementById("scoreX").textContent =
+        scoreX;
+
+    document.getElementById("scoreO").textContent =
+        scoreO;
+
+    document.getElementById("draw").textContent =
+        draws;
+
+}
+
+
+// رفتن به راند بعد
+function nextRound() {
+
+    // اگر آخرین راند تمام شده
+    if (currentRound >= getTotalRounds()) {
+
+        finishMatch();
+
+        return;
+
+    }
+
+
+    // رفتن به راند بعد
+    currentRound++;
+
+
+    // پاک کردن بورد
+    resetBoard();
+
+}
+
+function updateRoundDisplay() {
+
+    document.getElementById("roundDisplay").textContent =
+        "Round " + currentRound + "/" + getTotalRounds();
+
+}
+// پاک کردن بورد برای راند جدید
+function resetBoard() {
+
+    cells.forEach(function(cell) {
+
+        cell.textContent = "";
+
+        // پاک کردن نور خانه‌های برنده
+        cell.classList.remove("winner");
+
+    });
+
+
+    gameOver = false;
+
+    currentPlayer = "X";
+
+    updateRoundDisplay();
+
+    // نمایش اسم بازیکن X
+    document.getElementById("turn").textContent =
+        "Turn: " + getPlayerName("X");
+
+
+    // نمایش شماره راند
+    document.getElementById("winner").textContent =
+        "Round " + currentRound;
+
+
+    // برگشتن صفحه به بورد
+    document.getElementById("board").scrollIntoView({
+
+        behavior: "smooth",
+
+        block: "center"
+
+    });
+
+}
+
+
+// پایان مسابقه
+function finishMatch() {
+
+    let finalMessage = "";
+
+    const playerXName = getPlayerName("X");
+    const playerOName = getPlayerName("O");
+
+
+    if (scoreX > scoreO) {
+
+        finalMessage =
+            "🏆 " +
+            playerXName +
+            " Wins The Match!<br>" +
+            "Score: " +
+            scoreX +
+            " - " +
+            scoreO;
+
+    } else if (scoreO > scoreX) {
+
+        finalMessage =
+            "🏆 " +
+            playerOName +
+            " Wins The Match!<br>" +
+            "Score: " +
+            scoreO +
+            " - " +
+            scoreX;
+
+    } else {
+
+        finalMessage =
+            "🤝 The Match Is A Draw!<br>" +
+            "Score: " +
+            scoreX +
+            " - " +
+            scoreO;
+    }
+
+
+    gameOver = true;
+
+
+    const winnerElement =
+    document.getElementById("winner");
+
+    winnerElement.innerHTML = finalMessage;
+
+    winnerElement.classList.add("matchWinner");
+
+
+    document.getElementById("winner").scrollIntoView({
+
+        behavior: "smooth",
+
+        block: "center"
+
+    });
+
+}
+
+// Restart Match
+document.getElementById("restart").addEventListener("click", function() {
+
+    document.getElementById("winner")
+    .classList.remove("matchWinner");
+
+    scoreX = 0;
+
+    scoreO = 0;
+
+    draws = 0;
+
+    currentRound = 1;
+
+    currentPlayer = "X";
+
+    updateRoundDisplay();
+
+    gameOver = false;
+
+
+    // پاک کردن بورد
+    cells.forEach(function(cell) {
+
+        cell.textContent = "";
+
+        cell.classList.remove("winner");
+
+    });
+
+
+    updateScore();
+
+
+    document.getElementById("turn").textContent =
+        "Turn: " + getPlayerName("X");
+
+
+    document.getElementById("winner").textContent = "";
+
+
+    // برگشت به بورد
+    document.getElementById("board").scrollIntoView({
+
+        behavior: "smooth",
+
+        block: "center"
+
+    });
+
+});
+
+
+// New Game
+document.getElementById("newGame").addEventListener("click", function() {
+
+    document.getElementById("winner")
+    .classList.remove("matchWinner");
+    // ریست امتیازها
+    scoreX = 0;
+
+    scoreO = 0;
+
+    draws = 0;
+
+
+    // شروع از راند اول
+    currentRound = 1;
+
+    updateRoundDisplay();
+
+    // نوبت X
+    currentPlayer = "X";
+
+
+    // فعال شدن بازی
+    gameOver = false;
+
+
+    // پاک کردن بورد
+    cells.forEach(function(cell) {
+
+        cell.textContent = "";
+
+        cell.classList.remove("winner");
+
+    });
+
+
+    // پاک کردن اسم بازیکن‌ها
+    document.getElementById("Player X").value = "";
+
+    document.getElementById("Player O").value = "";
+
+
+    // صفر کردن امتیاز
+    updateScore();
+
+
+    // نمایش نوبت
+    document.getElementById("turn").textContent =
+        "Turn: X";
+
+
+    // پاک کردن پیام
+    document.getElementById("winner").textContent = "";
+
+
+    // برگشت صفحه به بالا
+    window.scrollTo({
+
+        top: 0,
+
+        behavior: "smooth"
+
+    });
+
+});
+
+</script>
+
+</html>
