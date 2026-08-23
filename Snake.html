@@ -4,6 +4,7 @@
 
 <head>
 
+```
 <meta charset="UTF-8">
 
 <meta name="viewport"
@@ -75,8 +76,8 @@
 
 
     #gameBoard {
-        width: 500px;
-        height: 500px;
+        width: min(500px, 90vw);
+        height: min(500px, 90vw);
 
         margin: 20px auto;
 
@@ -297,11 +298,13 @@
     }
 
 </style>
+```
 
 </head>
 
 <body>
 
+```
 <h1>🐍 Snake V1</h1>
 
 
@@ -419,7 +422,11 @@
     const gridSize = 20;
 
 
-    const cellSize = 25;
+    function getCellSize() {
+
+        return gameBoard.clientWidth / gridSize;
+
+    }
 
 
 
@@ -494,6 +501,11 @@
 
                 cell.classList.add("cell");
 
+
+                const cellSize = getCellSize();
+
+                cell.style.width = cellSize + "px";
+                cell.style.height = cellSize + "px";
 
                 cell.style.left =
                     (column * cellSize) + "px";
@@ -590,6 +602,8 @@
 
 
     function drawSnake() {
+
+        const cellSize = getCellSize();
 
         const oldSnake =
             gameBoard.querySelectorAll(
@@ -715,6 +729,8 @@
 
 
     function drawFood() {
+
+        const cellSize = getCellSize();
 
         const oldFood =
             gameBoard.querySelector(
@@ -1016,6 +1032,8 @@
 
 
     function showPlusOne() {
+
+        const cellSize = getCellSize();
 
         const plusOne =
             document.createElement(
@@ -1355,7 +1373,7 @@
 
 
 </script>
-
+```
 
 </body>
 
