@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Snake V1</title>
+
+
+<style>
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+
+    body {
+        background: #000;
+        color: white;
+
+        font-family: Tahoma, sans-serif;
+
+        text-align: center;
+
+        min-height: 100vh;
+
+        padding: 25px;
+    }
+
+
+    h1 {
+        color: turquoise;
+
+        font-size: 45px;
+
+        margin-bottom: 15px;
+
+        text-shadow:
+            0 0 10px turquoise,
+            0 0 20px turquoise;
+    }
+
+
+    #highScore {
+        color: gold;
+
+        font-size: 22px;
+
+        font-weight: bold;
+
+        margin-bottom: 8px;
+
+        text-shadow: 0 0 8px gold;
+    }
+
+
+    #score {
+        color: turquoise;
+
+        font-size: 22px;
+
+        font-weight: bold;
+
+        margin-bottom: 15px;
+
+        text-shadow: 0 0 8px turquoise;
+    }
+
+
+    #gameBoard {
+        width: 500px;
+        height: 500px;
+
+        margin: 20px auto;
+
+        background: #050505;
+
+        border: 3px solid turquoise;
+
+        box-shadow:
+            0 0 10px rgba(64, 224, 208, 0.7);
+
+        position: relative;
+
+        overflow: hidden;
+    }
+
+
+    .cell {
+        position: absolute;
+
+        width: 25px;
+        height: 25px;
+
+        border: 1px solid #111;
+
+        background: transparent;
+    }
+
+
+    .snake {
+        position: absolute;
+
+        width: 25px;
+        height: 25px;
+
+        background: turquoise;
+
+        border-radius: 5px;
+
+        box-shadow:
+            0 0 8px turquoise;
+
+        z-index: 2;
+    }
+
+
+    .snake.head {
+        background: #32e6d5;
+
+        box-shadow:
+            0 0 12px turquoise,
+            0 0 20px rgba(64, 224, 208, 0.5);
+    }
+
+
+    .food {
+        position: absolute;
+
+        width: 25px;
+        height: 25px;
+
+        background: red;
+
+        border-radius: 50%;
+
+        box-shadow:
+            0 0 10px red;
+
+        z-index: 1;
+    }
+
+
+    #message {
+        min-height: 35px;
+
+        color: turquoise;
+
+        font-size: 22px;
+
+        font-weight: bold;
+
+        margin: 10px;
+
+        text-shadow: 0 0 10px turquoise;
+    }
+
+
+    .score-plus-one {
+        position: absolute;
+
+        color: #ffffff;
+
+        font-size: 28px;
+
+        font-weight: bold;
+
+        pointer-events: none;
+
+        z-index: 20;
+
+        text-shadow:
+            0 0 5px turquoise,
+            0 0 10px turquoise,
+            0 0 18px turquoise;
+
+        transform: translate(-50%, -50%);
+
+        animation:
+            scorePop 0.7s ease-out forwards;
+    }
+
+
+    @keyframes scorePop {
+
+        0% {
+            transform:
+                translate(-50%, -50%)
+                scale(0.4);
+
+            opacity: 1;
+        }
+
+
+        30% {
+            transform:
+                translate(-50%, -50%)
+                scale(1.4);
+
+            opacity: 1;
+        }
+
+
+        100% {
+            transform:
+                translate(-50%, -75%)
+                scale(1);
+
+            opacity: 0;
+        }
+
+    }
+
+
+    button {
+        background: #111;
+
+        color: turquoise;
+
+        border: 2px solid turquoise;
+
+        border-radius: 8px;
+
+        padding: 12px 25px;
+
+        margin: 6px;
+
+        font-size: 16px;
+
+        cursor: pointer;
+
+        transition: 0.2s;
+    }
+
+
+    button:hover {
+        background: turquoise;
+
+        color: black;
+
+        box-shadow:
+            0 0 15px turquoise;
+    }
+
+
+    /* کنترل‌های موبایل */
+
+    #mobileControls {
+        display: none;
+
+        width: 180px;
+
+        margin: 20px auto;
+    }
+
+
+    #mobileControls button {
+        width: 55px;
+        height: 55px;
+
+        padding: 0;
+
+        font-size: 22px;
+
+        margin: 3px;
+    }
+
+
+    .controlRow {
+        display: flex;
+
+        justify-content: center;
+
+        align-items: center;
+    }
+
+
+    @media (max-width: 600px) {
+
+        #gameBoard {
+            width: 90vw;
+            height: 90vw;
+        }
+
+
+        #mobileControls {
+            display: block;
+        }
+
+    }
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🐍 Snake V1</h1>
+
+
+<div id="highScore">
+
+    🏆 Best:
+    <span id="highScoreValue">0</span>
+
+</div>
+
+
+<div id="score">
+
+    ⭐ Score:
+    <span id="scoreValue">0</span>
+
+</div>
+
+
+<div id="gameBoard"></div>
+
+
+<div id="message"></div>
+
+
+<!-- کنترل موبایل -->
+
+<div id="mobileControls">
+
+    <div class="controlRow">
+
+        <button data-direction="up">
+            ↑
+        </button>
+
+    </div>
+
+
+    <div class="controlRow">
+
+        <button data-direction="left">
+            ←
+        </button>
+
+
+        <button data-direction="down">
+            ↓
+        </button>
+
+
+        <button data-direction="right">
+            →
+        </button>
+
+    </div>
+
+</div>
+
+
+<button id="restart">
+    Restart
+</button>
+
+
+<button id="newGame">
+    New Game
+</button>
+
+
+
+<script>
+
+
+    // =========================
+    // عناصر HTML
+    // =========================
+
+
+    const gameBoard =
+        document.getElementById("gameBoard");
+
+
+    const scoreValue =
+        document.getElementById("scoreValue");
+
+
+    const highScoreValue =
+        document.getElementById("highScoreValue");
+
+
+    const message =
+        document.getElementById("message");
+
+
+    const restartButton =
+        document.getElementById("restart");
+
+
+    const newGameButton =
+        document.getElementById("newGame");
+
+
+    const mobileButtons =
+        document.querySelectorAll(
+            "#mobileControls button"
+        );
+
+
+
+    // =========================
+    // تنظیمات بازی
+    // =========================
+
+
+    const gridSize = 20;
+
+
+    const cellSize = 25;
+
+
+
+    // =========================
+    // متغیرهای بازی
+    // =========================
+
+
+    let snake;
+
+    let food;
+
+    let direction;
+
+    let nextDirection;
+
+    let score;
+
+    let highScore;
+
+    let gameOver;
+
+    let speed;
+
+    let gameTimer;
+
+
+
+    // =========================
+    // رکورد ذخیره شده
+    // =========================
+
+
+    highScore =
+        Number(
+            localStorage.getItem(
+                "snakeHighScore"
+            )
+        ) || 0;
+
+
+    highScoreValue.textContent =
+        highScore;
+
+
+
+    // =========================
+    // ساخت زمین
+    // =========================
+
+
+    function createGrid() {
+
+        gameBoard.innerHTML = "";
+
+
+        for (
+            let row = 0;
+            row < gridSize;
+            row++
+        ) {
+
+            for (
+                let column = 0;
+                column < gridSize;
+                column++
+            ) {
+
+                const cell =
+                    document.createElement("div");
+
+
+                cell.classList.add("cell");
+
+
+                cell.style.left =
+                    (column * cellSize) + "px";
+
+
+                cell.style.top =
+                    (row * cellSize) + "px";
+
+
+                gameBoard.appendChild(cell);
+
+            }
+
+        }
+
+    }
+
+
+
+    // =========================
+    // شروع بازی
+    // =========================
+
+
+    function startGame() {
+
+        clearInterval(gameTimer);
+
+
+        createGrid();
+
+
+        snake = [
+
+            {
+                row: 10,
+                column: 10
+            },
+
+            {
+                row: 10,
+                column: 9
+            },
+
+            {
+                row: 10,
+                column: 8
+            }
+
+        ];
+
+
+        direction = "right";
+
+
+        nextDirection = "right";
+
+
+        score = 0;
+
+
+        gameOver = false;
+
+
+        speed = 180;
+
+
+        scoreValue.textContent =
+            score;
+
+
+        message.textContent = "";
+
+
+        createFood();
+
+
+        drawSnake();
+
+
+        gameTimer =
+            setInterval(
+                moveSnake,
+                speed
+            );
+
+    }
+
+
+
+    // =========================
+    // نمایش مار
+    // =========================
+
+
+    function drawSnake() {
+
+        const oldSnake =
+            gameBoard.querySelectorAll(
+                ".snake"
+            );
+
+
+        oldSnake.forEach(
+            function(part) {
+
+                part.remove();
+
+            }
+        );
+
+
+        snake.forEach(
+            function(segment, index) {
+
+                const part =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                part.classList.add(
+                    "snake"
+                );
+
+
+                if (index === 0) {
+
+                    part.classList.add(
+                        "head"
+                    );
+
+                }
+
+
+                part.style.left =
+                    (segment.column *
+                        cellSize) + "px";
+
+
+                part.style.top =
+                    (segment.row *
+                        cellSize) + "px";
+
+
+                gameBoard.appendChild(
+                    part
+                );
+
+            }
+        );
+
+    }
+
+
+
+    // =========================
+    // ساخت غذا
+    // =========================
+
+
+    function createFood() {
+
+        let newFood;
+
+
+        do {
+
+            newFood = {
+
+                row:
+                    Math.floor(
+                        Math.random() *
+                        gridSize
+                    ),
+
+                column:
+                    Math.floor(
+                        Math.random() *
+                        gridSize
+                    )
+
+            };
+
+
+        } while (
+
+            snake.some(
+                function(segment) {
+
+                    return (
+
+                        segment.row ===
+                            newFood.row &&
+
+                        segment.column ===
+                            newFood.column
+
+                    );
+
+                }
+            )
+
+        );
+
+
+        food = newFood;
+
+
+        drawFood();
+
+    }
+
+
+
+    // =========================
+    // نمایش غذا
+    // =========================
+
+
+    function drawFood() {
+
+        const oldFood =
+            gameBoard.querySelector(
+                ".food"
+            );
+
+
+        if (oldFood) {
+
+            oldFood.remove();
+
+        }
+
+
+        const foodElement =
+            document.createElement(
+                "div"
+            );
+
+
+        foodElement.classList.add(
+            "food"
+        );
+
+
+        foodElement.style.left =
+            (food.column *
+                cellSize) + "px";
+
+
+        foodElement.style.top =
+            (food.row *
+                cellSize) + "px";
+
+
+        gameBoard.appendChild(
+            foodElement
+        );
+
+    }
+
+
+
+    // =========================
+    // حرکت مار
+    // =========================
+
+
+    function moveSnake() {
+
+        if (gameOver) {
+
+            return;
+
+        }
+
+
+        direction =
+            nextDirection;
+
+
+        const head = {
+
+            row:
+                snake[0].row,
+
+            column:
+                snake[0].column
+
+        };
+
+
+        // بالا
+
+        if (
+            direction === "up"
+        ) {
+
+            head.row--;
+
+        }
+
+
+        // پایین
+
+        else if (
+            direction === "down"
+        ) {
+
+            head.row++;
+
+        }
+
+
+        // چپ
+
+        else if (
+            direction === "left"
+        ) {
+
+            head.column--;
+
+        }
+
+
+        // راست
+
+        else if (
+            direction === "right"
+        ) {
+
+            head.column++;
+
+        }
+
+
+
+        // =========================
+        // برخورد با دیوار
+        // =========================
+
+
+        if (
+
+            head.row < 0 ||
+
+            head.row >= gridSize ||
+
+            head.column < 0 ||
+
+            head.column >= gridSize
+
+        ) {
+
+            endGame(
+                "💥 Game Over!"
+            );
+
+            return;
+
+        }
+
+
+
+        // =========================
+        // بررسی خوردن غذا
+        // =========================
+
+
+        const ateFood =
+
+            head.row === food.row &&
+
+            head.column === food.column;
+
+
+
+        // اگر غذا نخورده
+        // دم حذف می‌شود
+
+        if (!ateFood) {
+
+            snake.pop();
+
+        }
+
+
+
+        // =========================
+        // برخورد با خودش
+        // =========================
+
+
+        const hitSelf =
+
+            snake.some(
+                function(segment) {
+
+                    return (
+
+                        segment.row ===
+                            head.row &&
+
+                        segment.column ===
+                            head.column
+
+                    );
+
+                }
+            );
+
+
+        if (hitSelf) {
+
+            endGame(
+                "💥 You Hit Yourself!"
+            );
+
+            return;
+
+        }
+
+
+
+        // =========================
+        // اضافه کردن سر
+        // =========================
+
+
+        snake.unshift(head);
+
+
+
+        // =========================
+        // خوردن غذا
+        // =========================
+
+
+        if (ateFood) {
+
+            score++;
+
+
+            scoreValue.textContent =
+                score;
+
+
+
+            // بررسی رکورد
+
+            if (
+                score > highScore
+            ) {
+
+                highScore =
+                    score;
+
+
+                localStorage.setItem(
+                    "snakeHighScore",
+                    highScore
+                );
+
+
+                highScoreValue.textContent =
+                    highScore;
+
+            }
+
+
+
+            // نمایش +1
+
+            showPlusOne();
+
+
+
+            // غذای جدید
+
+            createFood();
+
+
+
+            // افزایش سرعت
+
+            if (speed > 70) {
+
+                speed -= 10;
+
+
+                clearInterval(
+                    gameTimer
+                );
+
+
+                gameTimer =
+                    setInterval(
+                        moveSnake,
+                        speed
+                    );
+
+            }
+
+        }
+
+
+
+        // نمایش مار
+
+        drawSnake();
+
+    }
+
+
+
+    // =========================
+    // انیمیشن +1
+    // =========================
+
+
+    function showPlusOne() {
+
+        const plusOne =
+            document.createElement(
+                "div"
+            );
+
+
+        plusOne.classList.add(
+            "score-plus-one"
+        );
+
+
+        plusOne.textContent =
+            "+1";
+
+
+        plusOne.style.left =
+            (snake[0].column * cellSize + cellSize / 2) + "px";
+
+
+        plusOne.style.top =
+            (snake[0].row * cellSize + cellSize / 2) + "px";
+
+
+        gameBoard.appendChild(
+            plusOne
+        );
+
+
+        setTimeout(
+            function() {
+
+                plusOne.remove();
+
+            },
+            700
+        );
+
+    }
+
+
+
+    // =========================
+    // کنترل کیبورد
+    // =========================
+
+
+    document.addEventListener(
+        "keydown",
+        function(event) {
+
+            const key =
+                event.code;
+
+
+            // جلوگیری از اسکرول
+
+            if (
+
+                key === "ArrowUp" ||
+
+                key === "ArrowDown" ||
+
+                key === "ArrowLeft" ||
+
+                key === "ArrowRight" ||
+
+                key === "KeyW" ||
+
+                key === "KeyA" ||
+
+                key === "KeyS" ||
+
+                key === "KeyD"
+
+            ) {
+
+                event.preventDefault();
+
+            }
+
+
+
+            // بالا
+
+            if (
+
+                (
+                    key === "ArrowUp" ||
+                    key === "KeyW"
+                ) &&
+
+                direction !== "down"
+
+            ) {
+
+                nextDirection =
+                    "up";
+
+            }
+
+
+
+            // پایین
+
+            else if (
+
+                (
+                    key === "ArrowDown" ||
+                    key === "KeyS"
+                ) &&
+
+                direction !== "up"
+
+            ) {
+
+                nextDirection =
+                    "down";
+
+            }
+
+
+
+            // چپ
+
+            else if (
+
+                (
+                    key === "ArrowLeft" ||
+                    key === "KeyA"
+                ) &&
+
+                direction !== "right"
+
+            ) {
+
+                nextDirection =
+                    "left";
+
+            }
+
+
+
+            // راست
+
+            else if (
+
+                (
+                    key === "ArrowRight" ||
+                    key === "KeyD"
+                ) &&
+
+                direction !== "left"
+
+            ) {
+
+                nextDirection =
+                    "right";
+
+            }
+
+        }
+    );
+
+
+
+    // =========================
+    // کنترل موبایل
+    // =========================
+
+
+    mobileButtons.forEach(
+        function(button) {
+
+            button.addEventListener(
+                "click",
+                function() {
+
+                    const newDirection =
+                        button.dataset.direction;
+
+
+                    if (
+
+                        newDirection ===
+                            "up" &&
+
+                        direction !==
+                            "down"
+
+                    ) {
+
+                        nextDirection =
+                            "up";
+
+                    }
+
+
+                    else if (
+
+                        newDirection ===
+                            "down" &&
+
+                        direction !==
+                            "up"
+
+                    ) {
+
+                        nextDirection =
+                            "down";
+
+                    }
+
+
+                    else if (
+
+                        newDirection ===
+                            "left" &&
+
+                        direction !==
+                            "right"
+
+                    ) {
+
+                        nextDirection =
+                            "left";
+
+                    }
+
+
+                    else if (
+
+                        newDirection ===
+                            "right" &&
+
+                        direction !==
+                            "left"
+
+                    ) {
+
+                        nextDirection =
+                            "right";
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+
+    // =========================
+    // پایان بازی
+    // =========================
+
+
+    function endGame(text) {
+
+        gameOver = true;
+
+
+        clearInterval(
+            gameTimer
+        );
+
+
+        message.textContent =
+            text +
+            "  Score: " +
+            score;
+
+
+        message.scrollIntoView({
+
+            behavior:
+                "smooth",
+
+            block:
+                "center"
+
+        });
+
+    }
+
+
+
+    // =========================
+    // Restart
+    // =========================
+
+
+    restartButton.addEventListener(
+        "click",
+        function() {
+
+            startGame();
+
+        }
+    );
+
+
+
+    // =========================
+    // New Game
+    // =========================
+
+
+    newGameButton.addEventListener(
+        "click",
+        function() {
+
+            startGame();
+
+
+            window.scrollTo({
+
+                top: 0,
+
+                behavior:
+                    "smooth"
+
+            });
+
+        }
+    );
+
+
+
+    // =========================
+    // اجرای اولیه
+    // =========================
+
+
+    startGame();
+
+
+</script>
+
+
+</body>
+
+</html>
