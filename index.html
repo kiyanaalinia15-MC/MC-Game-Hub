@@ -33,15 +33,10 @@
 ========================= */
 
 body{
-
     background:#050505;
-
     font-family:'Orbitron',Tahoma,sans-serif;
-
     color:white;
-
     overflow-x:hidden;
-
 }
 
 
@@ -62,20 +57,20 @@ body::before{
     height:100%;
 
     background:
-        radial-gradient(
-            circle at top,
-            rgba(0,255,255,.08),
-            transparent 40%
-        ),
 
-        radial-gradient(
-            circle at bottom,
-            rgba(0,255,255,.05),
-            transparent 50%
-        );
+    radial-gradient(
+        circle at top,
+        rgba(0,255,255,.08),
+        transparent 40%
+    ),
+
+    radial-gradient(
+        circle at bottom,
+        rgba(0,255,255,.05),
+        transparent 50%
+    );
 
     z-index:-2;
-
 }
 
 
@@ -93,23 +88,22 @@ body::after{
 
     background-image:
 
-        linear-gradient(
-            rgba(0,255,255,.03) 1px,
-            transparent 1px
-        ),
+    linear-gradient(
+        rgba(0,255,255,.03) 1px,
+        transparent 1px
+    ),
 
-        linear-gradient(
-            90deg,
-            rgba(0,255,255,.03) 1px,
-            transparent 1px
-        );
+    linear-gradient(
+        90deg,
+        rgba(0,255,255,.03) 1px,
+        transparent 1px
+    );
 
     background-size:45px 45px;
 
     animation:gridMove 15s linear infinite;
 
     z-index:-1;
-
 }
 
 
@@ -134,7 +128,7 @@ header{
 
     width:100%;
 
-    padding:25px 70px;
+    padding:12px 70px;
 
     display:flex;
 
@@ -153,12 +147,16 @@ header{
     border-bottom:2px solid turquoise;
 
     box-shadow:
-        0 0 20px rgba(64,224,208,.35);
+    0 0 20px rgba(64,224,208,.35);
 
     z-index:999;
 
 }
 
+
+/* =========================
+   LOGO TEXT
+========================= */
 
 .logo{
 
@@ -171,9 +169,67 @@ header{
     color:turquoise;
 
     text-shadow:
-        0 0 10px turquoise,
-        0 0 20px turquoise,
-        0 0 40px turquoise;
+
+    0 0 10px turquoise,
+    0 0 20px turquoise,
+    0 0 40px turquoise;
+
+}
+
+
+/* =========================
+   MAIN IMAGE LOGO
+========================= */
+
+.logo-area{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+}
+
+
+.main-logo{
+
+    width:95px;
+
+    height:80px;
+
+    object-fit:contain;
+
+    display:block;
+
+    filter:
+
+    drop-shadow(
+        0 0 5px rgba(64,224,208,.5)
+    )
+
+    drop-shadow(
+        0 0 12px rgba(64,224,208,.25)
+    );
+
+    transition:.35s;
+
+}
+
+
+.main-logo:hover{
+
+    transform:scale(1.08);
+
+    filter:
+
+    drop-shadow(
+        0 0 10px turquoise
+    )
+
+    drop-shadow(
+        0 0 20px rgba(64,224,208,.6)
+    );
 
 }
 
@@ -210,7 +266,8 @@ nav a:hover{
 
     color:turquoise;
 
-    text-shadow:0 0 15px turquoise;
+    text-shadow:
+    0 0 15px turquoise;
 
 }
 
@@ -247,9 +304,10 @@ nav a:hover{
     color:turquoise;
 
     text-shadow:
-        0 0 15px turquoise,
-        0 0 30px turquoise,
-        0 0 60px turquoise;
+
+    0 0 15px turquoise,
+    0 0 30px turquoise,
+    0 0 60px turquoise;
 
     animation:glow 2s infinite alternate;
 
@@ -261,16 +319,18 @@ nav a:hover{
     from{
 
         text-shadow:
-            0 0 10px turquoise,
-            0 0 25px turquoise;
+
+        0 0 10px turquoise,
+        0 0 25px turquoise;
 
     }
 
     to{
 
         text-shadow:
-            0 0 25px turquoise,
-            0 0 60px cyan;
+
+        0 0 25px turquoise,
+        0 0 60px cyan;
 
     }
 
@@ -332,7 +392,8 @@ nav a:hover{
 
     color:black;
 
-    box-shadow:0 0 25px turquoise;
+    box-shadow:
+    0 0 25px turquoise;
 
     transform:translateY(-6px);
 
@@ -352,10 +413,7 @@ nav a:hover{
     display:grid;
 
     grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(320px,1fr)
-        );
+    repeat(auto-fit,minmax(320px,1fr));
 
     gap:35px;
 
@@ -392,8 +450,9 @@ nav a:hover{
     transform:translateY(-12px);
 
     box-shadow:
-        0 0 20px turquoise,
-        0 0 45px rgba(64,224,208,.5);
+
+    0 0 20px turquoise,
+    0 0 45px rgba(64,224,208,.5);
 
 }
 
@@ -405,20 +464,19 @@ nav a:hover{
     position:absolute;
 
     top:-100%;
-
     left:-100%;
 
     width:200%;
-
     height:200%;
 
     background:
-        linear-gradient(
-            45deg,
-            transparent,
-            rgba(64,224,208,.15),
-            transparent
-        );
+
+    linear-gradient(
+        45deg,
+        transparent,
+        rgba(64,224,208,.15),
+        transparent
+    );
 
     transform:rotate(30deg);
 
@@ -430,7 +488,6 @@ nav a:hover{
 .card:hover::before{
 
     top:100%;
-
     left:100%;
 
 }
@@ -444,7 +501,8 @@ nav a:hover{
 
     margin-bottom:18px;
 
-    text-shadow:0 0 10px turquoise;
+    text-shadow:
+    0 0 10px turquoise;
 
 }
 
@@ -493,7 +551,8 @@ nav a:hover{
 
     color:black;
 
-    box-shadow:0 0 25px turquoise;
+    box-shadow:
+    0 0 25px turquoise;
 
 }
 
@@ -511,10 +570,7 @@ nav a:hover{
     display:grid;
 
     grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(220px,1fr)
-        );
+    repeat(auto-fit,minmax(220px,1fr));
 
     gap:25px;
 
@@ -542,7 +598,8 @@ nav a:hover{
 
     transform:translateY(-10px);
 
-    box-shadow:0 0 25px turquoise;
+    box-shadow:
+    0 0 25px turquoise;
 
 }
 
@@ -555,7 +612,8 @@ nav a:hover{
 
     margin-bottom:12px;
 
-    text-shadow:0 0 15px turquoise;
+    text-shadow:
+    0 0 15px turquoise;
 
 }
 
@@ -601,7 +659,6 @@ footer{
     position:fixed;
 
     top:50%;
-
     left:50%;
 
     transform:translate(-50%,-50%);
@@ -619,8 +676,9 @@ footer{
     padding:35px;
 
     box-shadow:
-        0 0 15px rgba(64,224,208,.5),
-        0 0 35px rgba(64,224,208,.2);
+
+    0 0 15px rgba(64,224,208,.5),
+    0 0 35px rgba(64,224,208,.2);
 
     z-index:2000;
 
@@ -636,8 +694,9 @@ footer{
     margin-bottom:25px;
 
     text-shadow:
-        0 0 10px turquoise,
-        0 0 20px turquoise;
+
+    0 0 10px turquoise,
+    0 0 20px turquoise;
 
 }
 
@@ -681,7 +740,7 @@ footer{
 #backupPanel textarea:focus{
 
     box-shadow:
-        0 0 12px rgba(64,224,208,.5);
+    0 0 12px rgba(64,224,208,.5);
 
 }
 
@@ -717,7 +776,8 @@ footer{
 
     color:black;
 
-    box-shadow:0 0 20px turquoise;
+    box-shadow:
+    0 0 20px turquoise;
 
 }
 
@@ -743,11 +803,11 @@ footer{
 
     header{
 
-        padding:20px;
+        padding:15px 20px;
 
         flex-direction:column;
 
-        gap:20px;
+        gap:10px;
 
     }
 
@@ -755,6 +815,17 @@ footer{
     .logo{
 
         font-size:30px;
+
+        text-align:center;
+
+    }
+
+
+    .main-logo{
+
+        width:75px;
+
+        height:65px;
 
     }
 
@@ -770,16 +841,23 @@ footer{
     }
 
 
+    nav a{
+
+        font-size:15px;
+
+    }
+
+
     .hero h1{
 
-        font-size:55px;
+        font-size:48px;
 
     }
 
 
     .hero p{
 
-        font-size:18px;
+        font-size:17px;
 
     }
 
@@ -792,11 +870,60 @@ footer{
 
 }
 
+/* Loading Screen */
+#loading-screen {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loader {
+    width: 60px;
+    height: 60px;
+    border: 5px solid #222;
+    border-top: 5px solid #00ffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+#loading-screen p {
+    color: #00ffff;
+    font-size: 20px;
+    margin-top: 20px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+#loading-screen.hide {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+
 </style>
 
 </head>
 
 <body>
+
+        
+<!-- Loading Screen -->
+<div id="loading-screen">
+    <div class="loader"></div>
+    <p>Loading...</p>
+</div>
+
+
 
 <!-- =========================
      BACKUP PANEL
@@ -807,22 +934,27 @@ footer{
 <h2>🛠️ Report a Problem</h2>
 
 <input
-    type="text"
-    id="reportName"
-    placeholder="Enter Your Name"
+type="text"
+id="reportName"
+placeholder="Enter Your Name"
+
 >
 
 <textarea
-    id="reportProblem"
-    placeholder="Describe your problem..."
+id="reportProblem"
+placeholder="Describe your problem..."
 ></textarea>
 
 <button id="sendReport">
-    Send Report
+
+Send Report
+
 </button>
 
 <button id="closeBackup">
-    Close
+
+Close
+
 </button>
 
 <div id="reportStatus"></div>
@@ -835,30 +967,54 @@ footer{
 
 <header id="top">
 
+<!-- LOGO TEXT -->
+
 <div class="logo">
 
-    🎮 MC Game Hub
+🎮 MC Game Hub
 
 </div>
 
+<!-- MAIN LOGO -->
+
+<div class="logo-area">
+
+<img
+src="logo.png"
+alt="MC Game Hub Logo"
+class="main-logo"
+
+>
+
+</div>
+
+<!-- NAVIGATION -->
 
 <nav>
 
-    <a href="#">
-        Home
-    </a>
+<a href="#top">
 
-    <a href="#games">
-        Games
-    </a>
+Home
 
-    <a href="#">
-        LeaderBoard
-    </a>
+</a>
 
-    <a href="#backup" id="backupButton">
-        backUP
-    </a>
+<a href="#games">
+
+Games
+
+</a>
+
+<a href="#">
+
+LeaderBoard
+
+</a>
+
+<a href="#backup" id="backupButton">
+
+backUP
+
+</a>
 
 </nav>
 
@@ -870,37 +1026,41 @@ footer{
 
 <section class="hero">
 
-
 <h1>
-    MC Game Hub V2
-</h1>
 
+MC Game Hub V2
+
+</h1>
 
 <p>
 
-    به هاب بازی‌های من خوش اومدی.
-    اینجا تمام بازی‌هایی که ساختم قرار می‌گیرن.
-    این پروژه در نسخه V2 با طراحی نئونی و حرفه‌ای ساخته شده.
+به هاب بازی‌های من خوش اومدی.
+اینجا تمام بازی‌هایی که ساختم قرار می‌گیرن.
+این پروژه در نسخه V2 با طراحی نئونی و حرفه‌ای ساخته شده.
 
 </p>
 
-
 <div class="hero-buttons">
 
-    <a
-        href="#games"
-        class="btn"
-    >
-        Start
-    </a>
+<a
+href="#games"
+class="btn"
 
+>
 
-    <a
-        href="#"
-        class="btn"
-    >
-        About Project
-    </a>
+Start
+
+</a>
+
+<a
+href="#"
+class="btn"
+
+>
+
+About Project
+
+</a>
 
 </div>
 
@@ -911,124 +1071,130 @@ footer{
 ========================= -->
 
 <section
-    class="games"
-    id="games"
+class="games"
+id="games"
 >
-
 
 <!-- XO -->
 
 <div class="card">
 
-    <h2>
-        🎮 XO V2
-    </h2>
+<h2>
 
+🎮 XO V2
 
-    <p>
+</h2>
 
-        نسخه حرفه‌ای بازی XO
-        با سیستم امتیاز،
-        چند دست،
-        ظاهر نئونی
-        و امکانات بیشتر.
+<p>
 
-    </p>
+نسخه حرفه‌ای بازی XO
+با سیستم امتیاز،
+چند دست،
+ظاهر نئونی
+و امکانات بیشتر.
 
+</p>
 
-    <a
-        class="play-btn"
-        href="XO.v2.html"
-    >
-        Play
-    </a>
+<a
+class="play-btn"
+href="XO.v2.html"
+
+>
+
+Play
+
+</a>
 
 </div>
-
-
 
 <!-- SNAKE -->
 
 <div class="card">
 
-    <h2>
-        🐍 Snake V1
-    </h2>
+<h2>
 
+🐍 Snake V1
 
-    <p>
+</h2>
 
-        بازی کلاسیک Snake
-        با سیستم امتیاز،
-        رکورد،
-        افزایش سرعت
-        و کنترل با کیبورد و موبایل.
+<p>
 
-    </p>
+بازی کلاسیک Snake
+با سیستم امتیاز،
+رکورد،
+افزایش سرعت
+و کنترل با کیبورد و موبایل.
 
+</p>
 
-    <a
-        class="play-btn"
-        href="Snake.html"
-    >
-        Play
-    </a>
+<a
+class="play-btn"
+href="Snake.html"
+
+>
+
+Play
+
+</a>
 
 </div>
-
-
 
 <!-- MEMORY -->
 
 <div class="card">
 
-    <h2>
-        🧠 Memory Game
-    </h2>
+<h2>
 
+🧠 Memory Game
 
-    <p>
+</h2>
 
-      بازی تقویت حافظه
-      با تایمر و شمارش حرکات
-      و ظاهر نئونی
-    </p>
+<p>
 
+بازی تقویت حافظه
+با تایمر و شمارش حرکات
+و ظاهر نئونی
 
-    <a
-        class="play-btn"
-        href="MemoryGame.Html"
-    >
-        Play
-    </a>
+</p>
+
+<a
+class="play-btn"
+href="MemoryGame.Html"
+
+>
+
+PLay
+
+</a>
 
 </div>
-
-
 
 <!-- ROCK PAPER SCISSORS -->
 
 <div class="card">
 
-    <h2>
-        ✊ Rock Paper Scissors
-    </h2>
+<h2>
 
+✊ Rock Paper Scissors
 
-    <p>
+</h2>
 
-        بازی سنگ، کاغذ، قیچی
-        در نسخه‌های بعدی اضافه خواهد شد.
+<p>
 
-    </p>
+بازی سنگ، کاغذ، قیچی
+در نسخه‌های بعدی اضافه خواهد شد.
 
+</p>
 
-    <a
-        class="play-btn"
-        href="#"
-    >
-        Coming Soon
-    </a>
+<a
+class="play-btn"
+href="#"
+
+>
+
+Coming Soon
+
+</a>
 
 </div>
 
@@ -1042,55 +1208,67 @@ footer{
 
 <div class="stat">
 
-    <h1>
-        4
-    </h1>
+<h1>
 
-    <p>
-        Games
-    </p>
+4
+
+</h1>
+
+<p>
+
+Games
+
+</p>
 
 </div>
-
 
 <div class="stat">
 
-    <h1>
-        2
-    </h1>
+<h1>
 
-    <p>
-        Playable
-    </p>
+2
+
+</h1>
+
+<p>
+
+Playable
+
+</p>
 
 </div>
-
 
 <div class="stat">
 
-    <h1>
-        v.2
-    </h1>
+<h1>
 
-    <p>
-        Current Version
-    </p>
+V2
+
+</h1>
+
+<p>
+
+Current Version
+
+</p>
 
 </div>
-
 
 <div class="stat">
 
-    <h1>
-        100%
-    </h1>
+<h1>
 
-    <p>
-        Made With HTML & CSS
-    </p>
+100%
+
+</h1>
+
+<p>
+
+Made With HTML & CSS
+
+</p>
 
 </div>
-
 
 </section>
 
@@ -1101,11 +1279,15 @@ footer{
 <footer>
 
 <p>
-    © 2026 MC Game Hub
+
+© 2026 MC Game Hub
+
 </p>
 
 <p>
-    Designed By Kiyan ❤️
+
+Designed By Kiyan ❤️
+
 </p>
 
 </footer>
@@ -1118,7 +1300,7 @@ footer{
 ========================= */
 
 const cards =
-    document.querySelectorAll(".card");
+document.querySelectorAll(".card");
 
 
 cards.forEach(function(card){
@@ -1128,23 +1310,24 @@ cards.forEach(function(card){
         function(e){
 
             const rect =
-                card.getBoundingClientRect();
+            card.getBoundingClientRect();
 
 
             const x =
-                e.clientX - rect.left;
+            e.clientX - rect.left;
 
 
             const y =
-                e.clientY - rect.top;
+            e.clientY - rect.top;
 
 
             card.style.background =
-                `radial-gradient(
-                    circle at ${x}px ${y}px,
-                    rgba(64,224,208,.18),
-                    #111 65%
-                )`;
+
+            `radial-gradient(
+                circle at ${x}px ${y}px,
+                rgba(64,224,208,.18),
+                #111 65%
+            )`;
 
         }
     );
@@ -1155,7 +1338,7 @@ cards.forEach(function(card){
         function(){
 
             card.style.background =
-                "#111";
+            "rgba(15,15,15,.92)";
 
         }
     );
@@ -1168,32 +1351,31 @@ cards.forEach(function(card){
 ========================= */
 
 const backupButton =
-    document.getElementById("backupButton");
+document.getElementById("backupButton");
 
 
 const backupPanel =
-    document.getElementById("backupPanel");
+document.getElementById("backupPanel");
 
 
 const closeBackup =
-    document.getElementById("closeBackup");
+document.getElementById("closeBackup");
 
 
 const sendReport =
-    document.getElementById("sendReport");
+document.getElementById("sendReport");
 
 
 const reportName =
-    document.getElementById("reportName");
+document.getElementById("reportName");
 
 
 const reportProblem =
-    document.getElementById("reportProblem");
+document.getElementById("reportProblem");
 
 
 const reportStatus =
-    document.getElementById("reportStatus");
-
+document.getElementById("reportStatus");
 
 
 /* =========================
@@ -1201,17 +1383,16 @@ const reportStatus =
 ========================= */
 
 backupButton.addEventListener(
-    "click",
-    function(event){
+"click",
+function(event){
 
-        event.preventDefault();
+    event.preventDefault();
 
-        backupPanel.style.display =
-            "block";
+    backupPanel.style.display =
+    "block";
 
-    }
+}
 );
-
 
 
 /* =========================
@@ -1219,18 +1400,17 @@ backupButton.addEventListener(
 ========================= */
 
 closeBackup.addEventListener(
-    "click",
-    function(){
+"click",
+function(){
 
-        backupPanel.style.display =
-            "none";
+    backupPanel.style.display =
+    "none";
 
-        reportStatus.textContent =
-            "";
+    reportStatus.textContent =
+    "";
 
-    }
+}
 );
-
 
 
 /* =========================
@@ -1238,84 +1418,81 @@ closeBackup.addEventListener(
 ========================= */
 
 sendReport.addEventListener(
-    "click",
-    function(){
+"click",
+function(){
 
-        const name =
-            reportName.value.trim();
-
-
-        const problem =
-            reportProblem.value.trim();
+    const name =
+    reportName.value.trim();
 
 
-
-        if(
-            name === "" ||
-            problem === ""
-        ){
-
-            reportStatus.textContent =
-                "⚠️ Please enter your name and problem.";
-
-            return;
-
-        }
+    const problem =
+    reportProblem.value.trim();
 
 
-
-        /* گرفتن گزارش‌های قبلی */
-
-        let reports =
-            JSON.parse(
-                localStorage.getItem(
-                    "mcGameHubReports"
-                )
-            ) || [];
-
-
-
-        /* ساخت گزارش جدید */
-
-        const newReport = {
-
-            name:name,
-
-            problem:problem,
-
-            date:
-                new Date().toLocaleString()
-
-        };
-
-
-
-        reports.push(newReport);
-
-
-
-        /* ذخیره گزارش */
-
-        localStorage.setItem(
-            "mcGameHubReports",
-            JSON.stringify(reports)
-        );
-
-
+    if(
+        name === "" ||
+        problem === ""
+    ){
 
         reportStatus.textContent =
-            "✅ Report received!";
+        "⚠️ Please enter your name and problem.";
 
-
-
-        reportName.value =
-            "";
-
-        reportProblem.value =
-            "";
+        return;
 
     }
+
+
+    let reports =
+    JSON.parse(
+        localStorage.getItem(
+            "mcGameHubReports"
+        )
+    ) || [];
+
+
+    const newReport = {
+
+        name:name,
+
+        problem:problem,
+
+        date:
+        new Date().toLocaleString()
+
+    };
+
+
+    reports.push(newReport);
+
+
+    localStorage.setItem(
+
+        "mcGameHubReports",
+
+        JSON.stringify(reports)
+
+    );
+
+
+    reportStatus.textContent =
+    "✅ Report received!";
+
+
+    reportName.value =
+    "";
+
+
+    reportProblem.value =
+    "";
+
+}
 );
+
+window.addEventListener("load", function () {
+    setTimeout(function () {
+        document.getElementById("loading-screen").classList.add("hide");
+    }, 1500);
+});
 
 </script>
 
