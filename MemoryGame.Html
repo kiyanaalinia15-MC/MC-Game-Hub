@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Memory Game | MC Game Hub</title>
+
+    <style>
+
+        /* =========================
+           RESET
+        ========================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        /* =========================
+           BODY
+        ========================= */
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top, #063b3d 0%, #020808 35%, #000 75%);
+            color: white;
+            font-family: Tahoma, Arial, sans-serif;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 30px;
+        }
+
+
+        /* =========================
+           MAIN CONTAINER
+        ========================= */
+
+        .game-container {
+            width: 100%;
+            max-width: 900px;
+
+            background: rgba(0, 15, 15, 0.88);
+
+            border: 2px solid #00ffff;
+            border-radius: 25px;
+
+            padding: 30px;
+
+            box-shadow:
+                0 0 15px #00ffff,
+                0 0 40px rgba(0, 255, 255, 0.25);
+
+            text-align: center;
+        }
+
+
+        /* =========================
+           TITLE
+        ========================= */
+
+        .title {
+            font-size: 42px;
+            color: #00ffff;
+
+            margin-bottom: 8px;
+
+            text-shadow:
+                0 0 10px #00ffff,
+                0 0 25px #00ffff;
+        }
+
+
+        .subtitle {
+            color: #9fffff;
+            font-size: 15px;
+            margin-bottom: 25px;
+        }
+
+
+        /* =========================
+           INFO BAR
+        ========================= */
+
+        .info-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 15px;
+
+            margin-bottom: 25px;
+        }
+
+
+        .info-box {
+            background: rgba(0, 255, 255, 0.06);
+
+            border: 1px solid #00ffff;
+            border-radius: 15px;
+
+            padding: 12px;
+
+            box-shadow:
+                0 0 10px rgba(0, 255, 255, 0.15);
+        }
+
+
+        .info-label {
+            display: block;
+
+            color: #8fffff;
+            font-size: 13px;
+
+            margin-bottom: 5px;
+        }
+
+
+        .info-value {
+            color: #00ffff;
+
+            font-size: 22px;
+            font-weight: bold;
+
+            text-shadow: 0 0 8px #00ffff;
+        }
+
+
+        /* =========================
+           GAME BOARD
+        ========================= */
+
+        .game-board {
+            width: 100%;
+            max-width: 600px;
+
+            margin: auto;
+
+            display: grid;
+
+            grid-template-columns: repeat(4, 1fr);
+
+            gap: 15px;
+        }
+
+
+        /* =========================
+           CARD
+        ========================= */
+
+        .card {
+            aspect-ratio: 1 / 1;
+
+            perspective: 1000px;
+
+            cursor: pointer;
+        }
+
+
+        .card-inner {
+            width: 100%;
+            height: 100%;
+
+            position: relative;
+
+            transform-style: preserve-3d;
+
+            transition: transform 0.55s ease;
+        }
+
+
+        .card.flipped .card-inner,
+        .card.matched .card-inner {
+            transform: rotateY(180deg);
+        }
+
+
+        /* =========================
+           CARD SIDES
+        ========================= */
+
+        .card-front,
+        .card-back {
+            position: absolute;
+
+            width: 100%;
+            height: 100%;
+
+            backface-visibility: hidden;
+
+            border-radius: 15px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+        /* =========================
+           CARD FRONT
+        ========================= */
+
+        .card-front {
+            background:
+                linear-gradient(
+                    135deg,
+                    #021919,
+                    #063333
+                );
+
+            border: 2px solid #00ffff;
+
+            color: #00ffff;
+
+            font-size: 34px;
+
+            box-shadow:
+                0 0 10px rgba(0, 255, 255, 0.25);
+        }
+
+
+        .card-front::after {
+            content: "?";
+
+            font-size: 38px;
+
+            text-shadow:
+                0 0 8px #00ffff,
+                0 0 20px #00ffff;
+        }
+
+
+        /* =========================
+           CARD BACK
+        ========================= */
+
+        .card-back {
+            background:
+                radial-gradient(
+                    circle,
+                    #063d3d,
+                    #021313
+                );
+
+            border: 2px solid #00ffff;
+
+            transform: rotateY(180deg);
+
+            font-size: 42px;
+
+            box-shadow:
+                0 0 15px rgba(0, 255, 255, 0.4),
+                inset 0 0 15px rgba(0, 255, 255, 0.1);
+        }
+
+
+        /* =========================
+           HOVER
+        ========================= */
+
+        .card:not(.flipped):not(.matched):hover {
+            transform: translateY(-4px);
+        }
+
+
+        .card:not(.flipped):not(.matched):hover .card-front {
+            box-shadow:
+                0 0 15px #00ffff,
+                0 0 30px rgba(0, 255, 255, 0.35);
+        }
+
+
+        /* =========================
+           MATCHED
+        ========================= */
+
+        .card.matched .card-back {
+            border-color: #00ff99;
+
+            box-shadow:
+                0 0 15px #00ff99,
+                0 0 35px rgba(0, 255, 153, 0.35);
+        }
+
+
+        /* =========================
+           BUTTONS
+        ========================= */
+
+        .buttons {
+            margin-top: 30px;
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 15px;
+
+            flex-wrap: wrap;
+        }
+
+
+        button {
+            border: none;
+
+            padding: 13px 25px;
+
+            border-radius: 12px;
+
+            font-size: 15px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.25s;
+        }
+
+
+        .restart-btn {
+            background: #00ffff;
+
+            color: #001010;
+
+            box-shadow:
+                0 0 10px #00ffff;
+        }
+
+
+        .restart-btn:hover {
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 0 15px #00ffff,
+                0 0 30px #00ffff;
+        }
+
+
+        .hub-btn {
+            background: transparent;
+
+            color: #00ffff;
+
+            border: 1px solid #00ffff;
+        }
+
+
+        .hub-btn:hover {
+            background: #00ffff;
+
+            color: #001010;
+
+            box-shadow:
+                0 0 15px #00ffff;
+        }
+
+
+        /* =========================
+           WIN MESSAGE
+        ========================= */
+
+        .win-message {
+            display: none;
+
+            margin-top: 25px;
+
+            padding: 20px;
+
+            border: 2px solid #00ff99;
+
+            border-radius: 15px;
+
+            background: rgba(0, 255, 153, 0.08);
+
+            box-shadow:
+                0 0 20px rgba(0, 255, 153, 0.3);
+        }
+
+
+        .win-message.show {
+            display: block;
+
+            animation: winAnimation 0.6s ease;
+        }
+
+
+        .win-title {
+            color: #00ff99;
+
+            font-size: 28px;
+
+            margin-bottom: 8px;
+
+            text-shadow:
+                0 0 10px #00ff99;
+        }
+
+
+        .win-text {
+            color: #cffff0;
+
+            font-size: 15px;
+        }
+
+
+        @keyframes winAnimation {
+
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            margin-top: 25px;
+
+            color: #5faaaa;
+
+            font-size: 12px;
+        }
+
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 650px) {
+
+            body {
+                padding: 15px;
+            }
+
+
+            .game-container {
+                padding: 20px;
+
+                border-radius: 18px;
+            }
+
+
+            .title {
+                font-size: 30px;
+            }
+
+
+            .subtitle {
+                font-size: 13px;
+            }
+
+
+            .game-board {
+                gap: 9px;
+            }
+
+
+            .card-front::after {
+                font-size: 25px;
+            }
+
+
+            .card-back {
+                font-size: 30px;
+            }
+
+
+            .info-bar {
+                gap: 8px;
+            }
+
+
+            .info-box {
+                padding: 9px;
+            }
+
+
+            .info-label {
+                font-size: 11px;
+            }
+
+
+            .info-value {
+                font-size: 17px;
+            }
+
+        }
+
+
+        @media (max-width: 400px) {
+
+            .game-container {
+                padding: 15px;
+            }
+
+
+            .game-board {
+                gap: 7px;
+            }
+
+
+            .card-back {
+                font-size: 25px;
+            }
+
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+    <main class="game-container">
+
+
+        <!-- TITLE -->
+
+        <h1 class="title">
+            MEMORY GAME
+        </h1>
+
+
+        <p class="subtitle">
+            Find all matching pairs!
+        </p>
+
+
+        <!-- INFO -->
+
+        <section class="info-bar">
+
+            <div class="info-box">
+
+                <span class="info-label">
+                    PAIRS
+                </span>
+
+                <span
+                    class="info-value"
+                    id="pairs">
+                    0 / 8
+                </span>
+
+            </div>
+
+
+            <div class="info-box">
+
+                <span class="info-label">
+                    MOVES
+                </span>
+
+                <span
+                    class="info-value"
+                    id="moves">
+                    0
+                </span>
+
+            </div>
+
+
+            <div class="info-box">
+
+                <span class="info-label">
+                    TIME
+                </span>
+
+                <span
+                    class="info-value"
+                    id="timer">
+                    00:00
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- GAME -->
+
+        <section
+            class="game-board"
+            id="gameBoard">
+        </section>
+
+
+        <!-- WIN MESSAGE -->
+
+        <section
+            class="win-message"
+            id="winMessage">
+
+            <h2 class="win-title">
+                🎉 YOU WIN!
+            </h2>
+
+            <p
+                class="win-text"
+                id="winText">
+            </p>
+
+        </section>
+
+
+        <!-- BUTTONS -->
+
+        <div class="buttons">
+
+            <button
+                class="restart-btn"
+                id="restartBtn">
+
+                🔄 Restart Game
+
+            </button>
+
+
+            <button
+                class="hub-btn"
+                onclick="goToHub()">
+
+                🏠 MC Game Hub
+
+            </button>
+
+        </div>
+
+
+        <footer class="footer">
+
+            MC Game Hub • Memory Game V1
+
+        </footer>
+
+    </main>
+
+
+
+    <script>
+
+        /* =========================
+           GAME DATA
+        ========================= */
+
+        const symbols = [
+            "🎮",
+            "🧩",
+            "🚀",
+            "⚡",
+            "👾",
+            "🔥",
+            "💎",
+            "🏆"
+        ];
+
+
+        let cards = [];
+
+        let firstCard = null;
+
+        let secondCard = null;
+
+        let lockBoard = false;
+
+        let moves = 0;
+
+        let matchedPairs = 0;
+
+        let seconds = 0;
+
+        let timerInterval = null;
+
+        let gameStarted = false;
+
+
+
+        /* =========================
+           ELEMENTS
+        ========================= */
+
+        const gameBoard =
+            document.getElementById("gameBoard");
+
+        const movesElement =
+            document.getElementById("moves");
+
+        const pairsElement =
+            document.getElementById("pairs");
+
+        const timerElement =
+            document.getElementById("timer");
+
+        const restartBtn =
+            document.getElementById("restartBtn");
+
+        const winMessage =
+            document.getElementById("winMessage");
+
+        const winText =
+            document.getElementById("winText");
+
+
+
+        /* =========================
+           START GAME
+        ========================= */
+
+        function startGame() {
+
+            stopTimer();
+
+            cards = [];
+
+            firstCard = null;
+
+            secondCard = null;
+
+            lockBoard = false;
+
+            moves = 0;
+
+            matchedPairs = 0;
+
+            seconds = 0;
+
+            gameStarted = false;
+
+
+            movesElement.textContent = "0";
+
+            pairsElement.textContent = "0 / 8";
+
+            timerElement.textContent = "00:00";
+
+
+            winMessage.classList.remove("show");
+
+
+            /*
+                Create pairs
+
+                Example:
+
+                🎮 🎮
+                🧩 🧩
+                🚀 🚀
+            */
+
+            cards = [...symbols, ...symbols];
+
+
+            shuffleCards(cards);
+
+
+            createBoard();
+
+        }
+
+
+
+        /* =========================
+           SHUFFLE
+        ========================= */
+
+        function shuffleCards(array) {
+
+            for (
+                let i = array.length - 1;
+                i > 0;
+                i--
+            ) {
+
+                const randomIndex =
+                    Math.floor(
+                        Math.random() * (i + 1)
+                    );
+
+
+                [
+                    array[i],
+                    array[randomIndex]
+                ] = [
+                    array[randomIndex],
+                    array[i]
+                ];
+
+            }
+
+        }
+
+
+
+        /* =========================
+           CREATE BOARD
+        ========================= */
+
+        function createBoard() {
+
+            gameBoard.innerHTML = "";
+
+
+            cards.forEach((symbol, index) => {
+
+                const card =
+                    document.createElement("div");
+
+
+                card.classList.add("card");
+
+
+                card.dataset.symbol = symbol;
+
+
+                card.innerHTML = `
+
+                    <div class="card-inner">
+
+                        <div class="card-front"></div>
+
+                        <div class="card-back">
+                            ${symbol}
+                        </div>
+
+                    </div>
+
+                `;
+
+
+                card.addEventListener(
+                    "click",
+                    flipCard
+                );
+
+
+                gameBoard.appendChild(card);
+
+            });
+
+        }
+
+
+
+        /* =========================
+           FLIP CARD
+        ========================= */
+
+        function flipCard() {
+
+            /*
+                Don't allow:
+
+                - Clicking while board is locked
+                - Clicking the same card twice
+                - Clicking an already matched card
+            */
+
+            if (
+                lockBoard ||
+                this === firstCard ||
+                this.classList.contains("matched")
+            ) {
+                return;
+            }
+
+
+            /*
+                Start timer
+                after first click
+            */
+
+            if (!gameStarted) {
+
+                gameStarted = true;
+
+                startTimer();
+
+            }
+
+
+            this.classList.add("flipped");
+
+
+            if (!firstCard) {
+
+                firstCard = this;
+
+                return;
+
+            }
+
+
+            secondCard = this;
+
+
+            moves++;
+
+            movesElement.textContent = moves;
+
+
+            checkMatch();
+
+        }
+
+
+
+        /* =========================
+           CHECK MATCH
+        ========================= */
+
+        function checkMatch() {
+
+            const isMatch =
+                firstCard.dataset.symbol ===
+                secondCard.dataset.symbol;
+
+
+            if (isMatch) {
+
+                disableCards();
+
+            } else {
+
+                unflipCards();
+
+            }
+
+        }
+
+
+
+        /* =========================
+           MATCH
+        ========================= */
+
+        function disableCards() {
+
+            firstCard.classList.add("matched");
+
+            secondCard.classList.add("matched");
+
+
+            matchedPairs++;
+
+
+            pairsElement.textContent =
+                `${matchedPairs} / 8`;
+
+
+            resetTurn();
+
+
+            if (matchedPairs === 8) {
+
+                finishGame();
+
+            }
+
+        }
+
+
+
+        /* =========================
+           NOT MATCH
+        ========================= */
+
+        function unflipCards() {
+
+            lockBoard = true;
+
+
+            setTimeout(() => {
+
+                firstCard.classList.remove("flipped");
+
+                secondCard.classList.remove("flipped");
+
+
+                resetTurn();
+
+            }, 900);
+
+        }
+
+
+
+        /* =========================
+           RESET TURN
+        ========================= */
+
+        function resetTurn() {
+
+            firstCard = null;
+
+            secondCard = null;
+
+            lockBoard = false;
+
+        }
+
+
+
+        /* =========================
+           TIMER
+        ========================= */
+
+        function startTimer() {
+
+            stopTimer();
+
+
+            timerInterval =
+                setInterval(() => {
+
+                    seconds++;
+
+                    updateTimer();
+
+                }, 1000);
+
+        }
+
+
+
+        function stopTimer() {
+
+            if (timerInterval) {
+
+                clearInterval(timerInterval);
+
+                timerInterval = null;
+
+            }
+
+        }
+
+
+
+        function updateTimer() {
+
+            const minutes =
+                Math.floor(seconds / 60);
+
+
+            const remainingSeconds =
+                seconds % 60;
+
+
+            const formattedMinutes =
+                String(minutes).padStart(2, "0");
+
+
+            const formattedSeconds =
+                String(remainingSeconds).padStart(2, "0");
+
+
+            timerElement.textContent =
+                `${formattedMinutes}:${formattedSeconds}`;
+
+        }
+
+
+
+        /* =========================
+           FINISH GAME
+        ========================= */
+
+        function finishGame() {
+
+            stopTimer();
+
+
+            setTimeout(() => {
+
+                winText.textContent =
+                    `You found all 8 pairs in ${moves} moves and ${timerElement.textContent}!`;
+
+
+                winMessage.classList.add("show");
+
+
+                winMessage.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+
+
+            }, 500);
+
+        }
+
+
+
+        /* =========================
+           RESTART
+        ========================= */
+
+        restartBtn.addEventListener(
+            "click",
+            startGame
+        );
+
+
+
+        /* =========================
+           GO TO HUB
+        ========================= */
+
+        function goToHub() {
+
+            /*
+                اگر فایل Memory.html
+                داخل پوشه اصلی MC Game Hub باشد:
+
+                index.html
+
+                درست است.
+            */
+
+            window.location.href =
+                "index.html";
+
+        }
+
+
+
+        /* =========================
+           START
+        ========================= */
+
+        startGame();
+
+    </script>
+
+</body>
+</html>
