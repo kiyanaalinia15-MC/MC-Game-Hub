@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MC Game Hub - Leaderboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #050b10;
+            color: white;
+            font-family: Tahoma, Arial, sans-serif;
+            padding: 30px 15px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .header h1 {
+            color: #00f5d4;
+            font-size: 42px;
+            text-shadow:
+                0 0 10px #00f5d4,
+                0 0 25px #00f5d4;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #9fb5bd;
+            font-size: 15px;
+        }
+
+        /* =========================
+           SEASON BOX
+        ========================= */
+
+        .season-box {
+            background: #0b171e;
+            border: 1px solid #00f5d4;
+            border-radius: 18px;
+            padding: 22px;
+            margin-bottom: 25px;
+
+            box-shadow:
+                0 0 15px rgba(0, 245, 212, 0.15);
+        }
+
+        .season-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .season-title {
+            color: #00f5d4;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .season-time {
+            color: #ffffff;
+            background: #071117;
+            border: 1px solid #17434c;
+            padding: 9px 15px;
+            border-radius: 10px;
+        }
+
+        /* =========================
+           LEADERBOARD
+        ========================= */
+
+        .leaderboard {
+            background: #0b171e;
+            border: 1px solid #17434c;
+            border-radius: 20px;
+            overflow: hidden;
+
+            box-shadow:
+                0 0 20px rgba(0, 245, 212, 0.08);
+        }
+
+        .table-header,
+        .player-row {
+            display: grid;
+            grid-template-columns:
+                80px
+                minmax(180px, 1fr)
+                140px
+                140px
+                160px
+                140px;
+            align-items: center;
+        }
+
+        .table-header {
+            background: #071117;
+            min-height: 60px;
+            color: #7f9da5;
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .table-header div,
+        .player-row div {
+            padding: 15px;
+        }
+
+        .player-row {
+            min-height: 75px;
+            border-top: 1px solid #12313a;
+            transition: 0.2s;
+        }
+
+        .player-row:hover {
+            background: rgba(0, 245, 212, 0.05);
+        }
+
+        /* =========================
+           RANK
+        ========================= */
+
+        .rank {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .rank-1 {
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+        }
+
+        .rank-2 {
+            color: #c0c0c0;
+            text-shadow: 0 0 8px #c0c0c0;
+        }
+
+        .rank-3 {
+            color: #cd7f32;
+            text-shadow: 0 0 8px #cd7f32;
+        }
+
+        /* =========================
+           PLAYER
+        ========================= */
+
+        .player-name {
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .player-name.current {
+            color: #00f5d4;
+            text-shadow: 0 0 8px #00f5d4;
+        }
+
+        .number {
+            color: #d9e5e8;
+        }
+
+        .points {
+            color: #00f5d4;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .coins {
+            color: #ffd84d;
+            font-weight: bold;
+        }
+
+        /* =========================
+           EMPTY
+        ========================= */
+
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #78919a;
+        }
+
+        .empty-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .empty h2 {
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        /* =========================
+           BACK BUTTON
+        ========================= */
+
+        .bottom {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .back-btn {
+            border: 1px solid #00f5d4;
+            background: transparent;
+            color: #00f5d4;
+            padding: 13px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: 0.25s;
+        }
+
+        .back-btn:hover {
+            background: #00f5d4;
+            color: #031014;
+
+            box-shadow:
+                0 0 15px #00f5d4,
+                0 0 30px rgba(0, 245, 212, 0.5);
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 800px) {
+
+            body {
+                padding: 20px 10px;
+            }
+
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .leaderboard {
+                overflow-x: auto;
+            }
+
+            .table-header,
+            .player-row {
+                min-width: 850px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="header">
+        <h1>🏆 LEADERBOARD</h1>
+        <p>Compete. Win. Climb to the top.</p>
+    </div>
+
+
+    <!-- SEASON -->
+
+    <div class="season-box">
+
+        <div class="season-top">
+
+            <div class="season-title">
+                ⚡ Season 1
+            </div>
+
+            <div class="season-time" id="seasonTime">
+                10 Days Season
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- LEADERBOARD -->
+
+    <div class="leaderboard">
+
+        <!-- HEADER -->
+
+        <div class="table-header">
+
+            <div>Rank</div>
+
+            <div>Player</div>
+
+            <div>Memory Wins</div>
+
+            <div>RPS Wins</div>
+
+            <div>Snake Best</div>
+
+            <div>Total Points</div>
+
+        </div>
+
+
+        <!-- PLAYERS -->
+
+        <div id="leaderboardList"></div>
+
+    </div>
+
+
+    <!-- BACK -->
+
+    <div class="bottom">
+
+        <button class="back-btn" onclick="goBack()">
+            ← Back to MC Game Hub
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /* =========================================
+       LOCAL STORAGE
+    ========================================= */
+
+    const STORAGE_KEY = "mc_game_hub_users";
+
+
+    /* =========================================
+       GET USERS
+    ========================================= */
+
+    function getUsers() {
+
+        const data = localStorage.getItem(STORAGE_KEY);
+
+        if (!data) {
+            return [];
+        }
+
+        try {
+            return JSON.parse(data);
+        }
+
+        catch (error) {
+
+            console.error(
+                "Could not read leaderboard data:",
+                error
+            );
+
+            return [];
+        }
+    }
+
+
+    /* =========================================
+       SAVE USERS
+    ========================================= */
+
+    function saveUsers(users) {
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(users)
+        );
+    }
+
+
+    /* =========================================
+       CREATE DEMO DATA
+       فقط برای تست اولیه
+    ========================================= */
+
+    function createDemoUsers() {
+
+        const users = getUsers();
+
+        if (users.length > 0) {
+            return;
+        }
+
+
+        const demoUsers = [
+
+            {
+                username: "Shadow",
+                memoryWins: 18,
+                rpsWins: 14,
+                snakeBest: 920,
+                totalPoints: 2740,
+                coins: 500
+            },
+
+            {
+                username: "Kiyan",
+                memoryWins: 15,
+                rpsWins: 12,
+                snakeBest: 780,
+                totalPoints: 2340,
+                coins: 350
+            },
+
+            {
+                username: "DarkWolf",
+                memoryWins: 12,
+                rpsWins: 10,
+                snakeBest: 650,
+                totalPoints: 1900,
+                coins: 250
+            },
+
+            {
+                username: "Phoenix",
+                memoryWins: 9,
+                rpsWins: 8,
+                snakeBest: 520,
+                totalPoints: 1530,
+                coins: 180
+            },
+
+            {
+                username: "Player5",
+                memoryWins: 5,
+                rpsWins: 4,
+                snakeBest: 300,
+                totalPoints: 940,
+                coins: 100
+            }
+
+        ];
+
+
+        saveUsers(demoUsers);
+    }
+
+
+    /* =========================================
+       SORT LEADERBOARD
+    ========================================= */
+
+    function sortUsers(users) {
+
+        return users.sort(
+            (a, b) => b.totalPoints - a.totalPoints
+        );
+
+    }
+
+
+    /* =========================================
+       DISPLAY LEADERBOARD
+    ========================================= */
+
+    function displayLeaderboard() {
+
+        const list =
+            document.getElementById(
+                "leaderboardList"
+            );
+
+
+        let users = getUsers();
+
+        users = sortUsers(users);
+
+
+        /* No players */
+
+        if (users.length === 0) {
+
+            list.innerHTML = `
+
+                <div class="empty">
+
+                    <div class="empty-icon">
+                        🏆
+                    </div>
+
+                    <h2>No Players Yet</h2>
+
+                    <p>
+                        Create an account and start playing!
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+        }
+
+
+        /* Current player */
+
+        const currentUser =
+            localStorage.getItem(
+                "mc_current_user"
+            );
+
+
+        list.innerHTML = "";
+
+
+        users.forEach(
+            (user, index) => {
+
+                const rank =
+                    index + 1;
+
+
+                let rankDisplay =
+                    rank;
+
+
+                if (rank === 1) {
+                    rankDisplay = "🥇";
+                }
+
+                else if (rank === 2) {
+                    rankDisplay = "🥈";
+                }
+
+                else if (rank === 3) {
+                    rankDisplay = "🥉";
+                }
+
+
+                const isCurrent =
+                    currentUser &&
+                    currentUser === user.username;
+
+
+                const row =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                row.className =
+                    "player-row";
+
+
+                row.innerHTML = `
+
+                    <div class="rank rank-${rank}">
+                        ${rankDisplay}
+                    </div>
+
+
+                    <div class="
+                        player-name
+                        ${isCurrent ? "current" : ""}
+                    ">
+                        ${escapeHTML(user.username)}
+                        ${isCurrent ? " ⭐" : ""}
+                    </div>
+
+
+                    <div class="number">
+                        ${user.memoryWins || 0}
+                    </div>
+
+
+                    <div class="number">
+                        ${user.rpsWins || 0}
+                    </div>
+
+
+                    <div class="number">
+                        ${user.snakeBest || 0}
+                    </div>
+
+
+                    <div class="points">
+                        ${user.totalPoints || 0}
+                    </div>
+
+                `;
+
+
+                list.appendChild(row);
+
+            }
+        );
+
+    }
+
+
+    /* =========================================
+       SECURITY
+       جلوگیری از HTML داخل Username
+    ========================================= */
+
+    function escapeHTML(text) {
+
+        return String(text)
+
+            .replaceAll("&", "&amp;")
+
+            .replaceAll("<", "&lt;")
+
+            .replaceAll(">", "&gt;")
+
+            .replaceAll('"', "&quot;")
+
+            .replaceAll("'", "&#039;");
+
+    }
+
+
+    /* =========================================
+       BACK TO HUB
+    ========================================= */
+
+    function goBack() {
+
+        window.location.href =
+            "index.html";
+
+    }
+
+
+    /* =========================================
+       START
+    ========================================= */
+
+    createDemoUsers();
+
+    displayLeaderboard();
+
+</script>
+
+</body>
+</html>
