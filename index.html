@@ -1,1734 +1,2249 @@
 <!DOCTYPE html>
-
-<html lang="fa" dir="rtl">
-
+<html lang="en" dir="ltr">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>MC Game Hub </title>
+<meta name="theme-color" content="#05090d">
+<meta name="description" content="MC Game Hub — play, compete, and level up.">
+<title>MC Game Hub | V3</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
-
-/* =========================
-   RESET
-========================= */
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    scroll-behavior:smooth;
+:root {
+  --bg: #05090d;
+  --panel: #0a141b;
+  --panel2: #0d1b23;
+  --cyan: #40e0d0;
+  --cyan-bright: #00fff0;
+  --muted: #91a9b1;
+  --border: rgba(64,224,208,.25);
+  --gold: #ffd166;
+  --radius: 20px;
 }
 
-
-/* =========================
-   BODY
-========================= */
-
-body{
-    background:#050505;
-    font-family:'Orbitron',Tahoma,sans-serif;
-    color:white;
-    overflow-x:hidden;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
 }
 
-
-/* =========================
-   BACKGROUND
-========================= */
-
-body::before{
-
-    content:"";
-
-    position:fixed;
-
-    top:0;
-    left:0;
-
-    width:100%;
-    height:100%;
-
-    background:
-
-    radial-gradient(
-        circle at top,
-        rgba(0,255,255,.08),
-        transparent 40%
-    ),
-
-    radial-gradient(
-        circle at bottom,
-        rgba(0,255,255,.05),
-        transparent 50%
-    );
-
-    z-index:-2;
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: #f4ffff;
+  font-family: Arial, sans-serif;
+  overflow-x: hidden;
 }
 
-
-body::after{
-
-    content:"";
-
-    position:fixed;
-
-    top:0;
-    left:0;
-
-    width:100%;
-    height:100%;
-
-    background-image:
-
-    linear-gradient(
-        rgba(0,255,255,.03) 1px,
-        transparent 1px
-    ),
-
-    linear-gradient(
-        90deg,
-        rgba(0,255,255,.03) 1px,
-        transparent 1px
-    );
-
-    background-size:45px 45px;
-
-    animation:gridMove 15s linear infinite;
-
-    z-index:-1;
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% -10%, #00fff020, transparent 50%),
+    radial-gradient(ellipse at 0% 50%, #00fff009, transparent 40%),
+    radial-gradient(ellipse at 100% 80%, #00a8ff0b, transparent 40%);
 }
 
-
-@keyframes gridMove{
-
-    0%{
-        transform:translateY(0);
-    }
-
-    100%{
-        transform:translateY(45px);
-    }
-
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(#40e0d007 1px, transparent 1px),
+    linear-gradient(90deg, #40e0d007 1px, transparent 1px);
+  background-size: 45px 45px;
+  mask-image: linear-gradient(to bottom, black, transparent 85%);
 }
 
+a {
+  color: inherit;
+}
 
-/* =========================
-   HEADER
-========================= */
+button, input, textarea {
+  font: inherit;
+}
 
+button, a {
+  -webkit-tap-highlight-color: transparent;
+}
 
-/* =========================
-   HEADER / TOP NAVIGATION
-========================= */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--cyan-bright);
+  outline-offset: 4px;
+}
+
+button {
+  cursor: pointer;
+}
+
+.container {
+  width: min(1200px, calc(100% - 36px));
+  margin-inline: auto;
+}
+
+/* LOADING SCREEN */
+
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: #030609;
+  transition: opacity .45s, visibility .45s;
+}
+
+#loading-screen.hide {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader {
+  width: 58px;
+  height: 58px;
+  border: 3px solid #163039;
+  border-top-color: var(--cyan-bright);
+  border-radius: 50%;
+  box-shadow: 0 0 25px #00fff01c;
+  animation: spin .8s linear infinite;
+}
+
+#loading-screen p {
+  color: var(--cyan);
+  font: 12px Orbitron, sans-serif;
+  letter-spacing: 4px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* NAVIGATION */
 
 #top.top-nav {
-    width: calc(100% - 32px);
-    max-width: 1500px;
-    min-height: 88px;
-    margin: 8px auto 0;
-    padding: 14px 24px;
-
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 16px;
-
-    position: relative;
-    top: auto;
-    z-index: 10;
-
-    direction: ltr;
-    background: rgba(5, 11, 16, 0.92);
-    backdrop-filter: blur(12px);
-
-    border: 1px solid rgba(64, 224, 208, 0.4);
-    border-radius: 20px;
-
-    box-shadow: 0 0 20px rgba(64, 224, 208, 0.18);
+  position: relative;
+  z-index: 100;
+  width: min(1500px, calc(100% - 32px));
+  min-height: 78px;
+  margin: 14px auto 0;
+  padding: 12px 18px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 18px;
+  direction: ltr;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #071017d9;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 8px 40px #0005, inset 0 1px #ffffff06;
 }
 
-/* LEFT AND RIGHT GROUPS */
-
-#top .nav-side {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 0;
+.nav-side {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
 }
 
-#top .nav-left {
-    justify-content: flex-start;
+.nav-left { justify-content: flex-start; }
+.nav-right { justify-content: flex-end; }
+
+.nav-icon {
+  position: relative;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cyan);
+  background: #0b2027;
+  border: 1px solid #17434c;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: .22s ease;
 }
 
-#top .nav-right {
-    justify-content: flex-end;
+.nav-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-/* ICON BUTTONS */
-
-#top .nav-icon {
-    position: relative;
-    flex: 0 0 46px;
-    width: 46px;
-    height: 46px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    color: turquoise;
-    background: #0b2027;
-    border: 1px solid #17434c;
-    border-radius: 13px;
-
-    text-decoration: none;
-    cursor: pointer;
-
-    transition: 0.25s ease;
+.nav-icon:hover {
+  color: #041012;
+  background: var(--cyan);
+  border-color: var(--cyan);
+  box-shadow: 0 0 20px #40e0d044;
+  transform: translateY(-2px);
 }
 
-#top .nav-icon svg {
-    width: 22px;
-    height: 22px;
-
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+.nav-icon::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  z-index: 200;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: #0a141b;
+  color: var(--cyan);
+  font: 11px Arial, sans-serif;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -4px);
+  transition: .2s;
+  pointer-events: none;
 }
 
-#top .nav-icon:hover,
-#top .nav-icon:focus-visible {
-    color: #050b10;
-    background: turquoise;
-    border-color: turquoise;
-    box-shadow: 0 0 18px rgba(64, 224, 208, 0.45);
-    transform: translateY(-2px);
-    outline: none;
+.nav-icon:hover::after,
+.nav-icon:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
 }
 
-/* TOOLTIP */
-
-#top .nav-icon::after {
-    content: attr(data-tooltip);
-
-    position: absolute;
-    top: calc(100% + 9px);
-    left: 50%;
-    transform: translate(-50%, -4px);
-
-    padding: 7px 10px;
-    border: 1px solid #17434c;
-    border-radius: 8px;
-
-    background: #0b171e;
-    color: turquoise;
-
-    font: 12px Arial, sans-serif;
-    white-space: nowrap;
-    pointer-events: none;
-
-    opacity: 0;
-    visibility: hidden;
-    transition: 0.2s ease;
+.brand-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  white-space: nowrap;
+  text-align: center;
 }
 
-#top .nav-icon:hover::after,
-#top .nav-icon:focus-visible::after {
-    opacity: 1;
-    visibility: visible;
-    transform: translate(-50%, 0);
+.brand-title span {
+  color: var(--cyan);
+  font: 800 clamp(14px, 2vw, 23px) Orbitron, sans-serif;
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 15px #40e0d04d;
 }
 
-/* CENTER BRAND */
-
-#top .brand-title {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    text-align: center;
-    text-decoration: none;
-    white-space: nowrap;
+.brand-title small {
+  color: #718d96;
+  font: 9px Orbitron, sans-serif;
+  letter-spacing: 2px;
 }
 
-#top .brand-title span {
-    color: turquoise;
-    font-family: 'Orbitron', Arial, sans-serif;
-    font-size: clamp(17px, 2vw, 27px);
-    font-weight: 700;
-    letter-spacing: 2px;
-
-    text-shadow:
-        0 0 10px rgba(64, 224, 208, 0.8),
-        0 0 22px rgba(64, 224, 208, 0.35);
+.hidden {
+  display: none !important;
 }
 
-#top .brand-title small {
-    margin-top: 5px;
-    color: #78969e;
-    font: 9px Arial, sans-serif;
-    letter-spacing: 2px;
+.nav-username {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--cyan);
+  background: #0b2027;
+  font-size: 12px;
 }
 
-/* REMOVE OLD LOGO STYLES FROM HEADER */
-#top .logo,
-#top .logo-area {
-    display: none;
+/* HERO */
+
+/* FUTURISTIC HUD HERO */
+
+.hero {
+  --hud-cyan: #00fff0;
+  position: relative;
+  isolation: isolate;
+  width: min(1120px, calc(100% - 36px));
+  min-height: 510px;
+  margin: 35px auto 55px;
+  padding: 65px 35px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at center, #06334480 0%, #061522e8 48%, #030910 100%);
+  border: 1px solid #00fff044;
+  clip-path: polygon(
+    5% 0, 95% 0,
+    100% 12%, 100% 88%,
+    95% 100%, 5% 100%,
+    0 88%, 0 12%
+  );
+  box-shadow: inset 0 0 55px #00eaff0b;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  z-index: -1;
+  border: 1px solid #40e0d044;
+  clip-path: polygon(
+    5% 0, 95% 0,
+    100% 12%, 100% 88%,
+    95% 100%, 5% 100%,
+    0 88%, 0 12%
+  );
+  pointer-events: none;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -30%;
+  left: 0;
+  width: 100%;
+  height: 45%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    #00fff012 45%,
+    #00fff044 50%,
+    #00fff008 55%,
+    transparent
+  );
+  animation: hudScan 6s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes hudScan {
+  from { transform: translateY(0); }
+  to { transform: translateY(360%); }
+}
+
+.hero .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 15px;
+  margin-bottom: 27px;
+  border: 1px solid #40e0d055;
+  background: #06151dcc;
+  color: var(--hud-cyan);
+  font: 10px Orbitron, sans-serif;
+  letter-spacing: 3px;
+  box-shadow: 0 0 18px #00fff00b;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--hud-cyan);
+  box-shadow: 0 0 12px var(--hud-cyan);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  50% { opacity: .35; }
+}
+
+.hero h1 {
+  width: 100%;
+  margin-bottom: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font: 900 clamp(32px, 6.2vw, 72px)/1.15 Orbitron, sans-serif;
+  letter-spacing: clamp(-2px, -.15vw, 0px);
+  text-shadow: 0 0 22px #ffffff16;
+}
+
+.hero h1 .main-title {
+  display: block;
+  color: #fff4f4;
+}
+
+.hero h1 .hub-name {
+  display: block;
+  margin: 5px 0 3px;
+  color: var(--hud-cyan);
+  font: 600 clamp(9px, 1.5vw, 13px)/1.6 Orbitron, sans-serif;
+  letter-spacing: clamp(3px, .8vw, 7px);
+  text-shadow: 0 0 15px #00fff066;
+}
+
+.hero h1 .zone-title {
+  display: block;
+  color: #ffffff;
+  text-shadow: 0 0 25px #00fff01c;
+}
+
+.hero-description {
+  max-width: 650px;
+  margin: 0 auto 25px;
+  color: #9bbbc6;
+  font-size: clamp(13px, 1.8vw, 16px);
+  line-height: 1.9;
+}
+
+.hero-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  flex-wrap: wrap;
+}
+
+.hero-mini-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(15px, 4vw, 35px);
+  flex-wrap: wrap;
+  margin-top: 35px;
+}
+
+.mini-stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #b19191;
+  font-size: 11px;
+}
+
+.mini-stat strong {
+  color: #ffffff;
+  font: 700 14px Orbitron, sans-serif;
+}
+
+.mini-icon {
+  color: var(--hud-cyan);
+  font-size: 18px;
+}
+
+@media (max-width: 600px) {
+  .hero {
+    width: calc(100% - 18px);
+    min-height: 450px;
+    margin: 24px auto 35px;
+    padding: 48px 15px;
+  }
+
+  .hero .eyebrow {
+    max-width: 100%;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    padding: 8px 10px;
+  }
+
+  .hero h1 {
+    letter-spacing: -1px;
+  }
+
+  .hero h1 .hub-name {
+    letter-spacing: 3px;
+  }
+
+  .hero-description {
+    font-size: 13px;
+  }
+
+  .hero-mini-stats {
+    gap: 13px;
+    margin-top: 28px;
+  }
+
+  .mini-stat {
+    gap: 5px;
+    font-size: 9px;
+  }
+
+  .mini-stat strong {
+    font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero::after,
+  .live-dot {
+    animation: none;
+  }
+}
+
+/* SECTION HEADINGS */
+
+.section {
+  padding: 35px 0 65px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
+}
+
+.section-kicker {
+  color: var(--cyan);
+  font: 10px Orbitron, sans-serif;
+  letter-spacing: 3px;
+  margin-bottom: 10px;
+}
+
+.section-heading h2 {
+  font: 800 clamp(23px, 4vw, 34px) Orbitron, sans-serif;
+}
+
+.section-heading p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+  margin-top: 10px;
+}
+
+.section-link {
+  color: var(--cyan);
+  text-decoration: none;
+  font-size: 12px;
+  padding-bottom: 5px;
+}
+
+.section-link:hover {
+  text-decoration: underline;
+}
+
+/* GAME CARDS */
+
+.games {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.card {
+  --mx: 50%;
+  --my: 50%;
+  position: relative;
+  min-width: 0;
+  min-height: 260px;
+  padding: 26px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(320px circle at var(--mx) var(--my), #40e0d015, transparent 65%),
+    linear-gradient(145deg, #0d1b23, #071017 75%);
+  transition: border-color .25s, transform .25s, box-shadow .25s;
+  isolation: isolate;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  background: linear-gradient(120deg, transparent 25%, #40e0d00c 50%, transparent 75%);
+  transform: translateX(-100%);
+  transition: .7s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  border-color: #40e0d099;
+  box-shadow: 0 14px 40px #0006, 0 0 24px #40e0d00b;
+}
+
+.card:hover::before {
+  opacity: 1;
+  transform: translateX(100%);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.game-icon {
+  width: 67px;
+  height: 67px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #40e0d04a;
+  border-radius: 17px;
+  background: #40e0d00d;
+  font-size: 34px;
+  box-shadow: inset 0 0 20px #40e0d007;
+}
+
+.game-number {
+  color: #67818a;
+  font: 11px Orbitron, sans-serif;
+  letter-spacing: 2px;
+}
+
+.game-status {
+  display: inline-block;
+  margin-top: 9px;
+  padding: 6px 9px;
+  border: 1px solid #40e0d035;
+  border-radius: 6px;
+  color: var(--cyan);
+  font: 9px Orbitron, sans-serif;
+  letter-spacing: 1px;
+}
+
+.card h3 {
+  font: 700 clamp(17px, 2.5vw, 22px) Orbitron, sans-serif;
+  margin-bottom: 12px;
+  overflow-wrap: anywhere;
+}
+
+.card p {
+  max-width: 470px;
+  min-height: 60px;
+  margin-bottom: 20px;
+  color: #91a9b1;
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.game-type {
+  color: #718c94;
+  font-size: 11px;
+}
+
+.play-btn {
+  min-width: 105px;
+  padding: 11px 17px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid #40e0d07a;
+  border-radius: 8px;
+  color: var(--cyan);
+  background: #40e0d009;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 800;
+  transition: .2s;
+}
+
+.play-btn:hover {
+  color: #031012;
+  background: var(--cyan);
+  box-shadow: 0 0 18px #40e0d02b;
+}
+
+.play-btn span {
+  font-size: 16px;
+}
+
+/* FEATURE STRIP */
+
+.feature-strip {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 25px;
+  align-items: center;
+  padding: 32px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(ellipse at 100% 0%, #00fff016, transparent 50%),
+    linear-gradient(130deg, #0b171e, #081116);
+}
+
+.feature-strip h2 {
+  max-width: 550px;
+  margin-bottom: 14px;
+  font: 800 clamp(22px, 4vw, 33px)/1.4 Orbitron, sans-serif;
+}
+
+.feature-strip h2 span {
+  color: var(--cyan);
+}
+
+.feature-strip p {
+  max-width: 560px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.9;
+  margin-bottom: 22px;
+}
+
+.feature-art {
+  min-height: 200px;
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+
+.feature-art::before,
+.feature-art::after {
+  content: "";
+  position: absolute;
+  width: 155px;
+  height: 155px;
+  border: 1px solid #40e0d044;
+  border-radius: 50%;
+  box-shadow: 0 0 35px #40e0d00a, inset 0 0 30px #40e0d00a;
+}
+
+.feature-art::after {
+  width: 205px;
+  height: 205px;
+  border-style: dashed;
+  animation: orbit 24s linear infinite;
+}
+
+.feature-art span {
+  z-index: 1;
+  font-size: 74px;
+  filter: drop-shadow(0 0 20px #40e0d033);
+}
+
+@keyframes orbit {
+  to { transform: rotate(360deg); }
+}
+
+/* STATS */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.stat {
+  padding: 23px 15px;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: linear-gradient(145deg, #0b171e, #071017);
+  transition: .25s;
+}
+
+.stat:hover {
+  border-color: #40e0d07a;
+  transform: translateY(-3px);
+}
+
+.stat-icon {
+  font-size: 22px;
+  margin-bottom: 14px;
+}
+
+.stat h3 {
+  color: var(--cyan);
+  font: 800 clamp(21px, 3vw, 32px) Orbitron, sans-serif;
+  margin-bottom: 9px;
+}
+
+.stat p {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* REPORT MODAL */
+
+#backupOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: #000b;
+  backdrop-filter: blur(7px);
+}
+
+#backupOverlay.open {
+  display: flex;
+}
+
+#backupPanel {
+  width: min(510px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 26px;
+  border: 1px solid #40e0d080;
+  border-radius: 18px;
+  background: #081219;
+  box-shadow: 0 0 55px #40e0d014;
+}
+
+.modal-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 12px;
+}
+
+.modal-heading h2 {
+  color: var(--cyan);
+  font: 700 18px Orbitron, sans-serif;
+}
+
+.close-x {
+  width: 35px;
+  height: 35px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #0b2027;
+  color: var(--cyan);
+}
+
+.modal-description {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+#backupPanel label {
+  display: block;
+  margin-bottom: 8px;
+  color: #b5cbd0;
+  font-size: 12px;
+}
+
+#backupPanel input,
+#backupPanel textarea {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 12px 13px;
+  border: 1px solid #21414a;
+  border-radius: 9px;
+  background: #040a0e;
+  color: white;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+#backupPanel textarea {
+  min-height: 125px;
+  resize: vertical;
+}
+
+#backupPanel input:focus,
+#backupPanel textarea:focus {
+  border-color: var(--cyan);
+  outline: none;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+#reportStatus {
+  min-height: 22px;
+  margin-top: 15px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--cyan);
+}
+
+#reportStatus.error {
+  color: #ff9292;
+}
+
+/* FOOTER */
+
+footer {
+  margin-top: 50px;
+  border-top: 1px solid var(--border);
+  background: #05090d;
+}
+
+.footer-inner {
+  min-height: 125px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-block: 25px;
+}
+
+.footer-brand {
+  color: var(--cyan);
+  font: 700 15px Orbitron, sans-serif;
+}
+
+.footer-inner p {
+  margin-top: 9px;
+  color: #718790;
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.footer-links {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: #a4bbc1;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  color: var(--cyan);
+}
+
+.footer-bottom {
+  padding: 14px 0;
+  border-top: 1px solid #ffffff09;
+  color: #5e757d;
+  text-align: center;
+  font-size: 11px;
 }
 
 /* RESPONSIVE */
 
 @media (max-width: 900px) {
-    #top.top-nav {
-        width: calc(100% - 20px);
-        padding: 12px;
-        gap: 8px;
-    }
-
-    #top .nav-side {
-        gap: 6px;
-    }
-
-    #top .nav-icon {
-        flex-basis: 38px;
-        width: 38px;
-        height: 40px;
-    }
-
-    #top .nav-icon svg {
-        width: 19px;
-        height: 19px;
-    }
-
-    #top .brand-title span {
-        font-size: 15px;
-        letter-spacing: 1px;
-    }
-
-    #top .brand-title small {
-        font-size: 7px;
-        letter-spacing: 1px;
-    }
-}
-
-@media (max-width: 520px) {
-    #top.top-nav {
-        width: calc(100% - 12px);
-        padding: 10px 7px;
-        gap: 5px;
-        border-radius: 15px;
-    }
-
-    #top .nav-side {
-        gap: 4px;
-    }
-
-    #top .nav-icon {
-        flex-basis: 31px;
-        width: 31px;
-        height: 34px;
-        border-radius: 9px;
-    }
-
-    #top .nav-icon svg {
-        width: 17px;
-        height: 17px;
-    }
-
-    #top .brand-title span {
-        font-size: 11px;
-        letter-spacing: 0;
-    }
-
-    #top .brand-title small {
-        font-size: 6px;
-        letter-spacing: 0;
-    }
-}
-
-/* =========================
-   HERO
-========================= */
-
-.hero{
-
-    min-height:90vh;
-
-    display:flex;
-
-    flex-direction:column;
-
-    justify-content:center;
-
-    align-items:center;
-
-    text-align:center;
-
-    padding:30px;
-
-}
-
-
-.hero h1{
-
-    font-size:75px;
-
-    margin-bottom:20px;
-
-    color:turquoise;
-
-    text-shadow:
-
-    0 0 15px turquoise,
-    0 0 30px turquoise,
-    0 0 60px turquoise;
-
-    animation:glow 2s infinite alternate;
-
-}
-
-
-@keyframes glow{
-
-    from{
-
-        text-shadow:
-
-        0 0 10px turquoise,
-        0 0 25px turquoise;
-
-    }
-
-    to{
-
-        text-shadow:
-
-        0 0 25px turquoise,
-        0 0 60px cyan;
-
-    }
-
-}
-
-
-.hero p{
-
-    font-size:23px;
-
-    color:#d7d7d7;
-
-    max-width:850px;
-
-    line-height:1.8;
-
-    margin-bottom:45px;
-
-}
-
-
-/* =========================
-   HERO BUTTONS
-========================= */
-
-.hero-buttons{
-
-    display:flex;
-
-    gap:20px;
-
-    flex-wrap:wrap;
-
-}
-
-
-.btn{
-
-    padding:16px 42px;
-
-    border:2px solid turquoise;
-
-    border-radius:12px;
-
-    text-decoration:none;
-
-    color:turquoise;
-
-    font-size:19px;
-
-    transition:.35s;
-
-}
-
-
-.btn:hover{
-
-    background:turquoise;
-
-    color:black;
-
-    box-shadow:
-    0 0 25px turquoise;
-
-    transform:translateY(-6px);
-
-}
-
-
-/* =========================
-   GAMES
-========================= */
-
-.games{
-
-    width:90%;
-
-    margin:auto;
-
-    display:grid;
-
-    grid-template-columns:
-    repeat(auto-fit,minmax(320px,1fr));
-
-    gap:35px;
-
-    padding-bottom:80px;
-
-}
-
-
-/* =========================
-   GAME CARD
-========================= */
-
-.card{
-
-    background:rgba(15,15,15,.92);
-
-    border:2px solid turquoise;
-
-    border-radius:20px;
-
-    padding:30px;
-
-    transition:.4s;
-
-    position:relative;
-
-    overflow:hidden;
-
-}
-
-
-.card:hover{
-
-    transform:translateY(-12px);
-
-    box-shadow:
-
-    0 0 20px turquoise,
-    0 0 45px rgba(64,224,208,.5);
-
-}
-
-
-.card::before{
-
-    content:"";
-
-    position:absolute;
-
-    top:-100%;
-    left:-100%;
-
-    width:200%;
-    height:200%;
-
-    background:
-
-    linear-gradient(
-        45deg,
-        transparent,
-        rgba(64,224,208,.15),
-        transparent
-    );
-
-    transform:rotate(30deg);
-
-    transition:.8s;
-
-}
-
-
-.card:hover::before{
-
-    top:100%;
-    left:100%;
-
-}
-
-
-.card h2{
-
-    font-size:32px;
-
-    color:turquoise;
-
-    margin-bottom:18px;
-
-    text-shadow:
-    0 0 10px turquoise;
-
-}
-
-
-.card p{
-
-    font-size:17px;
-
-    line-height:1.8;
-
-    color:#d7d7d7;
-
-    margin-bottom:25px;
-
-}
-
-
-/* =========================
-   PLAY BUTTON
-========================= */
-
-.play-btn{
-
-    display:inline-block;
-
-    padding:13px 35px;
-
-    border:2px solid turquoise;
-
-    border-radius:10px;
-
-    text-decoration:none;
-
-    color:turquoise;
-
-    transition:.35s;
-
-    font-weight:bold;
-
-}
-
-
-.play-btn:hover{
-
-    background:turquoise;
-
-    color:black;
-
-    box-shadow:
-    0 0 25px turquoise;
-
-}
-
-
-/* =========================
-   STATS
-========================= */
-
-.stats{
-
-    width:90%;
-
-    margin:80px auto;
-
-    display:grid;
-
-    grid-template-columns:
-    repeat(auto-fit,minmax(220px,1fr));
-
-    gap:25px;
-
-}
-
-
-.stat{
-
-    background:#101010;
-
-    border:2px solid turquoise;
-
-    border-radius:18px;
-
-    padding:30px;
-
-    text-align:center;
-
-    transition:.35s;
-
-}
-
-
-.stat:hover{
-
-    transform:translateY(-10px);
-
-    box-shadow:
-    0 0 25px turquoise;
-
-}
-
-
-.stat h1{
-
-    font-size:55px;
-
-    color:turquoise;
-
-    margin-bottom:12px;
-
-    text-shadow:
-    0 0 15px turquoise;
-
-}
-
-
-.stat p{
-
-    font-size:18px;
-
-    color:#dddddd;
-
-}
-
-
-/* =========================
-   FOOTER
-========================= */
-
-footer{
-
-    margin-top:80px;
-
-    padding:35px;
-
-    text-align:center;
-
-    border-top:2px solid turquoise;
-
-    color:#cccccc;
-
-    background:#070707;
-
-}
-
-
-/* =========================
-   BACKUP PANEL
-========================= */
-
-#backupPanel{
-
-    display:none;
-
-    position:fixed;
-
-    top:50%;
-    left:50%;
-
-    transform:translate(-50%,-50%);
-
-    width:90%;
-
-    max-width:550px;
-
-    background:rgba(10,10,10,.98);
-
-    border:2px solid turquoise;
-
-    border-radius:20px;
-
-    padding:35px;
-
-    box-shadow:
-
-    0 0 15px rgba(64,224,208,.5),
-    0 0 35px rgba(64,224,208,.2);
-
-    z-index:2000;
-
-    text-align:center;
-
-}
-
-
-#backupPanel h2{
-
-    color:turquoise;
-
-    margin-bottom:25px;
-
-    text-shadow:
-
-    0 0 10px turquoise,
-    0 0 20px turquoise;
-
-}
-
-
-#backupPanel input,
-#backupPanel textarea{
-
-    width:100%;
-
-    background:#080808;
-
-    color:white;
-
-    border:2px solid turquoise;
-
-    border-radius:10px;
-
-    padding:13px;
-
-    margin-bottom:15px;
-
-    font-family:Tahoma,sans-serif;
-
-    font-size:16px;
-
-    outline:none;
-
-}
-
-
-#backupPanel textarea{
-
-    min-height:130px;
-
-    resize:vertical;
-
-}
-
-
-#backupPanel input:focus,
-#backupPanel textarea:focus{
-
-    box-shadow:
-    0 0 12px rgba(64,224,208,.5);
-
-}
-
-
-#sendReport,
-#closeBackup{
-
-    padding:12px 25px;
-
-    border:2px solid turquoise;
-
-    border-radius:10px;
-
-    background:#111;
-
-    color:turquoise;
-
-    cursor:pointer;
-
-    font-weight:bold;
-
-    transition:.3s;
-
-    margin:5px;
-
-}
-
-
-#sendReport:hover,
-#closeBackup:hover{
-
-    background:turquoise;
-
-    color:black;
-
-    box-shadow:
-    0 0 20px turquoise;
-
-}
-
-
-#reportStatus{
-
-    min-height:25px;
-
-    margin-top:15px;
-
-    color:turquoise;
-
-    font-weight:bold;
-
-}
-
-
-/* =========================
-   MOBILE
-========================= */
-
-@media(max-width:900px){
-
-    header{
-
-        padding:15px 20px;
-
-        flex-direction:column;
-
-        gap:10px;
-
-    }
-
-
-    .logo{
-
-        font-size:30px;
-
-        text-align:center;
-
-    }
-
-
-    .main-logo{
-
-        width:75px;
-
-        height:65px;
-
-    }
-
-
-    nav{
-
-        flex-wrap:wrap;
-
-        justify-content:center;
-
-        gap:20px;
-
-    }
-
-
-    nav a{
-
-        font-size:15px;
-
-    }
-
-
-    .hero h1{
-
-        font-size:48px;
-
-    }
-
-
-    .hero p{
-
-        font-size:17px;
-
-    }
-
-
-    .games{
-
-        grid-template-columns:1fr;
-
-    }
-
-}
-
-/* Loading Screen */
-#loading-screen {
-    position: fixed;
-    inset: 0;
-    background: #000;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-.loader {
-    width: 60px;
-    height: 60px;
-    border: 5px solid #222;
-    border-top: 5px solid #00ffff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-#loading-screen p {
-    color: #00ffff;
-    font-size: 20px;
-    margin-top: 20px;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-#loading-screen.hide {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
-}
-
-/* ACCOUNT NAVIGATION */
-
-#top .hidden {
-    display: none !important;
-}
-
-/* ACCOUNT NAVIGATION */
-
-#top .hidden {
-    display: none !important;
-}
-
-#top .nav-username {
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 42px;
-    max-width: 145px;
-    padding: 9px 13px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    
-    color: #00f5d4;
-    background: #0b2027;
-    border: 1px solid #17434c;
-    border-radius: 12px;
-    font: 13px Arial, sans-serif;
-}
-
-#top #loggedInNav {
+  #top.top-nav {
+    padding: 11px;
     gap: 8px;
+  }
+
+  .nav-side {
+    gap: 5px;
+  }
+
+  .nav-icon {
+    flex-basis: 37px;
+    width: 37px;
+    height: 38px;
+    border-radius: 10px;
+  }
+
+  .nav-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .games {
+    gap: 14px;
+  }
+
+  .feature-strip {
+    grid-template-columns: 1fr .7fr;
+    padding: 25px;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
-@media (max-width: 520px) {
-    #top .nav-username {
-        max-width: 75px;
-        min-height: 34px;
-        padding: 6px;
-        font-size: 10px;
-        border-radius: 9px;
-    }
+@media (max-width: 600px) {
+  .container {
+    width: calc(100% - 24px);
+  }
+
+  #top.top-nav {
+    width: calc(100% - 12px);
+    min-height: 64px;
+    grid-template-columns: 1fr auto 1fr;
+    padding: 8px 6px;
+    gap: 4px;
+    border-radius: 13px;
+  }
+
+  .nav-side {
+    gap: 3px;
+  }
+
+  .nav-icon {
+    flex-basis: 30px;
+    width: 30px;
+    height: 32px;
+    border-radius: 8px;
+  }
+
+  .nav-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .brand-title span {
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+
+  .brand-title small {
+    font-size: 6px;
+    letter-spacing: .5px;
+  }
+
+  .nav-username {
+    max-width: 54px;
+    padding: 6px;
+    font-size: 9px;
+  }
+
+  #loggedInNav {
+    gap: 3px;
+  }
+
+  .hero {
+    min-height: 525px;
+    padding: 80px 8px 60px;
+  }
+
+  .hero h1 {
+    letter-spacing: -1px;
+  }
+
+  .hero-mini-stats {
+    gap: 15px;
+    margin-top: 40px;
+  }
+
+  .mini-stat {
+    gap: 6px;
+    font-size: 10px;
+  }
+
+  .mini-stat strong {
+    font-size: 12px;
+  }
+
+  .games {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 22px;
+    min-height: 245px;
+  }
+
+  .feature-strip {
+    grid-template-columns: 1fr;
+    padding: 23px;
+  }
+
+  .feature-art {
+    min-height: 160px;
+  }
+
+  .feature-art::before {
+    width: 120px;
+    height: 120px;
+  }
+
+  .feature-art::after {
+    width: 165px;
+    height: 165px;
+  }
+
+  .feature-art span {
+    font-size: 57px;
+  }
+
+  .footer-inner {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .footer-links {
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* FUTURISTIC HUD BUTTONS */
+
+.hero .hero-buttons .btn,
+.hero .hero-buttons .btn.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  font-family: "Arial", sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+
+  color: #00fff0;
+  background: rgba(0, 255, 240, 0.06);
+  border: 1px solid #00fff0;
+  border-radius: 6px;
+
+  text-decoration: none !important;
+  outline: none;
+
+  padding: 15px 24px;
+  min-height: 50px;
+
+  box-shadow: 0 0 12px rgba(0, 255, 240, 0.10);
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.hero .hero-buttons .btn:hover,
+.hero .hero-buttons .btn.secondary:hover {
+  color: #020b0d;
+  background: #00fff0;
+  border-color: #00fff0;
+  text-decoration: none !important;
+  box-shadow: 0 0 22px rgba(0, 255, 240, 0.4);
+  transform: translateY(-2px);
+}
+
+.hero .hero-buttons .btn span {
+  text-decoration: none;
+  font-size: 17px;
+  line-height: 1;
+}
+
+/* PROFILE & SHOP BUTTONS — NEON HUD */
+
+/* FEATURE PROFILE & SHOP BUTTONS ONLY */
+
+#featured .feature-strip .hero-buttons > a.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  padding: 13px 22px;
+  min-height: 46px;
+
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+
+  color: #00fff0;
+  background: rgba(0, 255, 240, 0.06);
+  border: 1px solid #00fff0;
+  border-radius: 6px;
+
+  text-decoration: none !important;
+  box-shadow: 0 0 12px rgba(0, 255, 240, 0.10);
+  transition: all 0.25s ease;
+}
+
+#featured .feature-strip .hero-buttons > a.btn:hover {
+  color: #020b0d;
+  background: #00fff0;
+  border-color: #00fff0;
+  text-decoration: none !important;
+  box-shadow: 0 0 22px rgba(0, 255, 240, 0.4);
+  transform: translateY(-2px);
+}
+
+a[href*="mode=profile"]:hover,
+a[href="Shop.html"]:hover {
+  color: #020b0d;
+  background: #00fff0;
+  border-color: #00fff0;
+  text-decoration: none !important;
+  box-shadow: 0 0 22px rgba(0, 255, 240, 0.4);
+  transform: translateY(-2px);
+}
+
+/* CYBER CROSSHAIR CURSOR */
+
+#cyber-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  z-index: 99999;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  color: #00fff0;
+  transition: color .18s ease;
+}
+
+#cyber-cursor::before,
+#cyber-cursor::after {
+  content: "";
+  position: absolute;
+  background: currentColor;
+  box-shadow: 0 0 7px currentColor;
+}
+
+#cyber-cursor::before {
+  width: 2px;
+  height: 30px;
+  left: 14px;
+  top: 0;
+}
+
+#cyber-cursor::after {
+  width: 30px;
+  height: 2px;
+  left: 0;
+  top: 14px;
+}
+
+#cyber-cursor .cursor-core {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  left: 12px;
+  top: 12px;
+  border: 1px solid currentColor;
+  background: #020b0d;
+  box-shadow: 0 0 10px currentColor;
+}
+
+#cyber-cursor.is-hovering {
+  color: #ffffff;
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+#cyber-cursor.is-clicking {
+  color: #00fff0;
+  transform: translate(-50%, -50%) scale(.75);
+}
+
+@media (pointer: fine) {
+  body,
+  body a,
+  body button,
+  body input,
+  body textarea,
+  body select {
+    cursor: none !important;
+  }
+}
+
+@media (pointer: coarse) {
+  #cyber-cursor {
+    display: none;
+  }
 }
 
 </style>
-
 </head>
 
 <body>
 
-        
-<!-- Loading Screen -->
-<div id="loading-screen">
-    <div class="loader"></div>
-    <p>Loading...</p>
+<!-- LOADING SCREEN -->
+<div id="loading-screen" aria-live="polite">
+  <div class="loader"></div>
+  <p>INITIALIZING HUB</p>
 </div>
 
-
-
-<!-- =========================
-     BACKUP PANEL
-========================= -->
-
-<div id="backupPanel">
-
-<h2>🛠️ Report a Problem</h2>
-
-<input
-type="text"
-id="reportName"
-placeholder="Enter Your Name"
-
->
-
-<textarea
-id="reportProblem"
-placeholder="Describe your problem..."
-></textarea>
-
-<button id="sendReport">
-
-Send Report
-
-</button>
-
-<button id="closeBackup">
-
-Close
-
-</button>
-
-<div id="reportStatus"></div>
-
-</div>
-
-<!-- =========================
-     HEADER
-========================= -->
-
-
-<!-- =========================
-     MC GAME HUB TOP NAVIGATION
-========================= -->
-
-
-<!-- MC GAME HUB TOP NAVIGATION -->
-<header id="top" class="top-nav">
-
-    <!-- LEFT: MAIN NAVIGATION -->
-    <nav class="nav-side nav-left" aria-label="Main navigation">
-
-        <a href="index.html" class="nav-icon"
-           aria-label="Home" data-tooltip="Home">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="m3 10 9-7 9 7"/>
-                <path d="M5 9v12h14V9"/>
-                <path d="M9 21v-7h6v7"/>
-            </svg>
-        </a>
-
-        <a href="#games" class="nav-icon"
-           aria-label="Games" data-tooltip="Games">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M6 9h12a4 4 0 0 1 3.8 5.2l-1 3a2 2 0 0 1-3.3 1l-2.5-2.2h-6L6.5 18.2a2 2 0 0 1-3.3-1l-1-3A4 4 0 0 1 6 9Z"/>
-                <path d="M7 12v4M5 14h4"/>
-                <circle cx="16" cy="13" r=".7"/>
-                <circle cx="18" cy="15" r=".7"/>
-            </svg>
-        </a>
-
-        <a href="Leaderboard.html" class="nav-icon"
-           aria-label="Leaderboard" data-tooltip="Leaderboard">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M8 21h8M12 17v4"/>
-                <path d="M7 4h10v5a5 5 0 0 1-10 0Z"/>
-                <path d="M7 6H3v2a5 5 0 0 0 5 5"/>
-                <path d="M17 6h4v2a5 5 0 0 1-5 5"/>
-            </svg>
-        </a>
-
-        <a href="Shop.html" class="nav-icon"
-           aria-label="Shop" data-tooltip="Shop">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M3 10h18"/>
-                <path d="m5 10 1-6h12l1 6"/>
-                <path d="M5 10v10h14V10"/>
-                <path d="M9 20v-6h6v6"/>
-            </svg>
-        </a>
-
-        <button type="button" id="backupButton"
-                class="nav-icon"
-                aria-label="Report a Problem"
-                data-tooltip="Report a Problem">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 3 3 7v5c0 5 4 8 9 9 5-1 9-4 9-9V7Z"/>
-                <path d="m8 12 3 3 5-6"/>
-            </svg>
-        </button>
-    </nav>
-
-    <!-- CENTER: BRAND -->
-    <a href="index.html" class="brand-title">
-        <span>MC GAME HUB</span>
-        <small>PLAY • COMPETE • WIN</small>
-    </a>
-
-    <!-- RIGHT: ACCOUNT -->
-    <div class="nav-side nav-right">
-
-        <!-- Visible when logged out -->
-        <div id="loggedOutNav" class="nav-side">
-            <a href="login.html?mode=register"
-               class="nav-icon"
-               aria-label="Register" data-tooltip="Register">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="10" cy="7" r="4"/>
-                    <path d="M19 8v6M16 11h6"/>
-                </svg>
-            </a>
-
-            <a href="login.html?mode=login"
-               class="nav-icon"
-               aria-label="Login" data-tooltip="Login">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M10 17l5-5-5-5"/>
-                    <path d="M15 12H3"/>
-                    <path d="M12 3h6a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3h-6"/>
-                </svg>
-            </a>
-        </div>
-
-        <!-- Visible when logged in -->
-        <div id="loggedInNav" class="nav-side hidden">
-            <a href="login.html?mode=profile"
-               class="nav-icon"
-               aria-label="Profile" data-tooltip="Profile">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <circle cx="12" cy="8" r="4"/>
-                    <path d="M4 21a8 8 0 0 1 16 0"/>
-                </svg>
-            </a>
-
-            <button type="button" id="navLogoutButton"
-                    class="nav-icon"
-                    aria-label="Log Out" data-tooltip="Log Out">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M10 17l5-5-5-5"/>
-                    <path d="M15 12H3"/>
-                    <path d="M12 3h6a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3h-6"/>
-                </svg>
-            </button>
-
-            <span id="navUsername" class="nav-username">Player</span>
-        </div>
+<!-- REPORT MODAL -->
+<div id="backupOverlay" role="dialog"
+     aria-modal="true" aria-labelledby="reportTitle">
+  <div id="backupPanel">
+    <div class="modal-heading">
+      <h2 id="reportTitle">REPORT A PROBLEM</h2>
+      <button type="button" class="close-x"
+              id="closeBackup" aria-label="Close report">✕</button>
     </div>
 
+    <p class="modal-description">
+      Found a bug or have an idea? Save a report locally in this browser.
+      This form does not send reports to an online server.
+    </p>
+
+    <form id="reportForm">
+      <label for="reportName">Your name</label>
+      <input type="text" id="reportName"
+             maxlength="60" autocomplete="name"
+             placeholder="Enter your name" required>
+
+      <label for="reportProblem">Describe the problem</label>
+      <textarea id="reportProblem" maxlength="2000"
+                placeholder="What happened?" required></textarea>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn">Save Report ↗</button>
+        <button type="button" class="btn secondary"
+                id="cancelBackup">Cancel</button>
+      </div>
+
+      <div id="reportStatus" role="status" aria-live="polite"></div>
+    </form>
+  </div>
+</div>
+
+<!-- NAVIGATION -->
+<header id="top" class="top-nav">
+  <nav class="nav-side nav-left" aria-label="Main navigation">
+
+    <a href="index.html" class="nav-icon"
+       aria-label="Home" data-tooltip="Home">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m3 10 9-7 9 7"/>
+        <path d="M5 9v12h14V9"/>
+        <path d="M9 21v-7h6v7"/>
+      </svg>
+    </a>
+
+    <a href="#games" class="nav-icon"
+       aria-label="Games" data-tooltip="Games">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 9h12a4 4 0 0 1 3.8 5.2l-1 3a2 2 0 0 1-3.3 1l-2.5-2.2h-6L6.5 18.2a2 2 0 0 1-3.3-1l-1-3A4 4 0 0 1 6 9Z"/>
+        <path d="M7 12v4M5 14h4"/>
+        <circle cx="16" cy="13" r=".7"/>
+        <circle cx="18" cy="15" r=".7"/>
+      </svg>
+    </a>
+
+    <a href="Leaderboard.html" class="nav-icon"
+       aria-label="Leaderboard" data-tooltip="Leaderboard">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M8 21h8M12 17v4"/>
+        <path d="M7 4h10v5a5 5 0 0 1-10 0Z"/>
+        <path d="M7 6H3v2a5 5 0 0 0 5 5"/>
+        <path d="M17 6h4v2a5 5 0 0 1-5 5"/>
+      </svg>
+    </a>
+
+    <a href="Shop.html" class="nav-icon"
+       aria-label="Shop" data-tooltip="Shop">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 10h18"/>
+        <path d="m5 10 1-6h12l1 6"/>
+        <path d="M5 10v10h14V10"/>
+        <path d="M9 20v-6h6v6"/>
+      </svg>
+    </a>
+
+    <button type="button" id="backupButton"
+            class="nav-icon"
+            aria-label="Report a problem"
+            data-tooltip="Report a Problem">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 3 3 7v5c0 5 4 8 9 9 5-1 9-4 9-9V7Z"/>
+        <path d="m8 12 3 3 5-6"/>
+      </svg>
+    </button>
+  </nav>
+
+  <a href="index.html" class="brand-title">
+    <span>MC GAME HUB</span>
+    <small>PLAY • COMPETE • WIN</small>
+  </a>
+
+  <div class="nav-side nav-right">
+    <div id="loggedOutNav" class="nav-side">
+      <a href="login.html?mode=register" class="nav-icon"
+         aria-label="Register" data-tooltip="Register">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="10" cy="7" r="4"/>
+          <path d="M19 8v6M16 11h6"/>
+        </svg>
+      </a>
+
+      <a href="login.html?mode=login" class="nav-icon"
+         aria-label="Login" data-tooltip="Login">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M10 17l5-5-5-5"/>
+          <path d="M15 12H3"/>
+          <path d="M12 3h6a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3h-6"/>
+        </svg>
+      </a>
+    </div>
+
+    <div id="loggedInNav" class="nav-side hidden">
+      <a href="login.html?mode=profile" class="nav-icon"
+         aria-label="Profile" data-tooltip="Profile">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 21a8 8 0 0 1 16 0"/>
+        </svg>
+      </a>
+
+      <button type="button" id="navLogoutButton"
+              class="nav-icon"
+              aria-label="Log out" data-tooltip="Log Out">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M10 17l5-5-5-5"/>
+          <path d="M15 12H3"/>
+          <path d="M12 3h6a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3h-6"/>
+        </svg>
+      </button>
+
+      <span id="navUsername" class="nav-username">Player</span>
+    </div>
+  </div>
 </header>
 
-<!-- =========================
-     HERO
-========================= -->
+<main>
+  <!-- HERO -->
 
-<section class="hero">
+<!-- FUTURISTIC HUD HERO -->
+<section class="hero" id="hero">
+  <div class="eyebrow">
+    <span class="live-dot"></span>
+    SYSTEM ONLINE • WELCOME PLAYER
+  </div>
 
-<h1>
+  <h1>
+    <span class="main-title">ENTER THE GAME</span>
+    <span class="hub-name">MC GAME HUB</span>
+    <span class="zone-title">! ZONE !</span>
+  </h1>
 
-MC Game Hub
+  <p class="hero-description">
+    One hub. Multiple challenges. Your next high score is waiting.
+    Play your favorite games, compete, and level up your experience.
+  </p>
 
-</h1>
+  <div class="hero-buttons">
+    <a href="#games" class="btn">
+      EXPLORE GAMES <span>↘</span>
+    </a>
 
-<p>
+    <a href="Shop.html" class="btn secondary">
+      VISIT THE SHOP <span>↗</span>
+    </a>
+  </div>
 
-به هاب بازی‌های من خوش اومدی.
-اینجا تمام بازی‌هایی که ساختم قرار می‌گیرن.
-این پروژه در نسخه V2 با طراحی نئونی و حرفه‌ای ساخته شده.
+  <div class="hero-mini-stats">
+    <div class="mini-stat">
+      <span class="mini-icon">🎮</span>
+      <strong id="heroGames">4</strong>
+      <span>GAMES</span>
+    </div>
 
-</p>
+    <div class="mini-stat">
+      <span class="mini-icon">👤</span>
+      <strong id="heroPlayers">—</strong>
+      <span>LOCAL ACCOUNTS</span>
+    </div>
 
-<div class="hero-buttons">
-
-<a
-href="#games"
-class="btn"
-
->
-
-Start
-
-</a>
-
-<a
-href="#"
-class="btn"
-
->
-
-About Project
-
-</a>
-
-</div>
-
+    <div class="mini-stat">
+      <span class="mini-icon">⚡</span>
+      <strong>V3</strong>
+      <span>HUB VERSION</span>
+    </div>
+  </div>
 </section>
-
-<!-- =========================
-     GAMES
-========================= -->
-
-<section
-class="games"
-id="games"
->
-
-<!-- XO -->
-
-<div class="card">
-
-<h2>
-
-🎮 XO V2
-
-</h2>
-
-<p>
-
-نسخه حرفه‌ای بازی XO
-با سیستم امتیاز،
-چند دست،
-ظاهر نئونی
-و امکانات بیشتر.
-
-</p>
-
-<a
-class="play-btn"
-href="XO.v2.html"
-
->
-
-Play
-
-</a>
-
-</div>
-
-<!-- SNAKE -->
-
-<div class="card">
-
-<h2>
-
-🐍 Snake V1
-
-</h2>
-
-<p>
-
-بازی کلاسیک Snake
-با سیستم امتیاز،
-رکورد،
-افزایش سرعت
-و کنترل با کیبورد و موبایل.
-
-</p>
-
-<a
-class="play-btn"
-href="Snake.html"
-
->
-
-Play
-
-</a>
-
-</div>
-
-<!-- MEMORY -->
-
-<div class="card">
-
-<h2>
-
-🧠 Memory Game
-
-</h2>
-
-<p>
-
-بازی تقویت حافظه
-با تایمر و شمارش حرکات
-و ظاهر نئونی
-
-</p>
-
-<a
-class="play-btn"
-href="MemoryGame V2.html"
-
->
-
-PLay
-
-</a>
-
-</div>
-
-<!-- ROCK PAPER SCISSORS -->
-
-<div class="card">
-
-<h2>
-
-✊ Rock Paper Scissors
-
-</h2>
-
-<p>
-
-بازی سنگ، کاغذ، قیچی
-بازی دونفره و روبات.
-
-</p>
-
-<a
-class="play-btn"
-href="RPS.V2.Html"
-
->
-
-Play
-
-</a>
-
-</div>
-
-</section>
-
-<!-- =========================
-     STATS
-========================= -->
-
-<section class="stats">
-
-<div class="stat">
-
-<h1>
-
-4
-
-</h1>
-
-<p>
-
-Games
-
-</p>
-
-</div>
-
-<div class="stat">
-
-<h1>
-
-4
-
-</h1>
-
-<p>
-
-Playable
-
-</p>
-
-</div>
-
-<div class="stat">
-
-<h1>
-
-V2
-
-</h1>
-
-<p>
-
-Current Version
-
-</p>
-
-</div>
-
-<div class="stat">
-
-<h1>
-
-100%
-
-</h1>
-
-<p>
-
-Made With HTML & CSS
-
-</p>
-
-</div>
-
-</section>
-
-<!-- =========================
-     FOOTER
-========================= -->
-
+<!-- END HUD HERO --> 
+
+  <!-- GAMES -->
+  <section class="section container" id="games">
+    <div class="section-heading">
+      <div>
+        <div class="section-kicker">CHOOSE YOUR CHALLENGE</div>
+        <h2>THE GAME LIBRARY</h2>
+        <p>Pick a game and make your next move.</p>
+      </div>
+      <a href="#featured" class="section-link">DISCOVER MORE ↘</a>
+    </div>
+
+    <div class="games">
+      <article class="card">
+        <div class="card-top">
+          <div class="game-icon">⭕</div>
+          <div style="text-align:right">
+            <div class="game-number">GAME 01</div>
+            <span class="game-status">STRATEGY</span>
+          </div>
+        </div>
+        <h3>XO V2</h3>
+        <p>
+          Think ahead, plan your moves, and outsmart your opponent
+          in the classic X and O challenge.
+        </p>
+        <div class="card-bottom">
+          <span class="game-type">STRATEGY · TWO PLAYERS</span>
+          <a class="play-btn" href="XO.v2.html">PLAY NOW <span>↗</span></a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-top">
+          <div class="game-icon">🐍</div>
+          <div style="text-align:right">
+            <div class="game-number">GAME 02</div>
+            <span class="game-status">ARCADE</span>
+          </div>
+        </div>
+        <h3>SNAKE V2</h3>
+        <p>
+          Collect points, avoid collisions, and beat your personal
+          best in this fast-paced arcade classic.
+        </p>
+        <div class="card-bottom">
+          <span class="game-type">ARCADE · HIGH SCORE</span>
+          <a class="play-btn" href="Snake.html">PLAY NOW <span>↗</span></a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-top">
+          <div class="game-icon">🧠</div>
+          <div style="text-align:right">
+            <div class="game-number">GAME 03</div>
+            <span class="game-status">BRAIN GAME</span>
+          </div>
+        </div>
+        <h3>MEMORY GAME V2</h3>
+        <p>
+          Test your memory, match the cards, and try to finish
+          with fewer moves and a better time.
+        </p>
+        <div class="card-bottom">
+          <span class="game-type">PUZZLE · MEMORY</span>
+          <a class="play-btn" href="MemoryGame V2.html">PLAY NOW <span>↗</span></a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-top">
+          <div class="game-icon">✊</div>
+          <div style="text-align:right">
+            <div class="game-number">GAME 04</div>
+            <span class="game-status">QUICK MATCH</span>
+          </div>
+        </div>
+        <h3>ROCK PAPER SCISSORS</h3>
+        <p>
+          Read the match, choose your move, and see whether
+          strategy or luck takes the round.
+          </p>
+          <div class="card-bottom">
+          <span class="game-type">CLASSIC · QUICK PLAY</span>
+          <a class="play-btn" href="RPS.V2.Html">PLAY NOW <span>↗</span></a>
+        </div>
+        </article>
+        <article class="card" id="gameCardSudoku">
+        <div class="game-status">LOCKED · SHOP</div>
+
+       <div class="card-icon">🧩</div>
+
+        <h3>Sudoku V2</h3>
+
+        <p>
+       Challenge your logic, complete the grid,
+       and beat your best score.
+       </p>
+
+       <a
+       class="play-btn"
+       href="#"
+        data-game="sudoku"
+        data-unlocked="false"
+        aria-disabled="true"
+          >
+        LOCKED 🔒
+          </a>
+      </article>
+      <article class="card" id="gameCardRacing">
+  <div class="card-top">
+    <div class="game-icon">🏎️</div>
+    <div style="text-align:right">
+      <div class="game-number">GAME 06</div>
+      <span class="game-status">LOCKED · SHOP</span>
+    </div>
+  </div>
+
+  <h3>RACING CAR</h3>
+  <p>
+    Race against your rivals, master the road,
+    and use nitro to reach the finish line.
+  </p>
+
+  <div class="card-bottom">
+    <span class="game-type">RACING · ARCADE</span>
+    <a class="play-btn"
+       href="#"
+       data-game="racing"
+       data-unlocked="false"
+       aria-disabled="true">
+        LOCKED 🔒
+        </a>
+        </div>
+         </article>
+
+         <article class="card" id="gameCardBlockBlast">
+          <div class="card-top">
+          <div class="game-icon">🧱</div>
+         <div style="text-align:right">
+         <div class="game-number">GAME 07</div>
+         <span class="game-status">LOCKED · SHOP</span>
+        </div>
+        </div>
+
+        <h3>BLOCK BLAST</h3>
+       <p>
+       Place blocks, complete rows and columns,
+        and challenge your puzzle-solving skills.
+       </p>
+
+       <div class="card-bottom">
+        <span class="game-type">PUZZLE · ARCADE</span>
+          <a class="play-btn"
+           href="#"
+           data-game="block-blast"
+            data-unlocked="false"
+            aria-disabled="true">
+            LOCKED 🔒
+           </a>
+          </div>
+        </article>
+           <article class="card" id="gameCardTempleRun">
+           <div class="card-top">
+           <div class="game-icon">🏃</div>
+           <div style="text-align:right">
+           <div class="game-number">GAME 08</div>
+           <span class="game-status">LOCKED · SHOP</span>
+           </div>
+            </div>
+
+            <h3>TEMPLE RUN</h3>
+           <p>
+           Run through ancient temples, dodge obstacles,
+            and see how far you can go.
+           </p>
+
+           <div class="card-bottom">
+           <span class="game-type">RUNNER · ARCADE</span>
+           <a class="play-btn"
+           href="#"
+           data-game="temple-run"
+           data-unlocked="false"
+           aria-disabled="true">
+           LOCKED 🔒
+          </a>
+         </div>
+        </article>
+      </div>
+  </section>
+
+  <!-- FEATURED -->
+  <section class="section container" id="featured">
+    <div class="feature-strip">
+      <div>
+        <div class="section-kicker">CUSTOMIZE YOUR EXPERIENCE</div>
+        <h2>YOUR PROFILE.<br><span>YOUR STYLE.</span></h2>
+        <p>
+          Make your player identity your own. Check your profile,
+          explore your achievements, and visit the shop for cosmetic
+          items and titles.
+        </p>
+        <div class="hero-buttons" style="justify-content:flex-start">
+          <a href="login.html?mode=profile" class="btn">MY PROFILE ↗</a>
+          <a href="Shop.html" class="btn secondary">OPEN SHOP ↗</a>
+        </div>
+      </div>
+
+      <div class="feature-art" aria-hidden="true">
+        <span>⚡</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- HUB STATS -->
+  <section class="section container" id="hub-stats">
+    <div class="section-heading">
+      <div>
+        <div class="section-kicker">THE HUB AT A GLANCE</div>
+        <h2>HUB OVERVIEW</h2>
+        <p>Quick facts about this version of MC Game Hub.</p>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-icon">🎮</div>
+        <h3 id="statGames">4</h3>
+        <p>GAME LINKS</p>
+      </div>
+
+      <div class="stat">
+        <div class="stat-icon">👥</div>
+        <h3 id="statPlayers">—</h3>
+        <p>LOCAL ACCOUNTS</p>
+      </div>
+
+      <div class="stat">
+        <div class="stat-icon">🛍️</div>
+        <h3>SHOP</h3>
+        <p>COSMETICS & TITLES</p>
+      </div>
+
+      <div class="stat">
+        <div class="stat-icon">🚀</div>
+        <h3>V3</h3>
+        <p>HUB VERSION</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- FOOTER -->
 <footer>
+  <div class="container footer-inner">
+    <div>
+      <div class="footer-brand">MC GAME HUB</div>
+      <p>Play. Compete. Win.<br>Created by KiyanMC ❤️.</p>
+    </div>
 
-<p>
+    <nav class="footer-links" aria-label="Footer navigation">
+      <a href="#top">Home</a>
+      <a href="#games">Games</a>
+      <a href="Shop.html">Shop</a>
+      <a href="Leaderboard.html">Leaderboard</a>
+      <a href="login.html?mode=profile">Profile</a>
+    </nav>
+  </div>
 
-© 2026 MC Game Hub
-
-</p>
-
-<p>
-
-Designed By Kiyan ❤️
-
-</p>
-
+  <div class="footer-bottom">
+    © 2026 MC Game Hub · V3 · All rights reserved.
+  </div>
 </footer>
 
 <script>
-
-
-/* =========================
-   CARD MOUSE EFFECT
-========================= */
-
-const cards =
-document.querySelectorAll(".card");
-
-
-cards.forEach(function(card){
-
-    card.addEventListener(
-        "mousemove",
-        function(e){
-
-            const rect =
-            card.getBoundingClientRect();
-
-
-            const x =
-            e.clientX - rect.left;
-
-
-            const y =
-            e.clientY - rect.top;
-
-
-            card.style.background =
-
-            `radial-gradient(
-                circle at ${x}px ${y}px,
-                rgba(64,224,208,.18),
-                #111 65%
-            )`;
-
-        }
-    );
-
-
-    card.addEventListener(
-        "mouseleave",
-        function(){
-
-            card.style.background =
-            "rgba(15,15,15,.92)";
-
-        }
-    );
-
-});
-
-
-/* =========================
-   BACKUP / REPORT SYSTEM
-========================= */
-
-const backupButton =
-document.getElementById("backupButton");
-
-
-const backupPanel =
-document.getElementById("backupPanel");
-
-
-const closeBackup =
-document.getElementById("closeBackup");
-
-
-const sendReport =
-document.getElementById("sendReport");
-
-
-const reportName =
-document.getElementById("reportName");
-
-
-const reportProblem =
-document.getElementById("reportProblem");
-
-
-const reportStatus =
-document.getElementById("reportStatus");
-
-
-/* =========================
-   OPEN BACKUP
-========================= */
-
-backupButton.addEventListener("click", function () {
-    backupPanel.style.display = "block";
-});
-
-/* =========================
-   CLOSE BACKUP
-========================= */
-
-closeBackup.addEventListener(
-"click",
-function(){
-
-    backupPanel.style.display =
-    "none";
-
-    reportStatus.textContent =
-    "";
-
-}
-);
-
-
-/* =========================
-   SEND REPORT
-========================= */
-
-sendReport.addEventListener(
-"click",
-function(){
-
-    const name =
-    reportName.value.trim();
-
-
-    const problem =
-    reportProblem.value.trim();
-
-
-    if(
-        name === "" ||
-        problem === ""
-    ){
-
-        reportStatus.textContent =
-        "⚠️ Please enter your name and problem.";
-
-        return;
-
-    }
-
-
-    let reports =
-    JSON.parse(
-        localStorage.getItem(
-            "mcGameHubReports"
-        )
-    ) || [];
-
-
-    const newReport = {
-
-        name:name,
-
-        problem:problem,
-
-        date:
-        new Date().toLocaleString()
-
-    };
-
-
-    reports.push(newReport);
-
-
-    localStorage.setItem(
-
-        "mcGameHubReports",
-
-        JSON.stringify(reports)
-
-    );
-
-
-    reportStatus.textContent =
-    "✅ Report received!";
-
-
-    reportName.value =
-    "";
-
-
-    reportProblem.value =
-    "";
-
-}
-);
-
-window.addEventListener("load", function () {
-    setTimeout(function () {
-        document.getElementById("loading-screen").classList.add("hide");
-    }, 1500);
-});
-
-
-/* ACCOUNT NAVIGATION */
+"use strict";
+
+/* ======================================
+   EXISTING ACCOUNT STORAGE
+====================================== */
 
 const HUB_CURRENT_USER_KEY = "mc_current_user";
 const HUB_USERS_KEY = "mc_game_hub_users";
+const HUB_REPORTS_KEY = "mcGameHubReports";
 
-function updateAccountNavigation() {
-    const loggedOutNav = document.getElementById("loggedOutNav");
-    const loggedInNav = document.getElementById("loggedInNav");
-    const navUsername = document.getElementById("navUsername");
+const GAME_COUNT = 8;
 
-    let users = [];
+function readHubUsers() {
+  try {
+    const raw = localStorage.getItem(HUB_USERS_KEY);
 
-    try {
-        users = JSON.parse(localStorage.getItem(HUB_USERS_KEY) || "[]");
-        if (!Array.isArray(users)) users = [];
-    } catch {
-        users = [];
-    }
+    if (!raw) return [];
 
-    const currentUsername = localStorage.getItem(HUB_CURRENT_USER_KEY);
+    const users = JSON.parse(raw);
 
-    const user = users.find(
-        item => item.username === currentUsername
-    );
-
-    if (user) {
-        loggedOutNav.classList.add("hidden");
-        loggedInNav.classList.remove("hidden");
-        navUsername.textContent = user.username;
-    } else {
-        loggedInNav.classList.add("hidden");
-        loggedOutNav.classList.remove("hidden");
-    }
+    return Array.isArray(users) ? users : [];
+  } catch (error) {
+    console.warn("Could not read local user data.", error);
+    return [];
+  }
 }
 
-updateAccountNavigation();
+function getCurrentHubUser() {
+  const username = localStorage.getItem(HUB_CURRENT_USER_KEY);
 
-document.getElementById("navLogoutButton").addEventListener("click", function () {
-    localStorage.removeItem(HUB_CURRENT_USER_KEY);
-    updateAccountNavigation();
-    window.location.href = "index.html";
+  if (!username) return null;
+
+  const users = readHubUsers();
+
+  return users.find(user =>
+    user &&
+    typeof user === "object" &&
+    user.username === username
+  ) || null;
+}
+
+/* ======================================
+   ACCOUNT NAVIGATION
+====================================== */
+
+function updateAccountNavigation() {
+  const loggedOutNav = document.getElementById("loggedOutNav");
+  const loggedInNav = document.getElementById("loggedInNav");
+  const navUsername = document.getElementById("navUsername");
+
+  const user = getCurrentHubUser();
+
+  if (user) {
+    loggedOutNav.classList.add("hidden");
+    loggedInNav.classList.remove("hidden");
+    navUsername.textContent = user.username || "Player";
+  } else {
+    loggedInNav.classList.add("hidden");
+    loggedOutNav.classList.remove("hidden");
+  }
+}
+
+document.getElementById("navLogoutButton").addEventListener("click", () => {
+  localStorage.removeItem(HUB_CURRENT_USER_KEY);
+  updateAccountNavigation();
+  window.location.href = "index.html";
 });
 
-/* Refresh the navbar when returning to the page */
-window.addEventListener("pageshow", updateAccountNavigation);
+/* ======================================
+   LOCAL ACCOUNT COUNT
+====================================== */
 
+
+function updateSudokuUnlock() {
+  const users = JSON.parse(
+    localStorage.getItem("mc_game_hub_users") || "[]"
+  );
+
+  const currentUser = localStorage.getItem("mc_current_user");
+
+  const user = users.find(
+    u => u.username === currentUser
+  );
+
+  const unlockedGames = Array.isArray(user?.unlockedGames)
+    ? user.unlockedGames
+    : [];
+
+  const inventory = Array.isArray(user?.shopInventory)
+    ? user.shopInventory
+    : [];
+
+  const isUnlocked =
+    unlockedGames.includes("sudoku") ||
+    inventory.includes("game_sudoku");
+
+  const card = document.getElementById("gameCardSudoku");
+
+  if (!card) return;
+
+  const button = card.querySelector('[data-game="sudoku"]');
+  const status = card.querySelector(".game-status");
+
+  card.classList.toggle("game-locked", !isUnlocked);
+
+  button.href = isUnlocked ? "Sudoku.html" : "#";
+  button.dataset.unlocked = String(isUnlocked);
+  button.setAttribute("aria-disabled", String(!isUnlocked));
+
+  button.innerHTML = isUnlocked
+    ? 'PLAY NOW <span>↗</span>'
+    : "LOCKED 🔒";
+
+  status.textContent = isUnlocked
+    ? "UNLOCKED"
+    : "LOCKED · SHOP";
+}
+
+document.addEventListener("click", function (event) {
+  const button = event.target.closest('[data-game="sudoku"]');
+
+  if (button && button.dataset.unlocked !== "true") {
+    event.preventDefault();
+    alert("Sudoku is locked. Buy it in Shop first.");
+  }
+});
+
+
+function updateRacingUnlock() {
+  const users = JSON.parse(
+    localStorage.getItem("mc_game_hub_users") || "[]"
+  );
+
+  const currentUser = localStorage.getItem("mc_current_user");
+
+  const user = users.find(
+    u => u.username === currentUser
+  );
+
+  const unlockedGames = Array.isArray(user?.unlockedGames)
+    ? user.unlockedGames
+    : [];
+
+  const inventory = Array.isArray(user?.shopInventory)
+    ? user.shopInventory
+    : [];
+
+  const isUnlocked =
+    unlockedGames.includes("racing_car") ||
+    inventory.includes("game_racing_car");
+
+  const card = document.getElementById("gameCardRacing");
+  if (!card) return;
+
+  const button = card.querySelector('[data-game="racing"]');
+  const status = card.querySelector(".game-status");
+
+  card.classList.toggle("game-locked", !isUnlocked);
+
+  button.href = isUnlocked ? "Race.html" : "#";
+  button.dataset.unlocked = String(isUnlocked);
+  button.setAttribute("aria-disabled", String(!isUnlocked));
+
+  button.innerHTML = isUnlocked
+    ? 'PLAY NOW <span>↗</span>'
+    : "LOCKED 🔒";
+
+  status.textContent = isUnlocked
+    ? "UNLOCKED"
+    : "LOCKED · SHOP";
+}
+
+function updateBlockBlastUnlock() {
+  const users = JSON.parse(
+    localStorage.getItem("mc_game_hub_users") || "[]"
+  );
+
+  const currentUser = localStorage.getItem("mc_current_user");
+
+  const user = users.find(
+    u => u.username === currentUser
+  );
+
+  const unlockedGames = Array.isArray(user?.unlockedGames)
+    ? user.unlockedGames
+    : [];
+
+  const inventory = Array.isArray(user?.shopInventory)
+    ? user.shopInventory
+    : [];
+
+  const isUnlocked =
+    unlockedGames.includes("block_blast") ||
+    inventory.includes("game_block_blast");
+
+  const card = document.getElementById("gameCardBlockBlast");
+  if (!card) return;
+
+  const button = card.querySelector('[data-game="block-blast"]');
+  const status = card.querySelector(".game-status");
+
+  card.classList.toggle("game-locked", !isUnlocked);
+
+  button.href = isUnlocked ? "Block Blast.html" : "#";
+  button.dataset.unlocked = String(isUnlocked);
+  button.setAttribute("aria-disabled", String(!isUnlocked));
+
+  button.innerHTML = isUnlocked
+    ? 'PLAY NOW <span>↗</span>'
+    : "LOCKED 🔒";
+
+  status.textContent = isUnlocked
+    ? "UNLOCKED"
+    : "LOCKED · SHOP";
+}
+
+function updateTempleRunUnlock() {
+  const users = JSON.parse(
+    localStorage.getItem("mc_game_hub_users") || "[]"
+  );
+
+  const currentUser = localStorage.getItem("mc_current_user");
+
+  const user = users.find(
+    u => u.username === currentUser
+  );
+
+  const unlockedGames = Array.isArray(user?.unlockedGames)
+    ? user.unlockedGames
+    : [];
+
+  const inventory = Array.isArray(user?.shopInventory)
+    ? user.shopInventory
+    : [];
+
+  const isUnlocked =
+    unlockedGames.includes("temple_run") ||
+    inventory.includes("game_temple_run");
+
+  const card = document.getElementById("gameCardTempleRun");
+  if (!card) return;
+
+  const button = card.querySelector('[data-game="temple-run"]');
+  const status = card.querySelector(".game-status");
+
+  card.classList.toggle("game-locked", !isUnlocked);
+
+  button.href = isUnlocked ? "T Runner.html" : "#";
+  button.dataset.unlocked = String(isUnlocked);
+  button.setAttribute("aria-disabled", String(!isUnlocked));
+
+  button.innerHTML = isUnlocked
+    ? 'PLAY NOW <span>↗</span>'
+    : "LOCKED 🔒";
+
+  status.textContent = isUnlocked
+    ? "UNLOCKED"
+    : "LOCKED · SHOP";
+}
+
+document.addEventListener("click", function(event) {
+  const button = event.target.closest('[data-game="racing"]');
+
+  if (button && button.dataset.unlocked !== "true") {
+    event.preventDefault();
+    alert("Racing Car is locked. Buy it in Shop first.");
+  }
+});
+
+
+function updateHubStats() {
+  const users = readHubUsers();
+  const validUsers = users.filter(user =>
+    user &&
+    typeof user === "object" &&
+    typeof user.username === "string"
+  );
+
+  const count = validUsers.length.toLocaleString();
+
+  document.getElementById("heroGames").textContent = String(GAME_COUNT);
+  document.getElementById("statGames").textContent = String(GAME_COUNT);
+  document.getElementById("heroPlayers").textContent = count;
+  document.getElementById("statPlayers").textContent = count;
+}
+
+/* ======================================
+   GAME CARD LIGHTING EFFECT
+====================================== */
+
+const cards = document.querySelectorAll(".card");
+
+cards.forEach(card => {
+  card.addEventListener("pointermove", event => {
+    if (event.pointerType === "touch") return;
+
+    const rect = card.getBoundingClientRect();
+
+    card.style.setProperty("--mx", `${event.clientX - rect.left}px`);
+    card.style.setProperty("--my", `${event.clientY - rect.top}px`);
+  });
+
+  card.addEventListener("pointerleave", () => {
+    card.style.setProperty("--mx", "50%");
+    card.style.setProperty("--my", "50%");
+  });
+});
+
+/* ======================================
+   REPORT MODAL
+====================================== */
+
+const backupOverlay = document.getElementById("backupOverlay");
+const backupButton = document.getElementById("backupButton");
+const closeBackup = document.getElementById("closeBackup");
+const cancelBackup = document.getElementById("cancelBackup");
+const reportForm = document.getElementById("reportForm");
+const reportName = document.getElementById("reportName");
+const reportProblem = document.getElementById("reportProblem");
+const reportStatus = document.getElementById("reportStatus");
+
+function openReportModal() {
+  backupOverlay.classList.add("open");
+  reportStatus.textContent = "";
+  reportStatus.classList.remove("error");
+  reportName.focus();
+}
+
+function closeReportModal() {
+  backupOverlay.classList.remove("open");
+  reportStatus.textContent = "";
+  reportStatus.classList.remove("error");
+  backupButton.focus();
+}
+
+backupButton.addEventListener("click", openReportModal);
+closeBackup.addEventListener("click", closeReportModal);
+cancelBackup.addEventListener("click", closeReportModal);
+
+backupOverlay.addEventListener("click", event => {
+  if (event.target === backupOverlay) {
+    closeReportModal();
+  }
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && backupOverlay.classList.contains("open")) {
+    closeReportModal();
+  }
+});
+
+reportForm.addEventListener("submit", event => {
+  event.preventDefault();
+
+  const name = reportName.value.trim();
+  const problem = reportProblem.value.trim();
+
+  if (!name || !problem) {
+    reportStatus.textContent = "Please fill in both fields.";
+    reportStatus.classList.add("error");
+    return;
+  }
+
+  let reports = [];
+
+  try {
+    const raw = localStorage.getItem(HUB_REPORTS_KEY);
+    reports = raw ? JSON.parse(raw) : [];
+
+    if (!Array.isArray(reports)) {
+      reports = [];
+    }
+  } catch (error) {
+    reportStatus.textContent = "Could not read saved reports.";
+    reportStatus.classList.add("error");
+    return;
+  }
+
+  reports.push({
+    name,
+    problem,
+    date: new Date().toLocaleString()
+  });
+
+  try {
+    localStorage.setItem(HUB_REPORTS_KEY, JSON.stringify(reports));
+
+    reportStatus.textContent =
+      "Report saved in this browser. It has not been sent online.";
+
+    reportStatus.classList.remove("error");
+    reportName.value = "";
+    reportProblem.value = "";
+  } catch (error) {
+    reportStatus.textContent =
+      "Could not save the report. Browser storage may be full.";
+
+    reportStatus.classList.add("error");
+  }
+});
+
+/* ======================================
+   LOADING SCREEN
+====================================== */
+
+function hideLoadingScreen() {
+  const loadingScreen = document.getElementById("loading-screen");
+
+  if (loadingScreen) {
+    loadingScreen.classList.add("hide");
+  }
+}
+
+window.addEventListener("load", () => {
+  window.setTimeout(hideLoadingScreen, 450);
+});
+
+/* ======================================
+   REFRESH NAVIGATION AND STATS
+====================================== */
+
+function initializeHub() {
+  updateAccountNavigation();
+  updateSudokuUnlock(); updateRacingUnlock(); updateBlockBlastUnlock(); updateTempleRunUnlock();
+  updateHubStats();
+}
+
+initializeHub();
+
+window.addEventListener("pageshow", initializeHub);
+
+window.addEventListener("storage", event => {
+  if (
+    event.key === HUB_CURRENT_USER_KEY ||
+    event.key === HUB_USERS_KEY
+  ) {
+    initializeHub();
+  }
+});
+
+/* Fail-safe: don't leave the page covered if loading is interrupted. */
+window.setTimeout(hideLoadingScreen, 3000);
+</script>
+<!-- CYBER CROSSHAIR CURSOR -->
+
+<div id="cyber-cursor" aria-hidden="true">
+  <span class="cursor-core"></span>
+</div>
+
+<script>
+(() => {
+  const cursor = document.getElementById("cyber-cursor");
+
+  if (!cursor || !window.matchMedia("(pointer: fine)").matches) {
+    return;
+  }
+
+  document.addEventListener("mousemove", (event) => {
+    cursor.style.left = event.clientX + "px";
+    cursor.style.top = event.clientY + "px";
+  });
+
+  document.addEventListener("mouseover", (event) => {
+    const target = event.target;
+
+    if (target instanceof Element &&
+        target.closest("a, button, input, textarea, select, [role='button']")) {
+      cursor.classList.add("is-hovering");
+    } else {
+      cursor.classList.remove("is-hovering");
+    }
+  });
+
+  document.addEventListener("mousedown", () => {
+    cursor.classList.add("is-clicking");
+  });
+
+  document.addEventListener("mouseup", () => {
+    cursor.classList.remove("is-clicking");
+  });
+
+  document.addEventListener("mouseleave", () => {
+    cursor.style.display = "none";
+  });
+
+  document.addEventListener("mouseenter", () => {
+    cursor.style.display = "block";
+  });
+})();
 </script>
 
 </body>
-
 </html>
