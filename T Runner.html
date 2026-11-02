@@ -1,0 +1,741 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON RUNNER V1</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@400;600;700&display=swap');
+
+:root {
+  --cyan: #27f5e5;
+  --bg: #03070b;
+  --panel: #0a151d;
+  --muted: #8caab3;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(ellipse at top, #102832, #03070b 65%);
+  color: #eaffff;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+button { font: inherit; cursor: pointer; }
+.app { width: min(100%, 1050px); margin: auto; padding: 14px; }
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 12px;
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.logo {
+  display: grid; place-items: center; width: 52px; height: 52px;
+  border: 1px solid var(--cyan); border-radius: 13px;
+  color: var(--cyan); font-family: Orbitron, sans-serif; font-weight: 900;
+  box-shadow: 0 0 20px #27f5e526;
+}
+h1 { margin: 0; font-family: Orbitron, sans-serif; font-size: clamp(20px, 4vw, 31px); letter-spacing: 1px; }
+.subtitle { color: var(--muted); font-size: 10px; margin-top: 5px; letter-spacing: 2px; }
+.badge { border: 1px solid #23505b; color: var(--cyan); border-radius: 20px; padding: 8px 12px; font-size: 11px; }
+.hud { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
+.stat { background: #09151c; border: 1px solid #1c3d47; border-radius: 10px; text-align: center; padding: 10px 4px; }
+.stat span { display: block; color: var(--muted); font-size: 10px; margin-bottom: 5px; }
+.stat strong { color: var(--cyan); font-family: Orbitron, sans-serif; font-size: clamp(14px, 2.8vw, 20px); }
+.game-wrap { position: relative; overflow: hidden; border: 1px solid #27616a; border-radius: 15px; background: #02070b; box-shadow: 0 0 30px #27f5e514; }
+canvas { display: block; width: 100%; height: min(62vh, 520px); min-height: 300px; touch-action: none; }
+.overlay {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  padding: 18px; background: #02070bd9; backdrop-filter: blur(4px); text-align: center;
+}
+.overlay.hidden { display: none; }
+.modal {
+  width: min(360px, 100%); padding: 24px 18px;
+  border: 1px solid #28616b; border-radius: 18px;
+  background: linear-gradient(145deg, #10232b, #050b10);
+  box-shadow: 0 0 35px #27f5e51b;
+}
+.modal h2 { margin: 0 0 10px; font-family: Orbitron, sans-serif; color: var(--cyan); }
+.modal p { color: var(--muted); line-height: 1.7; font-size: 13px; }
+.main-btn {
+  width: 100%; padding: 13px; border: 0; border-radius: 10px;
+  background: var(--cyan); color: #001414; font-weight: 900;
+  margin-top: 10px; box-shadow: 0 0 18px #27f5e52a;
+}
+.main-btn:hover { filter: brightness(1.12); }
+.controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+.control-btn {
+  padding: 12px 6px; border: 1px solid #24515b; border-radius: 10px;
+  background: #0b1b23; color: var(--cyan); font-weight: 700;
+  user-select: none; -webkit-user-select: none;
+}
+.control-btn:active { background: #14534f; transform: scale(.97); }
+.instructions {
+  margin-top: 12px; padding: 12px; border: 1px solid #183740;
+  border-radius: 10px; background: #071118; color: var(--muted);
+  font-size: 12px; line-height: 1.8; text-align: center;
+}
+.instructions b { color: var(--cyan); }
+.profile-status { margin-top: 8px; text-align: center; font-size: 12px; color: var(--muted); }
+.profile-status strong { color: var(--cyan); }
+@media (max-width: 520px) {
+  .app { padding: 8px; }
+  .hud { gap: 5px; }
+  .stat { padding: 8px 2px; }
+  canvas { min-height: 330px; height: 52vh; }
+  .subtitle { letter-spacing: 1px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo">NR</div>
+      <div>
+        <h1>NEON <span style="color:var(--cyan)">RUNNER</span></h1>
+        <div class="subtitle">ENDLESS RUN · SURVIVE THE GRID</div>
+      </div>
+    </div>
+    <div class="badge">● V1 · ENDLESS MODE</div>
+  </header>
+
+  <section class="hud">
+    <div class="stat"><span>DISTANCE</span><strong id="distance">0 m</strong></div>
+    <div class="stat"><span>COINS</span><strong id="coins">0</strong></div>
+    <div class="stat"><span>SPEED LEVEL</span><strong id="speed">1</strong></div>
+    <div class="stat"><span>BEST DISTANCE</span><strong id="best">0 m</strong></div>
+  </section>
+
+  <div class="game-wrap">
+    <canvas id="game" aria-label="Neon Runner game"></canvas>
+    <div class="overlay" id="overlay">
+      <div class="modal">
+        <h2 id="overlayTitle">NEON RUNNER</h2>
+        <p id="overlayText">Dodge obstacles, jump over barriers and slide under gates. Run as far as you can!</p>
+        <button class="main-btn" id="startBtn">START RUN</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="control-btn" id="leftBtn">◀ LEFT</button>
+    <button class="control-btn" id="jumpBtn">▲ JUMP</button>
+    <button class="control-btn" id="rightBtn">RIGHT ▶</button>
+    <button class="control-btn" id="slideBtn">▼ SLIDE</button>
+    <button class="control-btn" id="pauseBtn">Ⅱ PAUSE</button>
+    <button class="control-btn" id="restartBtn">↻ RESTART</button>
+  </div>
+
+  <div class="instructions">
+    <b>KEYBOARD:</b> ← → Move · ↑ / Space Jump · ↓ Slide · P Pause · R Restart
+    <br>
+    <b>REWARDS:</b> Every 500 meters = +10 coins · Every 500 meters = +1 speed level
+    <br>
+    Avoid obstacles. The run ends when you collide with one!
+  </div>
+  <div class="profile-status" id="profileStatus">Checking MC Game Hub profile...</div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+  const canvas = $("game");
+  const ctx = canvas.getContext("2d");
+
+  const USERS_KEY = "mc_game_hub_users";
+  const CURRENT_USER_KEY = "mc_current_user";
+  const RUNNER_KEY = "neonRunnerSave";
+
+  let W = 800, H = 500;
+  let running = false, paused = false, gameOver = false;
+  let lastTime = 0, distance = 0, coins = 0, speedLevel = 1;
+  let lane = 1, jumpTime = 0, slideTime = 0, spawnAt = 22;
+  let obstacles = [], roadOffset = 0, lastMilestone = 0;
+  let notice = "", noticeTime = 0, animationId = 0;
+  let best = 0;
+  let currentUsername = null;
+  let profileAvailable = false;
+  let saveData = {};
+
+  function readJSON(key, fallback) {
+    try {
+      const value = localStorage.getItem(key);
+      return value ? JSON.parse(value) : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function getUsers() {
+    const users = readJSON(USERS_KEY, []);
+    return Array.isArray(users) ? users : [];
+  }
+
+  function getCurrentUsername() {
+    try {
+      return localStorage.getItem(CURRENT_USER_KEY);
+    } catch {
+      return null;
+    }
+  }
+
+  function getCurrentUser(users = getUsers()) {
+    const username = getCurrentUsername();
+    if (!username) return null;
+    return users.find(user => user.username === username) || null;
+  }
+
+  function showProfileStatus(message) {
+    $("profileStatus").textContent = message;
+  }
+
+  function loadGameData() {
+    saveData = readJSON(RUNNER_KEY, {});
+    best = Math.max(0, Number(saveData.best) || 0);
+
+    const user = getCurrentUser();
+
+    if (!user) {
+      currentUsername = null;
+      profileAvailable = false;
+      coins = 0;
+      showProfileStatus("Log in to MC Game Hub to collect and save coins.");
+      return;
+    }
+
+    currentUsername = user.username;
+    profileAvailable = true;
+    coins = Math.max(0, Number(user.coins) || 0);
+
+    // Migrate old runner coins once for this account.
+    const migrated = saveData.coinsMigratedFor || [];
+    const migratedUsers = Array.isArray(migrated) ? migrated : [];
+
+    if (!migratedUsers.includes(currentUsername)) {
+      const oldCoins = Math.max(0, Number(saveData.coins) || 0);
+      if (oldCoins > 0) coins += oldCoins;
+
+      saveData.coinsMigratedFor = [...migratedUsers, currentUsername];
+      saveData.coins = 0;
+      saveData.best = best;
+
+      const users = getUsers();
+      const index = users.findIndex(u => u.username === currentUsername);
+      if (index !== -1) {
+        users[index].coins = coins;
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+      }
+      localStorage.setItem(RUNNER_KEY, JSON.stringify(saveData));
+    }
+
+    showProfileStatus("Logged in as " + currentUsername + " · Profile coins: " + coins);
+  }
+
+  function save() {
+    try {
+      const users = getUsers();
+
+      if (profileAvailable && currentUsername) {
+        const index = users.findIndex(u => u.username === currentUsername);
+
+        // Do not write to another account if the active login changed.
+        if (index !== -1 && getCurrentUsername() === currentUsername) {
+          users[index].coins = coins;
+          localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+      }
+
+      saveData.best = best;
+      saveData.coins = profileAvailable ? 0 : coins;
+      localStorage.setItem(RUNNER_KEY, JSON.stringify(saveData));
+
+      if (profileAvailable) {
+        showProfileStatus("Logged in as " + currentUsername + " · Profile coins: " + coins);
+      }
+    } catch (error) {
+      console.error("Could not save NEON RUNNER data:", error);
+      showProfileStatus("Could not save. Check that the game and hub use the same site origin.");
+    }
+  }
+
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = rect.width;
+    H = rect.height;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+  window.addEventListener("resize", resize);
+
+  function hud() {
+    $("distance").textContent = Math.floor(distance) + " m";
+    $("coins").textContent = coins;
+    $("speed").textContent = speedLevel;
+    $("best").textContent = best + " m";
+  }
+
+  function showNotice(text) {
+    notice = text;
+    noticeTime = 1.8;
+  }
+
+  function roadGeometry() {
+    return {
+      horizon: H * .22, bottom: H * 1.05,
+      topWidth: W * .12, bottomWidth: W * .91, center: W / 2
+    };
+  }
+
+  function roadPoint(z) {
+    const g = roadGeometry();
+    const p = Math.max(0, Math.min(1, z));
+    return {
+      y: g.horizon + (g.bottom - g.horizon) * p,
+      width: g.topWidth + (g.bottomWidth - g.topWidth) * p,
+      center: g.center, p
+    };
+  }
+
+  function laneX(laneIndex, z) {
+    const p = roadPoint(z);
+    return p.center + (laneIndex - 1) * p.width / 3;
+  }
+
+  function polygon(points, fill, stroke, lineWidth = 1) {
+    ctx.beginPath();
+    ctx.moveTo(points[0][0], points[0][1]);
+    for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
+    ctx.closePath();
+    if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+    if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lineWidth; ctx.stroke(); }
+  }
+
+  function drawBackground() {
+    const sky = ctx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, "#07151e");
+    sky.addColorStop(.48, "#10272e");
+    sky.addColorStop(1, "#020609");
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H);
+
+    for (let i = 0; i < 18; i++) {
+      const bw = W / 18;
+      const bh = H * (.06 + ((i * 37) % 17) / 100);
+      const x = i * bw;
+      ctx.fillStyle = i % 2 ? "#07151d" : "#0a1b22";
+      ctx.fillRect(x, H * .22 - bh, bw * .78, bh);
+      ctx.fillStyle = "#27f5e54a";
+      for (let wy = H * .22 - bh + 7; wy < H * .22 - 4; wy += 12) {
+        ctx.fillRect(x + 5, wy, 3, 3);
+      }
+    }
+
+    ctx.strokeStyle = "#27f5e52b";
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 15; i++) {
+      const x = i * W / 14;
+      ctx.beginPath();
+      ctx.moveTo(W / 2, H * .22);
+      ctx.lineTo(x, H);
+      ctx.stroke();
+    }
+
+    const g = roadGeometry();
+    polygon([
+      [g.center - g.topWidth / 2, g.horizon],
+      [g.center + g.topWidth / 2, g.horizon],
+      [g.center + g.bottomWidth / 2, H],
+      [g.center - g.bottomWidth / 2, H]
+    ], "#09141b", "#27f5e5", 2);
+
+    const movement = (distance * .085) % 1;
+    for (let i = 0; i < 14; i++) {
+      const z = ((i / 14) + movement) % 1;
+      const p = roadPoint(z);
+      const next = roadPoint(Math.min(1, z + .025));
+      const width = 1 + z * 3;
+      const dashH = 2 + z * 18;
+
+      for (const divider of [-.5, .5]) {
+        const x1 = p.center + p.width * divider / 1.5;
+        const x2 = next.center + next.width * divider / 1.5;
+        ctx.fillStyle = "#27f5e5a8";
+        ctx.beginPath();
+        ctx.moveTo(x1 - width, p.y);
+        ctx.lineTo(x1 + width, p.y);
+        ctx.lineTo(x2 + width, p.y + dashH);
+        ctx.lineTo(x2 - width, p.y + dashH);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 22; i++) {
+      const z = ((i / 22) + movement) % 1;
+      const p = roadPoint(z);
+      const size = 1 + z * 4;
+      for (const side of [-1, 1]) {
+        ctx.fillStyle = "#27f5e5";
+        ctx.shadowColor = "#27f5e5";
+        ctx.shadowBlur = 7 * z;
+        ctx.fillRect(
+          p.center + side * (p.width / 2 + 3 + z * 8) - size / 2,
+          p.y, size, size
+        );
+      }
+    }
+    ctx.shadowBlur = 0;
+  }
+
+  function drawObstacle(o) {
+    const z = 1 - o.ahead / 32;
+    if (z < .01 || z > 1.15) return;
+
+    const p = roadPoint(z);
+    const x = laneX(o.lane, z);
+    const scale = .25 + z * 1.15;
+    const w = Math.max(10, W * .045 * scale);
+    const h = Math.max(10, H * .075 * scale);
+
+    ctx.save();
+    ctx.shadowBlur = 14 * z;
+    ctx.shadowColor = o.type === "gate" ? "#ff4e9b" : "#ff5b78";
+
+    if (o.type === "block") {
+      polygon([
+        [x - w, p.y - h], [x + w, p.y - h],
+        [x + w * 1.2, p.y], [x - w * 1.2, p.y]
+      ], "#4a1629", "#ff5b78", 2 * scale);
+      ctx.fillStyle = "#ff8da4";
+      ctx.fillRect(x - w * .55, p.y - h * .72, w * 1.1, h * .13);
+      ctx.fillStyle = "#210a13";
+      ctx.fillRect(x - w * .45, p.y - h * .45, w * .9, h * .35);
+    } else {
+      ctx.fillStyle = "#35152d";
+      ctx.strokeStyle = "#ff4e9b";
+      ctx.lineWidth = Math.max(1, 2 * scale);
+      ctx.fillRect(x - w * 1.5, p.y - h * 1.6, w * 3, h * .35);
+      ctx.strokeRect(x - w * 1.5, p.y - h * 1.6, w * 3, h * .35);
+      ctx.fillRect(x - w * 1.5, p.y - h * 1.6, w * .2, h * 1.6);
+      ctx.fillRect(x + w * 1.3, p.y - h * 1.6, w * .2, h * 1.6);
+    }
+    ctx.restore();
+  }
+
+  function drawPlayer() {
+    const x = laneX(lane, .95);
+    const ground = H * .87;
+    const jumpHeight = jumpTime > 0
+      ? Math.sin((1 - jumpTime / .8) * Math.PI) * H * .17
+      : 0;
+    const sliding = slideTime > 0;
+    const scale = Math.max(.75, Math.min(1.15, W / 650));
+    const bodyHeight = (sliding ? 28 : 68) * scale;
+    const bodyWidth = 23 * scale;
+    const y = ground - jumpHeight;
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.fillStyle = "#27f5e52e";
+    ctx.beginPath();
+    ctx.ellipse(0, 3, 25 * scale, 8 * scale, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowColor = "#27f5e5";
+    ctx.shadowBlur = 18;
+
+    if (sliding) {
+      ctx.fillStyle = "#27f5e5";
+      ctx.fillRect(-25 * scale, -bodyHeight * .65, 48 * scale, 17 * scale);
+      ctx.fillStyle = "#d9ffff";
+      ctx.beginPath();
+      ctx.arc(19 * scale, -bodyHeight * .8, 9 * scale, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.strokeStyle = "#27f5e5";
+      ctx.lineWidth = 7 * scale;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(-7 * scale, -22 * scale);
+      ctx.lineTo(-12 * scale, -3 * scale);
+      ctx.moveTo(7 * scale, -22 * scale);
+      ctx.lineTo(13 * scale, -3 * scale);
+      ctx.stroke();
+
+      ctx.fillStyle = "#087c7a";
+      ctx.fillRect(-bodyWidth / 2, -bodyHeight * .7, bodyWidth, bodyHeight * .52);
+      ctx.strokeStyle = "#27f5e5";
+      ctx.lineWidth = 2 * scale;
+      ctx.strokeRect(-bodyWidth / 2, -bodyHeight * .7, bodyWidth, bodyHeight * .52);
+
+      ctx.strokeStyle = "#27f5e5";
+      ctx.lineWidth = 5 * scale;
+      ctx.beginPath();
+      ctx.moveTo(-bodyWidth / 2, -bodyHeight * .58);
+      ctx.lineTo(-bodyWidth, -bodyHeight * .36);
+      ctx.moveTo(bodyWidth / 2, -bodyHeight * .58);
+      ctx.lineTo(bodyWidth, -bodyHeight * .36);
+      ctx.stroke();
+
+      ctx.fillStyle = "#d9ffff";
+      ctx.beginPath();
+      ctx.arc(0, -bodyHeight * .83, 11 * scale, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#031117";
+      ctx.fillRect(-7 * scale, -bodyHeight * .86, 14 * scale, 4 * scale);
+    }
+    ctx.restore();
+    ctx.shadowBlur = 0;
+  }
+
+  function draw() {
+    if (!W || !H) return;
+    ctx.clearRect(0, 0, W, H);
+    drawBackground();
+
+    obstacles
+      .filter(o => o.ahead > 0 && o.ahead < 32)
+      .sort((a, b) => b.ahead - a.ahead)
+      .forEach(drawObstacle);
+
+    drawPlayer();
+
+    if (noticeTime > 0 && notice) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, noticeTime * 2);
+      ctx.font = `bold ${Math.max(17, W * .035)}px Orbitron, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#27f5e5";
+      ctx.shadowColor = "#27f5e5";
+      ctx.shadowBlur = 15;
+      ctx.fillText(notice, W / 2, H * .15);
+      ctx.restore();
+    }
+
+    if (paused && running) {
+      ctx.fillStyle = "#02060999";
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "#27f5e5";
+      ctx.font = "bold 28px Orbitron, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("PAUSED", W / 2, H / 2);
+    }
+  }
+
+  function spawnObstacle() {
+    obstacles.push({
+      lane: Math.floor(Math.random() * 3),
+      type: Math.random() < .35 ? "gate" : "block",
+      ahead: 35 + Math.random() * 4,
+      checked: false
+    });
+  }
+
+  function startGame() {
+    loadGameData();
+
+    if (!profileAvailable) {
+      $("overlayTitle").textContent = "LOGIN REQUIRED";
+      $("overlayText").textContent =
+        "Log in to MC Game Hub on this same site before collecting profile coins.";
+      $("startBtn").textContent = "TRY AGAIN";
+      $("overlay").classList.remove("hidden");
+      return;
+    }
+
+    cancelAnimationFrame(animationId);
+    distance = 0;
+    speedLevel = 1;
+    lane = 1;
+    jumpTime = 0;
+    slideTime = 0;
+    spawnAt = 20;
+    obstacles = [];
+    roadOffset = 0;
+    lastMilestone = 0;
+    notice = "";
+    noticeTime = 0;
+    running = true;
+    paused = false;
+    gameOver = false;
+    lastTime = 0;
+
+    $("overlay").classList.add("hidden");
+    $("pauseBtn").textContent = "Ⅱ PAUSE";
+    hud();
+    animationId = requestAnimationFrame(loop);
+  }
+
+  function endGame() {
+    running = false;
+    gameOver = true;
+    const finalDistance = Math.floor(distance);
+    best = Math.max(best, finalDistance);
+    save();
+    hud();
+
+    $("overlayTitle").textContent = "RUN OVER";
+    $("overlayText").innerHTML =
+      `Distance: <b>${finalDistance} m</b><br>` +
+      `Profile coins: <b>${coins}</b><br>` +
+      `Speed level reached: <b>${speedLevel}</b><br>` +
+      `Best distance: <b>${best} m</b>`;
+    $("startBtn").textContent = "RUN AGAIN";
+    $("overlay").classList.remove("hidden");
+    draw();
+  }
+
+  function moveLeft() {
+    if (!running || paused) return;
+    lane = Math.max(0, lane - 1);
+  }
+  function moveRight() {
+    if (!running || paused) return;
+    lane = Math.min(2, lane + 1);
+  }
+  function jump() {
+    if (!running || paused || jumpTime > 0 || slideTime > 0) return;
+    jumpTime = .8;
+  }
+  function slide() {
+    if (!running || paused || jumpTime > 0 || slideTime > 0) return;
+    slideTime = .65;
+  }
+  function togglePause() {
+    if (!running) return;
+    paused = !paused;
+    $("pauseBtn").textContent = paused ? "▶ RESUME" : "Ⅱ PAUSE";
+    if (!paused) {
+      lastTime = 0;
+      animationId = requestAnimationFrame(loop);
+    } else {
+      draw();
+    }
+  }
+
+  function loop(timestamp) {
+    if (!running || paused) return;
+    if (!lastTime) lastTime = timestamp;
+    const dt = Math.min((timestamp - lastTime) / 1000, .05);
+    lastTime = timestamp;
+
+    const metersPerSecond = 6 + (speedLevel - 1) * 1.15;
+    distance += metersPerSecond * dt;
+    roadOffset += metersPerSecond * dt;
+    jumpTime = Math.max(0, jumpTime - dt);
+    slideTime = Math.max(0, slideTime - dt);
+    noticeTime = Math.max(0, noticeTime - dt);
+
+    // Every 500 meters, add 10 coins to the logged-in profile.
+    const milestone = Math.floor(distance / 500);
+    if (milestone > lastMilestone) {
+      const earned = (milestone - lastMilestone) * 10;
+      coins += earned;
+      lastMilestone = milestone;
+      showNotice("+" + earned + " COINS!");
+      save();
+      hud();
+    }
+
+    // Increase speed level every 500 meters.
+    const newSpeed = 1 + Math.floor(distance / 500);
+    if (newSpeed > speedLevel) {
+      speedLevel = newSpeed;
+      showNotice("SPEED LEVEL " + speedLevel + "!");
+    }
+
+    if (distance >= spawnAt) {
+      spawnObstacle();
+      spawnAt = distance + Math.max(10, 23 - speedLevel * .45) + Math.random() * 9;
+    }
+
+    for (const o of obstacles) {
+      o.ahead -= metersPerSecond * dt;
+      if (o.ahead <= 1.2 && !o.checked) {
+        o.checked = true;
+        if (o.lane === lane) {
+          const jumping = jumpTime > .15;
+          const sliding = slideTime > .15;
+          const avoided = o.type === "block" ? jumping : sliding;
+          if (!avoided) {
+            endGame();
+            return;
+          }
+        }
+      }
+    }
+
+    obstacles = obstacles.filter(o => o.ahead > -3);
+    hud();
+    draw();
+    animationId = requestAnimationFrame(loop);
+  }
+
+  $("startBtn").addEventListener("click", startGame);
+  $("leftBtn").addEventListener("click", moveLeft);
+  $("rightBtn").addEventListener("click", moveRight);
+  $("jumpBtn").addEventListener("click", jump);
+  $("slideBtn").addEventListener("click", slide);
+  $("pauseBtn").addEventListener("click", togglePause);
+  $("restartBtn").addEventListener("click", startGame);
+
+
+document.addEventListener("keydown", e => {
+  const key = e.key.toLowerCase();
+
+  if (
+    ["arrowleft", "arrowright", "arrowup", "arrowdown", " "].includes(key) ||
+    e.code === "Space"
+  ) {
+    e.preventDefault();
+  }
+
+  if (key === "arrowleft" || key === "a") {
+    moveLeft();
+  } else if (key === "arrowright" || key === "d") {
+    moveRight();
+  } else if (key === "arrowup" || key === "w" || e.code === "Space") {
+    jump();
+  } else if (key === "arrowdown" || key === "s") {
+    slide();
+  } else if (key === "p") {
+    togglePause();
+  } else if (key === "r") {
+    startGame();
+  }
+});
+
+
+  let touchStartX = 0, touchStartY = 0;
+  canvas.addEventListener("touchstart", e => {
+    const t = e.changedTouches[0];
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+  }, { passive: true });
+
+  canvas.addEventListener("touchend", e => {
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 25) return;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      dx < 0 ? moveLeft() : moveRight();
+    } else {
+      dy < 0 ? jump() : slide();
+    }
+  }, { passive: true });
+
+  loadGameData();
+  hud();
+  resize();
+})();
+</script>
+</body>
+</html>
