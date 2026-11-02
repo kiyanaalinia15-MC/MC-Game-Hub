@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sudoku V2 - Neon Grid</title>
+
+<style>
+:root {
+  --bg: #05090d;
+  --panel: #0b171e;
+  --cyan: #27f5e5;
+  --muted: #8ba8b0;
+  --red: #ff5b78;
+  --green: #7dffb0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(ellipse at top, #102a32, #05090d 55%, #020406);
+  color: #eaffff;
+  font-family: Tahoma, Arial, sans-serif;
+}
+
+button, select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app {
+  max-width: 1100px;
+  margin: auto;
+  padding: 22px 14px 36px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  border: 1px solid var(--cyan);
+  border-radius: 14px;
+  padding: 13px;
+  color: var(--cyan);
+  font-weight: bold;
+  box-shadow: 0 0 22px #27f5e52b;
+}
+
+h1 {
+  font-size: clamp(24px, 4vw, 36px);
+  margin: 0;
+}
+
+.sub, .muted {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.sub {
+  margin-top: 5px;
+}
+
+.badge {
+  border: 1px solid #28535c;
+  background: #0a1d23;
+  border-radius: 99px;
+  padding: 9px 12px;
+  color: var(--cyan);
+  font-size: 12px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(270px, .8fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.panel {
+  background: linear-gradient(145deg, #0d1b23f5, #071016f5);
+  border: 1px solid #1e424b;
+  border-radius: 19px;
+  padding: 17px;
+  box-shadow: 0 12px 40px #0006;
+}
+
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 13px;
+}
+
+.heading h2 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.stat {
+  background: #071116;
+  border: 1px solid #1b343d;
+  border-radius: 11px;
+  text-align: center;
+  padding: 10px 4px;
+}
+
+.stat label {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.stat strong {
+  font-size: 19px;
+  color: var(--cyan);
+  font-variant-numeric: tabular-nums;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  border: 2px solid var(--cyan);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 24px #27f5e51b;
+}
+
+.cell {
+  position: relative;
+  aspect-ratio: 1;
+  min-width: 0;
+  border: 0;
+  border-left: 1px solid #24404a;
+  border-top: 1px solid #24404a;
+  border-radius: 0;
+  background: #081219;
+  color: #baffff;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-size: clamp(14px, 2.5vw, 23px);
+  font-weight: bold;
+}
+
+.cell:nth-child(9n) {
+  border-left: 0;
+}
+
+.cell:nth-child(-n+9) {
+  border-top: 0;
+}
+
+.cell:nth-child(3n):not(:nth-child(9n)) {
+  border-left: 2px solid #39717a;
+}
+
+.cell:nth-child(n+19):nth-child(-n+27),
+.cell:nth-child(n+46):nth-child(-n+54) {
+  border-bottom: 2px solid #39717a;
+}
+
+.cell.given {
+  color: #f0ffff;
+  background: #0e2029;
+}
+
+.cell.peer {
+  background: #10262e;
+}
+
+.cell.same {
+  background: #17434a;
+}
+
+.cell.selected {
+  background: #12635f !important;
+  box-shadow: inset 0 0 0 2px var(--cyan);
+  z-index: 1;
+}
+
+.cell.conflict, .cell.wrong {
+  color: var(--red);
+  background: #3b1823;
+}
+
+.notes {
+  position: absolute;
+  inset: 2px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  font-size: clamp(6px, 1vw, 10px);
+  font-weight: normal;
+  color: #8db8bd;
+  pointer-events: none;
+}
+
+.notes span {
+  display: grid;
+  place-items: center;
+}
+
+.pad {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 5px;
+  margin: 14px 0 10px;
+}
+
+
+.num {
+  min-height: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  border: 1px solid #23515b;
+  background: #0b2028;
+  color: #27f5e5;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.num-value {
+  font-size: 18px;
+}
+
+.num-count {
+  font-size: 9px;
+  color: #9bc5c9;
+}
+
+.num:hover:not(:disabled) {
+  background: #12433f;
+  border-color: #27f5e5;
+}
+
+.num:disabled {
+  opacity: 0.35;
+  filter: grayscale(1);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.num:hover {
+  background: #12433f;
+  border-color: var(--cyan);
+}
+
+.controls, .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn {
+  border: 1px solid #2a515a;
+  background: #10232b;
+  color: #eaffff;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.btn:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.primary {
+  background: var(--cyan);
+  color: #001514;
+  border-color: var(--cyan);
+  font-weight: bold;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.actions .btn {
+  width: 100%;
+}
+
+select {
+  width: 100%;
+  background: #09171d;
+  color: #eaffff;
+  border: 1px solid #28515b;
+  border-radius: 10px;
+  padding: 11px;
+}
+
+.section {
+  margin-top: 18px;
+}
+
+.section h3 {
+  font-size: 13px;
+  margin: 0 0 10px;
+}
+
+.message {
+  margin-top: 13px;
+  min-height: 44px;
+  border: 1px solid #203d46;
+  background: #08141a;
+  border-radius: 11px;
+  padding: 11px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.message.success {
+  border-color: #2d7659;
+  color: var(--green);
+}
+
+.message.error {
+  border-color: #753246;
+  color: #ff9aab;
+}
+
+.toggle {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid #23424b;
+  border-radius: 10px;
+  padding: 10px;
+  background: #09151b;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.toggle input {
+  accent-color: var(--cyan);
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.9;
+  margin-top: 10px;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  background: #020609dd;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  backdrop-filter: blur(7px);
+}
+
+.modal {
+  width: min(440px, 100%);
+  border: 1px solid #28606a;
+  border-radius: 21px;
+  background: linear-gradient(150deg, #10232b, #060d12);
+  padding: 24px;
+  box-shadow: 0 0 45px #27f5e51b;
+}
+
+.modal h2 {
+  margin: 0 0 8px;
+  font-size: 25px;
+}
+
+.modal p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.modal label {
+  display: block;
+  margin: 17px 0 8px;
+  font-size: 13px;
+}
+
+.modal .btn {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+footer {
+  text-align: center;
+  color: #52727a;
+  font-size: 11px;
+  margin-top: 20px;
+}
+
+@media (max-width: 790px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .app {
+    padding: 14px 9px;
+  }
+
+  .panel {
+    padding: 12px;
+  }
+
+  .cell {
+    font-size: clamp(13px, 4vw, 22px);
+  }
+}
+
+@media (max-width: 400px) {
+  .num {
+    min-height: 35px;
+  }
+
+  .stat strong {
+    font-size: 16px;
+  }
+}
+
+/* Modern English typography */
+body {
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+/* Smooth help panel toggle */
+#helpPanel {
+  transition: opacity 0.2s ease;
+}
+
+#helpPanel.hidden {
+  display: none !important;
+}
+
+/* Keep the Sudoku board as the main focus */
+.layout {
+  grid-template-columns: minmax(0, 1fr) 300px;
+  align-items: start;
+}
+
+.layout:has(#helpPanel.hidden) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+#helpToggle {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+#helpToggle:hover {
+  background: #12433f;
+  box-shadow: 0 0 14px #27f5e533;
+}
+
+@media (max-width: 790px) {
+  .layout,
+  .layout:has(#helpPanel.hidden) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Compact Sudoku layout for desktop */
+.app {
+  max-width: 1000px;
+  padding: 10px 14px 16px;
+}
+
+header {
+  margin-bottom: 10px;
+}
+
+.layout {
+  gap: 12px;
+}
+
+.panel {
+  padding: 12px;
+  border-radius: 14px;
+}
+
+.heading {
+  margin-bottom: 8px;
+}
+
+.stats {
+  gap: 6px;
+  margin-bottom: 9px;
+}
+
+.stat {
+  padding: 6px 3px;
+}
+
+.stat strong {
+  font-size: 16px;
+}
+
+.board {
+  width: min(100%, 570px);
+  margin-inline: auto;
+}
+
+.pad {
+  gap: 4px;
+  margin: 9px 0;
+}
+
+.num {
+  min-height: 40px;
+}
+
+.controls {
+  gap: 6px;
+}
+
+.btn {
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.section {
+  margin-top: 12px;
+}
+
+footer {
+  margin-top: 10px;
+}
+
+/* Smaller screens */
+@media (max-width: 790px) {
+  .app {
+    padding: 8px;
+  }
+
+  .board {
+    width: 100%;
+  }
+
+  .num {
+    min-height: 34px;
+  }
+}
+
+/* Short desktop screens */
+@media (min-width: 791px) and (max-height: 800px) {
+  .app {
+    padding-top: 6px;
+    padding-bottom: 8px;
+  }
+
+  header {
+    margin-bottom: 6px;
+  }
+
+  .logo {
+    padding: 8px;
+  }
+
+  h1 {
+    font-size: 25px;
+  }
+
+  .sub {
+    margin-top: 2px;
+  }
+
+  .panel {
+    padding: 9px;
+  }
+
+  .num {
+    min-height: 32px;
+  }
+
+  .section {
+    margin-top: 8px;
+  }
+
+  footer {
+    margin-top: 5px;
+  }
+}
+
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <div class="brand">
+    <div class="logo">9×9</div>
+    <div>
+      <h1>SUDOKU <span style="color:var(--cyan)">V2</span></h1>
+      <div class="sub">NEON GRID · THINK SHARP. PLAY SMART.</div>
+    </div>
+  </div>
+
+  <button class="btn" id="helpToggle" type="button">
+  ☰ Help
+</button>
+
+  <div class="badge">● Offline - Singel Player</div>
+</header>
+
+<div class="layout">
+
+<section class="panel">
+  <div class="heading">
+    <h2>Suduku table</h2>
+    <span class="muted" id="difficultyLabel">Level : Medium</span>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><label>Time</label><strong id="timer">00:00</strong></div>
+    <div class="stat"><label>Mistake</label><strong id="mistakes">0</strong></div>
+    <div class="stat"><label>Remian</label><strong id="remaining">--</strong></div>
+  </div>
+
+  <div class="board" id="board" role="grid" aria-label="Sudoku"></div>
+  <div class="pad" id="numberPad"></div>
+
+  <div class="controls">
+    <button class="btn" id="notesToggle">✎ Reiminder - off</button>
+    <button class="btn" id="eraseBtn">⌫ Backspace</button>
+    <button class="btn" id="checkBtn">✓ Check over view</button>
+  </div>
+
+  <div class="message" id="message" role="status">
+    یک خانه را انتخاب کن و عدد مناسب را وارد کن.
+  </div>
+</section>
+
+<aside class="panel hidden" id="helpPanel">
+  <div class="heading">
+    <h2>Game control</h2>
+    <span class="muted">SUDOKU LAB</span>
+  </div>
+
+  <div class="actions">
+    <button class="btn primary" id="newGameBtn">＋ New Game </button>
+    <button class="btn" id="hintBtn">✦ Hint</button>
+    <button class="btn" id="undoBtn">↶ Return</button>
+    <button class="btn" id="resetBtn">⟳ Restart</button>
+  </div>
+
+  <div class="section">
+    <h3>Difficulty</h3>
+    <select id="difficulty">
+      <option value="easy">Easy</option>
+      <option value="medium" selected>Medium</option>
+      <option value="hard">Hard</option>
+    </select>
+  </div>
+
+  <div class="section">
+    <h3>Records</h3>
+    <div class="stats">
+      <div class="stat"><label>Easy</label><strong id="bestEasy">--:--</strong></div>
+      <div class="stat"><label>Medium</label><strong id="bestMedium">--:--</strong></div>
+      <div class="stat"><label>Hard</label><strong id="bestHard">--:--</strong></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>میانبرهای صفحه‌کلید</h3>
+    <div class="hint">
+      <b>۱ تا ۹</b> ورود عدد · <b>Backspace</b> پاک کردن<br>
+      <b>↑ ↓ ← →</b> حرکت بین خانه‌ها · <b>N</b> حالت یادداشت<br>
+      <b>H</b> راهنمایی · <b>Ctrl+Z</b> بازگشت حرکت
+    </div>
+  </div>
+
+  <div class="section">
+    <label class="toggle">
+      <input id="highlightToggle" type="checkbox" checked>
+      برجسته‌کردن ردیف، ستون و اعداد مشابه
+    </label>
+  </div>
+
+  <div class="hint">
+    در هر ردیف، ستون و مربع ۳×۳ اعداد ۱ تا ۹ نباید تکرار شوند.
+    برای ثبت رکورد، جدول را کامل و درست حل کن.
+  </div>
+</aside>
+
+</div>
+
+<footer>NEON GRID • SUDOKU V2 • HTML + CSS + JavaScript</footer>
+</div>
+
+<div class="overlay" id="startOverlay">
+  <div class="modal">
+    <h2>?Ready <span style="color:var(--cyan)">🧩</span></h2>
+    <p>Choose Game difficulty</p>
+
+    <label for="startDifficulty">Difficulty Level</label>
+    <select id="startDifficulty">
+      <option value="easy">Easy - For beginner</option>
+      <option value="medium" selected>Medium</option>
+      <option value="hard">Hard - Professional</option>
+    </select>
+
+    <button class="btn primary" id="startBtn">Start Game</button>
+  </div>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+const $ = id => document.getElementById(id);
+const boardEl = $("board");
+const pad = $("numberPad");
+
+const LEVELS = {
+  easy: { label: "آسان", clues: 40 },
+  medium: { label: "متوسط", clues: 32 },
+  hard: { label: "سخت", clues: 27 }
+};
+
+let solution = [];
+let puzzle = [];
+let values = [];
+let notes = [];
+let selected = 40;
+let difficulty = "medium";
+let noteMode = false;
+let mistakes = 0;
+let seconds = 0;
+let timer = null;
+let started = false;
+let finished = false;
+let history = [];
+
+function shuffle(a) {
+  a = a.slice();
+
+  for (let i = a.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+
+  return a;
+}
+
+function pattern(r, c) {
+  return (r * 3 + Math.floor(r / 3) + c) % 9;
+}
+
+function makeSolution() {
+  let rows = shuffle([0,1,2]).flatMap(g =>
+    shuffle([0,1,2]).map(x => g * 3 + x)
+  );
+
+  let cols = shuffle([0,1,2]).flatMap(g =>
+    shuffle([0,1,2]).map(x => g * 3 + x)
+  );
+
+  let nums = shuffle([1,2,3,4,5,6,7,8,9]);
+
+  return rows.map(r =>
+    cols.map(c => nums[pattern(r,c)])
+  );
+}
+
+function makePuzzle(level) {
+  solution = makeSolution();
+  puzzle = solution.flat();
+
+  let indices = shuffle(Array.from({length:81}, (_,i) => i));
+
+  for (let i = LEVELS[level].clues; i < 81; i++) {
+    puzzle[indices[i]] = 0;
+  }
+
+  values = puzzle.slice();
+  notes = Array.from({length:81}, () => new Set());
+  selected = puzzle.findIndex(v => !v);
+
+  if (selected < 0) selected = 0;
+}
+
+function timeText(s) {
+  return String(Math.floor(s / 60)).padStart(2,"0") + ":" +
+         String(s % 60).padStart(2,"0");
+}
+
+function message(t, type = "") {
+  let el = $("message");
+  el.textContent = t;
+  el.className = "message" + (type ? " " + type : "");
+}
+
+function startTimer() {
+  clearInterval(timer);
+
+  timer = setInterval(() => {
+    if (started && !finished) {
+      seconds++;
+      $("timer").textContent = timeText(seconds);
+    }
+  }, 1000);
+}
+
+function updateStats() {
+  $("timer").textContent = timeText(seconds);
+  $("mistakes").textContent = mistakes;
+  $("remaining").textContent = values.filter(v => !v).length;
+}
+
+function bests() {
+  try {
+    return JSON.parse(localStorage.getItem("sudokuV2Best") || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function renderBests() {
+  let b = bests();
+
+  for (let l of Object.keys(LEVELS)) {
+    $("best" + l[0].toUpperCase() + l.slice(1)).textContent =
+      b[l] == null ? "--:--" : timeText(b[l]);
+  }
+}
+
+function peer(a, b) {
+  if (a === b) return true;
+
+  let ar = Math.floor(a / 9);
+  let ac = a % 9;
+  let br = Math.floor(b / 9);
+  let bc = b % 9;
+
+  return ar === br ||
+         ac === bc ||
+         (Math.floor(ar / 3) === Math.floor(br / 3) &&
+          Math.floor(ac / 3) === Math.floor(bc / 3));
+}
+
+function conflicts() {
+  let bad = new Set();
+
+  for (let i = 0; i < 81; i++) {
+    if (!values[i]) continue;
+
+    for (let j = i + 1; j < 81; j++) {
+      if (values[i] === values[j] && peer(i,j)) {
+        bad.add(i);
+        bad.add(j);
+      }
+    }
+  }
+
+  return bad;
+}
+
+function renderBoard() {
+    renderPad();
+  let bad = conflicts();
+  boardEl.innerHTML = "";
+
+  for (let i = 0; i < 81; i++) {
+    let b = document.createElement("button");
+
+    b.type = "button";
+    b.className = "cell";
+    b.setAttribute("role","gridcell");
+    b.setAttribute("aria-label",
+      `ردیف ${Math.floor(i/9)+1} ستون ${i%9+1}`);
+
+    if (puzzle[i]) b.classList.add("given");
+
+    if ($("highlightToggle").checked &&
+        selected >= 0 && peer(i,selected)) {
+      b.classList.add("peer");
+    }
+
+    if ($("highlightToggle").checked &&
+        values[i] && values[i] === values[selected]) {
+      b.classList.add("same");
+    }
+
+    if (i === selected) b.classList.add("selected");
+    if (bad.has(i)) b.classList.add("conflict");
+
+    if (values[i]) {
+      b.textContent = values[i];
+
+      if (!puzzle[i] &&
+          values[i] !== solution[Math.floor(i/9)][i%9]) {
+        b.classList.add("wrong");
+      }
+    } else if (notes[i].size) {
+      let ng = document.createElement("span");
+      ng.className = "notes";
+
+      for (let n = 1; n <= 9; n++) {
+        let s = document.createElement("span");
+        s.textContent = notes[i].has(n) ? n : "";
+        ng.appendChild(s);
+      }
+
+      b.appendChild(ng);
+    }
+
+    b.addEventListener("click", () => {
+      selected = i;
+      renderBoard();
+    });
+
+    boardEl.appendChild(b);
+  }
+
+  updateStats();
+}
+
+function renderPad() {
+  pad.innerHTML = "";
+
+  for (let n = 1; n <= 9; n++) {
+    let b = document.createElement("button");
+    b.className = "num";
+    b.textContent = n;
+    b.type = "button";
+    b.addEventListener("click", () => enter(n));
+    pad.appendChild(b);
+  }
+}
+
+function save() {
+  history.push({
+    values: values.slice(),
+    notes: notes.map(s => new Set(s)),
+    mistakes
+  });
+
+  if (history.length > 100) history.shift();
+}
+
+function enter(n) {
+  if (!started || finished || selected < 0) return;
+
+  if (puzzle[selected]) {
+    message("این خانه ثابت است؛ یک خانه خالی انتخاب کن.");
+    return;
+  }
+
+  save();
+
+  if (noteMode) {
+    if (notes[selected].has(n)) {
+      notes[selected].delete(n);
+    } else {
+      notes[selected].add(n);
+    }
+
+    message("یادداشت به‌روزرسانی شد.");
+  } else {
+    values[selected] = n;
+    notes[selected].clear();
+
+    if (conflicts().has(selected)) {
+      mistakes++;
+      message("این عدد در ردیف، ستون یا مربع تکراری است.", "error");
+    } else if (n !== solution[Math.floor(selected/9)][selected%9]) {
+      mistakes++;
+      message("عدد واردشده درست نیست؛ می‌توانی اصلاحش کنی.", "error");
+    } else {
+      message("درست بود! ادامه بده.", "success");
+    }
+
+    checkWin();
+  }
+
+  renderBoard();
+}
+
+function erase() {
+  if (!started || finished || selected < 0) return;
+
+  if (puzzle[selected]) {
+    message("خانه‌های ثابت پاک نمی‌شوند.");
+    return;
+  }
+
+  save();
+  values[selected] = 0;
+  notes[selected].clear();
+
+  renderBoard();
+  message("خانه پاک شد.");
+}
+
+function checkWin() {
+  if (values.some(v => !v)) return;
+
+  if (values.every((v,i) =>
+      v === solution[Math.floor(i/9)][i%9])) {
+
+    finished = true;
+    clearInterval(timer);
+
+    let b = bests();
+
+    if (b[difficulty] == null || seconds < b[difficulty]) {
+      b[difficulty] = seconds;
+
+      try {
+        localStorage.setItem("sudokuV2Best", JSON.stringify(b));
+      } catch {}
+    }
+
+    renderBests();
+
+    message(
+      `عالی بود! جدول را در ${timeText(seconds)} حل کردی؛ رکورد ذخیره شد! 🎉`,
+      "success"
+    );
+
+    $("hintBtn").disabled = true;
+  }
+}
+
+function checkBoard() {
+  if (!started || finished) return;
+
+  let bad = conflicts();
+
+  if (bad.size) {
+    message(`${bad.size} خانه در ردیف، ستون یا مربع ۳×۳ تکرار دارند.`, "error");
+    renderBoard();
+    return;
+  }
+
+  let empty = 0;
+  let wrong = 0;
+
+  values.forEach((v,i) => {
+    if (!v) empty++;
+    else if (v !== solution[Math.floor(i/9)][i%9]) wrong++;
+  });
+
+  if (!empty && !wrong) {
+    checkWin();
+    return;
+  }
+
+  if (wrong) {
+    message(`${wrong} عدد با جواب جدول هماهنگ نیست؛ خانه‌های قرمز را بررسی کن.`, "error");
+  } else {
+    message(`تکرار آشکاری نیست؛ ${empty} خانه خالی مانده.`, "success");
+  }
+
+  renderBoard();
+}
+
+function hint() {
+  if (!started || finished) return;
+
+  if (puzzle[selected]) {
+    let i = values.findIndex((v,i) => !puzzle[i] && !v);
+
+    if (i < 0) {
+      message("خانه خالی وجود ندارد.");
+      return;
+    }
+
+    selected = i;
+  }
+
+  save();
+
+  let n = solution[Math.floor(selected/9)][selected%9];
+
+  values[selected] = n;
+  notes[selected].clear();
+
+  message(`راهنمایی: عدد ${n} در خانه انتخاب‌شده قرار گرفت.`, "success");
+
+  checkWin();
+  renderBoard();
+}
+
+function undo() {
+  if (!history.length || finished) {
+    message("حرکتی برای بازگشت وجود ندارد.");
+    return;
+  }
+
+  let h = history.pop();
+
+  values = h.values;
+  notes = h.notes;
+  mistakes = h.mistakes;
+
+  renderBoard();
+  message("به حرکت قبلی برگشتی.");
+}
+
+function reset() {
+  values = puzzle.slice();
+  notes = Array.from({length:81}, () => new Set());
+  selected = puzzle.findIndex(v => !v);
+
+  if (selected < 0) selected = 0;
+
+  mistakes = 0;
+  seconds = 0;
+  finished = false;
+  history = [];
+
+  $("hintBtn").disabled = false;
+  started = true;
+
+  startTimer();
+  renderBoard();
+  message("جدول از نو شروع شد. موفق باشی!");
+}
+
+function newGame(level) {
+  difficulty = level;
+
+  makePuzzle(level);
+
+  mistakes = 0;
+  seconds = 0;
+  finished = false;
+  history = [];
+  noteMode = false;
+  started = true;
+
+  $("difficulty").value = level;
+  $("startDifficulty").value = level;
+  $("difficultyLabel").textContent = "سطح: " + LEVELS[level].label;
+  $("notesToggle").textContent = "✎ یادداشت: خاموش";
+  $("hintBtn").disabled = false;
+  $("startOverlay").classList.add("hidden");
+
+  startTimer();
+  renderPad();
+  renderBoard();
+
+  message("یک خانه خالی انتخاب کن و بازی را شروع کن.");
+}
+
+const helpToggle = $("helpToggle");
+const helpPanel = $("helpPanel");
+
+helpToggle.addEventListener("click", () => {
+  const isHidden = helpPanel.classList.toggle("hidden");
+
+  helpToggle.textContent = isHidden
+    ? "☰ Help"
+    : "✕ Close Help";
+});
+
+$("startBtn").addEventListener("click", () =>
+  newGame($("startDifficulty").value)
+);
+
+$("newGameBtn").addEventListener("click", () => {
+  $("startDifficulty").value = $("difficulty").value;
+  $("startOverlay").classList.remove("hidden");
+});
+
+$("difficulty").addEventListener("change", () => {
+  $("startDifficulty").value = $("difficulty").value;
+  $("startOverlay").classList.remove("hidden");
+});
+
+$("notesToggle").addEventListener("click", () => {
+  noteMode = !noteMode;
+
+  $("notesToggle").textContent =
+    "✎ یادداشت: " + (noteMode ? "روشن" : "خاموش");
+
+  message(noteMode ? "حالت یادداشت روشن شد." : "حالت یادداشت خاموش شد.");
+});
+
+$("eraseBtn").addEventListener("click", erase);
+$("checkBtn").addEventListener("click", checkBoard);
+$("hintBtn").addEventListener("click", hint);
+$("undoBtn").addEventListener("click", undo);
+$("resetBtn").addEventListener("click", reset);
+$("highlightToggle").addEventListener("change", renderBoard);
+
+document.addEventListener("keydown", e => {
+  if (!$("startOverlay").classList.contains("hidden")) return;
+
+  if (e.ctrlKey && e.key.toLowerCase() === "z") {
+    e.preventDefault();
+    undo();
+    return;
+  }
+
+  if (/^[1-9]$/.test(e.key)) {
+    enter(Number(e.key));
+    return;
+  }
+
+  if (e.key === "Backspace" || e.key === "Delete") {
+    erase();
+    return;
+  }
+
+  if (e.key.toLowerCase() === "n") {
+    noteMode = !noteMode;
+
+    $("notesToggle").textContent =
+      "✎ یادداشت: " + (noteMode ? "روشن" : "خاموش");
+
+    return;
+  }
+
+  if (e.key.toLowerCase() === "h") {
+    hint();
+    return;
+  }
+
+  if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)) {
+    e.preventDefault();
+
+    let r = Math.floor(selected/9);
+    let c = selected % 9;
+
+    if (e.key === "ArrowUp") r = (r + 8) % 9;
+    if (e.key === "ArrowDown") r = (r + 1) % 9;
+    if (e.key === "ArrowLeft") c = (c + 8) % 9;
+    if (e.key === "ArrowRight") c = (c + 1) % 9;
+
+    selected = r * 9 + c;
+    renderBoard();
+  }
+});
+
+renderBests();
+
+
+function renderPad() {
+  pad.innerHTML = "";
+
+  for (let n = 1; n <= 9; n++) {
+    const remaining = 9 - values.filter(v => v === n).length;
+
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "num";
+    b.disabled = remaining === 0;
+    b.innerHTML = `
+      <span class="num-value">${n}</span>
+      <span class="num-count">${remaining === 0 ? "تمام شد" : `مانده: ${remaining}`}</span>
+    `;
+
+    b.addEventListener("click", () => enter(n));
+    pad.appendChild(b);
+  }
+}
+
+
+renderBoard();
+})();
+</script>
+</body>
+</html>
