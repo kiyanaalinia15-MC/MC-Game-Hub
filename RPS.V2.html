@@ -1,652 +1,277 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Rock Paper Scissors V2</title>
+<meta charset="UTF-8">
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    body {
-      min-height: 100vh;
-      padding: 25px 15px;
-      background: #050b10;
-      color: #eaffff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
+<title>Rock Paper Scissors V2 | MC Game Hub</title>
 
-    h1 {
-      color: #00f5d4;
-      font-size: clamp(28px, 5vw, 44px);
-      margin-bottom: 12px;
-      text-shadow: 0 0 15px #00f5d477;
-    }
 
-    h2 {
-      color: #00f5d4;
-      margin-bottom: 18px;
-    }
 
-    .screen {
-      width: 100%;
-      max-width: 750px;
-      margin: 25px auto;
-      padding: 25px 18px;
-      border: 1px solid #00f5d477;
-      border-radius: 18px;
-      background: #0b171e;
-      box-shadow: 0 0 25px #00f5d41c;
-    }
+<style>
 
-    .hidden {
-      display: none !important;
-    }
+:root {
 
-    .subtitle {
-      color: #a9c6c8;
-      margin-bottom: 22px;
-      line-height: 1.6;
-    }
+  --bg: #050809;
 
-    /* =========================
-       SETUP
-    ========================= */
+  --panel: #0b1214;
 
-    .option-group {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px;
-      margin: 18px 0 25px;
-    }
+  --cyan: #00f5d4;
 
-    button {
-      border: 1px solid #00f5d4;
-      border-radius: 10px;
-      background: #10252d;
-      color: #eaffff;
-      padding: 12px 18px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-    }
+  --muted: #91a8aa;
 
-    button:hover {
-      background: #00f5d4;
-      color: #041014;
-      box-shadow: 0 0 16px #00f5d477;
-      transform: translateY(-2px);
-    }
+  --red: #ff5263;
 
-    button.selected {
-      background: #00f5d4;
-      color: #041014;
-      box-shadow: 0 0 15px #00f5d477;
-    }
+  --gold: #ffd166;
 
-    .primary-btn {
-      background: #00f5d4;
-      color: #041014;
-    }
+  --border: rgba(0,245,212,.23);
 
-    .back-btn {
-      border-color: #8ca7ad;
-      color: #c4d4d8;
-      background: #15232a;
-    }
+}
 
-    /* =========================
-       GAME INFO
-    ========================= */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .game-info {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      max-width: 700px;
-      margin: 20px auto;
-    }
+body {
 
-    .info-box {
-      padding: 13px 8px;
-      border: 1px solid #00f5d455;
-      border-radius: 10px;
-      background: #0b171e;
-    }
+  min-height: 100vh;
 
-    .info-label {
-      display: block;
-      color: #8ddddd;
-      font-size: 12px;
-      margin-bottom: 7px;
-    }
+  padding: 22px 14px 40px;
 
-    .info-value {
-      color: #00f5d4;
-      font-size: 21px;
-      font-weight: bold;
-    }
+  color: #efffff;
 
-    /* =========================
-       SCOREBOARD
-    ========================= */
+  background: radial-gradient(ellipse at top,#09201f,transparent 50%),var(--bg);
 
-    .scoreboard {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      max-width: 650px;
-      margin: 18px auto;
-    }
+  font-family: Arial,Helvetica,sans-serif;
 
-    .score-card {
-      padding: 15px 10px;
-      border: 1px solid #00f5d455;
-      border-radius: 12px;
-      background: #0b171e;
-      transition: 0.25s;
-    }
+}
 
-    .score-card.active {
-      border-color: #00f5d4;
-      box-shadow: 0 0 15px #00f5d433;
-    }
+button,input { font: inherit; }
 
-    .score-name {
-      color: #c6dfe0;
-      font-size: 14px;
-      margin-bottom: 8px;
-    }
+button { cursor: pointer; }
 
-    .score-number {
-      color: #00f5d4;
-      font-size: 30px;
-      font-weight: bold;
-    }
+button:disabled { cursor: not-allowed; opacity: .5; }
 
-    /* =========================
-       TURN
-    ========================= */
+.container { max-width: 900px; margin: auto; }
 
-    #turnDisplay {
-      min-height: 25px;
-      margin: 18px 0;
-      color: #00f5d4;
-      font-weight: bold;
-      font-size: 17px;
-    }
+header {
 
-    /* =========================
-       CHOICES
-    ========================= */
+  display:flex; justify-content:space-between; align-items:center;
 
-    .choices-title {
-      color: #a9c6c8;
-      margin: 15px 0;
-    }
+  gap:12px; flex-wrap:wrap; margin-bottom:26px;
 
-    .choices {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin: 20px auto;
-    }
+}
 
-    .choice-btn {
-      width: 115px;
-      height: 105px;
-      padding: 10px;
-      border-radius: 14px;
-      font-size: 17px;
-    }
+.brand { color:var(--cyan); font-size:23px; font-weight:900; letter-spacing:1px; }
 
-    .choice-emoji {
-      display: block;
-      font-size: 42px;
-      margin-bottom: 5px;
-    }
+.version { color:var(--muted); font-size:12px; margin-top:5px; }
 
-    .choice-btn.disabled {
-      opacity: 0.45;
-      pointer-events: none;
-    }
+.profile { border:1px solid var(--border); border-radius:12px; padding:10px 13px; color:var(--muted); font-size:13px; }
 
-    /* =========================
-       ROUND RESULT
-    ========================= */
+.profile strong { color:var(--cyan); }
 
-    .battle-area {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 25px;
-      margin: 25px auto;
-      flex-wrap: wrap;
-    }
+.hero { text-align:center; margin:25px 0; }
 
-    .fighter {
-      min-width: 150px;
-      padding: 18px 12px;
-      border: 1px solid #00f5d455;
-      border-radius: 15px;
-      background: #0b171e;
-    }
+.eyebrow { color:var(--cyan); letter-spacing:4px; font-size:12px; margin-bottom:12px; font-weight:bold; }
 
-    .fighter-name {
-      color: #8ddddd;
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
+h1 { font-size:clamp(30px,7vw,50px); }
 
-    .fighter-choice {
-      font-size: 55px;
-      min-height: 65px;
-    }
+h1 span { color:var(--cyan); text-shadow:0 0 20px #00f5d455; }
 
-    .vs {
-      color: #00f5d4;
-      font-size: 25px;
-      font-weight: bold;
-      text-shadow: 0 0 12px #00f5d477;
-    }
+.subtitle { color:var(--muted); font-size:14px; line-height:1.7; margin:12px auto 0; max-width:550px; }
 
-    /* =========================
-       RESULT
-    ========================= */
+.panel {
 
-    #roundResult {
-      min-height: 35px;
-      margin: 18px auto;
-      color: #00f5d4;
-      font-size: 22px;
-      font-weight: bold;
-      line-height: 1.5;
-    }
+  padding:clamp(15px,4vw,28px); border:1px solid var(--border);
 
-    #matchResult {
-      margin: 25px auto;
-      color: #00f5d4;
-      font-size: 27px;
-      font-weight: bold;
-      line-height: 1.5;
-      text-shadow: 0 0 12px #00f5d455;
-    }
+  border-radius:22px; background:linear-gradient(145deg,#0c1a1df7,#060c0efa);
 
-    .winner-box {
-      max-width: 600px;
-      margin: 25px auto;
-      padding: 25px 15px;
-      border: 1px solid #00f5d477;
-      border-radius: 16px;
-      background: #0b171e;
-      box-shadow: 0 0 25px #00f5d41c;
-    }
+  box-shadow:0 0 35px #00f5d40c;
 
-    /* =========================
-       CONTROLS
-    ========================= */
+}
 
-    .controls {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin: 25px auto;
-    }
+.section-title { text-align:center; color:var(--muted); font-size:12px; font-weight:bold; letter-spacing:1.5px; margin-bottom:14px; }
 
-    /* =========================
-       FRIEND MODE
-    ========================= */
+.modes { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:25px; }
 
-    .private-message {
-      max-width: 500px;
-      margin: 15px auto;
-      padding: 14px;
-      border: 1px solid #00f5d455;
-      border-radius: 10px;
-      color: #a9c6c8;
-      background: #081219;
-      line-height: 1.5;
-    }
+.mode-btn {
 
-    /* =========================
-       MOBILE
-    ========================= */
+  border:1px solid var(--border); border-radius:14px; padding:15px 8px;
 
-    @media (max-width: 480px) {
+  background:#081314; color:var(--muted); font-weight:bold; line-height:1.7;
 
-      body {
-        padding: 18px 8px;
-      }
+}
 
-      .screen {
-        padding: 20px 10px;
-      }
+.mode-btn span { display:block; font-size:24px; }
 
-      button {
-        padding: 10px 13px;
-        font-size: 13px;
-      }
+.mode-btn.active { border-color:var(--cyan); color:var(--cyan); background:#00f5d410; box-shadow:0 0 17px #00f5d40c; }
 
-      .choice-btn {
-        width: 92px;
-        height: 90px;
-      }
+.names { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
 
-      .choice-emoji {
-        font-size: 34px;
-      }
+.field label { display:block; color:var(--muted); font-size:12px; margin-bottom:7px; }
 
-      .fighter {
-        min-width: 120px;
-      }
+.field input {
 
-      .fighter-choice {
-        font-size: 45px;
-      }
+  width:100%; padding:12px; color:#fff; background:#050a0b;
 
-      .battle-area {
-        gap: 10px;
-      }
-    }
-  </style>
+  border:1px solid var(--border); border-radius:10px; outline:none;
+
+}
+
+.field input:focus { border-color:var(--cyan); }
+
+.scoreboard { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:24px; }
+
+.score-card { min-width:0; text-align:center; padding:15px 6px; border:1px solid var(--border); border-radius:14px; background:#0003; }
+
+.score-label { color:var(--muted); font-size:11px; line-height:1.5; overflow-wrap:anywhere; }
+
+.score-number { color:var(--cyan); font-size:clamp(25px,6vw,36px); font-weight:900; margin-top:7px; }
+
+.score-card.draw .score-number { color:var(--gold); }
+
+.battle { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; margin:20px 0 24px; }
+
+.fighter { min-width:0; text-align:center; padding:19px 6px; border:1px solid var(--border); border-radius:17px; background:#0003; }
+
+.fighter-name { color:var(--muted); font-size:11px; font-weight:bold; overflow-wrap:anywhere; }
+
+.hand { font-size:clamp(42px,10vw,68px); margin:14px 0; min-height:80px; display:grid; place-items:center; }
+
+.choice-label { color:var(--cyan); font-size:12px; min-height:16px; overflow-wrap:anywhere; }
+
+.versus { color:var(--cyan); font-size:15px; font-weight:900; }
+
+.result { min-height:76px; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:7px; text-align:center; padding:14px; margin-bottom:24px; border:1px solid var(--border); border-radius:14px; background:#00f5d408; }
+
+.result-title { color:var(--cyan); font-size:20px; font-weight:900; }
+
+.result-title.loss { color:var(--red); }
+
+.result-title.draw { color:var(--gold); }
+
+.result-detail { color:var(--muted); font-size:12px; line-height:1.7; }
+
+.choices { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:11px; }
+
+.choice-btn { min-width:0; min-height:120px; padding:13px 5px; color:#efffff; border:1px solid var(--border); border-radius:16px; background:#0a1517; transition:.2s; }
+
+.choice-btn:hover:not(:disabled) { transform:translateY(-4px); border-color:var(--cyan); box-shadow:0 0 20px #00f5d422; }
+
+.choice-emoji { display:block; font-size:40px; margin-bottom:10px; }
+
+.choice-name { font-size:13px; font-weight:900; }
+
+.choice-hint { display:block; margin-top:5px; color:var(--muted); font-size:10px; }
+
+.reward { margin-top:18px; padding:13px; border:1px dashed #ffd16655; border-radius:12px; color:var(--gold); font-size:12px; text-align:center; line-height:1.7; }
+
+.actions { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin-top:20px; }
+
+.action-btn { padding:12px 16px; color:var(--cyan); border:1px solid var(--border); border-radius:10px; background:#091314; font-weight:bold; font-size:12px; }
+
+.action-btn:hover { border-color:var(--cyan); }
+
+.action-btn.primary { background:var(--cyan); color:#001411; border-color:var(--cyan); }
+
+.status { margin-top:20px; padding:13px; border:1px solid var(--border); border-radius:12px; color:var(--muted); font-size:12px; line-height:1.8; text-align:center; overflow-wrap:anywhere; }
+
+.status strong { color:var(--cyan); }
+
+.status.warning { border-color:#ffd16655; }
+
+.hidden { display:none !important; }
+
+.footer { padding-top:24px; text-align:center; color:#587072; font-size:11px; line-height:1.8; }
+
+@media(max-width:480px) {
+
+  .brand { font-size:19px; }
+
+  .battle { gap:5px; }
+
+  .fighter { padding:15px 4px; }
+
+  .hand { font-size:42px; }
+
+  .choices { gap:6px; }
+
+  .choice-btn { min-height:105px; }
+
+  .choice-emoji { font-size:34px; }
+
+  .choice-name { font-size:11px; }
+
+  .names { gap:8px; }
+
+}
+
+
+/* Achievement toast */
+#achievementToast{position:fixed;z-index:9999;left:50%;top:22px;width:min(420px,calc(100vw - 28px));padding:16px 18px;transform:translate(-50%,-160%);opacity:0;border:1px solid #00f5d4;border-radius:16px;background:linear-gradient(135deg,#0b2425,#071012);color:#efffff;box-shadow:0 0 24px #00f5d455,inset 0 0 18px #00f5d40d;text-align:left;pointer-events:none;transition:transform .35s ease,opacity .35s ease}
+#achievementToast.show{transform:translate(-50%,0);opacity:1}
+#achievementToast .achievement-kicker{color:#00f5d4;font-size:11px;font-weight:900;letter-spacing:2px;margin-bottom:5px}
+#achievementToast .achievement-title{font-size:17px;font-weight:900;margin-bottom:4px}
+#achievementToast .achievement-desc{color:#a9c6c8;font-size:12px;line-height:1.5}
+</style>
+
 </head>
+
+
 
 <body>
 
-  <h1>🪨📄✂️ Rock Paper Scissors V2</h1>
+<main class="container">
 
+  <header>
 
-  <!-- =========================================
-       SETUP SCREEN
-  ========================================== -->
+    <div>
 
-  <section id="setupScreen" class="screen">
+      <div class="brand">MC GAME HUB</div>
 
-    <h2>Choose Game Mode</h2>
-
-    <p class="subtitle">
-      Select how you want to play.
-    </p>
-
-    <div class="option-group">
-
-      <button
-        id="botModeBtn"
-        class="selected"
-        type="button">
-        🤖 Play With Bot
-      </button>
-
-      <button
-        id="friendModeBtn"
-        type="button">
-        👥 Play With Friend
-      </button>
+      <div class="version">ROCK PAPER SCISSORS · V2</div>
 
     </div>
 
+    <div class="profile">Player: <strong id="profileName">Guest</strong></div>
 
-    <h2>Choose Rounds</h2>
-
-    <div class="option-group">
-
-      <button
-        class="round-btn selected"
-        data-rounds="1"
-        type="button">
-        1 Round
-      </button>
-
-      <button
-        class="round-btn"
-        data-rounds="2"
-        type="button">
-        2 Rounds
-      </button>
-
-      <button
-        class="round-btn"
-        data-rounds="3"
-        type="button">
-        3 Rounds
-      </button>
-
-    </div>
+  </header>
 
 
-    <p
-      id="roundDescription"
-      class="subtitle">
-      1 round match.
-    </p>
 
+  <section class="hero">
 
-    <button
-      id="startBtn"
-      class="primary-btn"
-      type="button">
-      Start Game
-    </button>
+    <div class="eyebrow">READY FOR BATTLE?</div>
 
+    <h1>ROCK <span>PAPER</span> SCISSORS</h1>
 
-    <div class="controls">
-
-      <button
-        id="setupBackBtn"
-        class="back-btn"
-        type="button">
-        ← Back to MC Game Hub
-      </button>
-
-    </div>
+    <p class="subtitle">Challenge the AI or battle your friend on the same computer.</p>
 
   </section>
 
 
 
-  <!-- =========================================
-       GAME SCREEN
-  ========================================== -->
+  <section class="panel">
 
-  <section id="gameScreen" class="hidden">
+    <div class="section-title">CHOOSE GAME MODE</div>
 
-    <!-- INFO -->
+    <div class="modes">
 
-    <div class="game-info">
+      <button class="mode-btn active" id="aiModeBtn">
 
-      <div class="info-box">
+        <span>🤖</span> SINGLE PLAYER
 
-        <span class="info-label">
-          ROUND
-        </span>
-
-        <span
-          id="roundValue"
-          class="info-value">
-          1 / 1
-        </span>
-
-      </div>
-
-
-      <div class="info-box">
-
-        <span class="info-label">
-          MODE
-        </span>
-
-        <span
-          id="modeValue"
-          class="info-value">
-          BOT
-        </span>
-
-      </div>
-
-    </div>
-
-
-
-    <!-- SCOREBOARD -->
-
-    <div class="scoreboard">
-
-      <div
-        id="player1Card"
-        class="score-card active">
-
-        <div
-          id="player1Name"
-          class="score-name">
-          Player
-        </div>
-
-        <div
-          id="player1Score"
-          class="score-number">
-          0
-        </div>
-
-      </div>
-
-
-      <div
-        id="player2Card"
-        class="score-card">
-
-        <div
-          id="player2Name"
-          class="score-name">
-          Bot
-        </div>
-
-        <div
-          id="player2Score"
-          class="score-number">
-          0
-        </div>
-
-      </div>
-
-    </div>
-
-
-
-    <!-- TURN -->
-
-    <div id="turnDisplay">
-      Your turn — choose your move!
-    </div>
-
-
-
-    <!-- BATTLE -->
-
-    <div class="battle-area">
-
-      <div class="fighter">
-
-        <div
-          id="fighter1Name"
-          class="fighter-name">
-          Player
-        </div>
-
-        <div
-          id="fighter1Choice"
-          class="fighter-choice">
-          ❔
-        </div>
-
-      </div>
-
-
-      <div class="vs">
-        VS
-      </div>
-
-
-      <div class="fighter">
-
-        <div
-          id="fighter2Name"
-          class="fighter-name">
-          Bot
-        </div>
-
-        <div
-          id="fighter2Choice"
-          class="fighter-choice">
-          ❔
-        </div>
-
-      </div>
-
-    </div>
-
-
-
-    <!-- CHOICES -->
-
-    <p
-      id="choicesTitle"
-      class="choices-title">
-      Choose your move
-    </p>
-
-
-    <div
-      id="choices"
-      class="choices">
-
-      <button
-        class="choice-btn"
-        data-choice="rock"
-        type="button">
-
-        <span class="choice-emoji">
-          🪨
-        </span>
-
-        Rock
+        <small>Play against AI · Earn XP</small>
 
       </button>
 
+      <button class="mode-btn" id="twoModeBtn">
 
-      <button
-        class="choice-btn"
-        data-choice="paper"
-        type="button">
+        <span>👥</span> TWO PLAYERS
 
-        <span class="choice-emoji">
-          📄
-        </span>
-
-        Paper
-
-      </button>
-
-
-      <button
-        class="choice-btn"
-        data-choice="scissors"
-        type="button">
-
-        <span class="choice-emoji">
-          ✂️
-        </span>
-
-        Scissors
+        <small>Play together · Local match</small>
 
       </button>
 
@@ -654,1085 +279,1119 @@
 
 
 
-    <!-- PRIVATE MESSAGE FOR FRIEND MODE -->
+    <div id="namesSection" class="names hidden">
 
-    <div
-      id="privateMessage"
-      class="private-message hidden">
-    </div>
+      <div class="field">
 
+        <label for="name1">PLAYER 1 NAME</label>
 
+        <input id="name1" maxlength="20" placeholder="Player 1">
 
-    <!-- ROUND RESULT -->
+      </div>
 
-    <div
-      id="roundResult"
-      aria-live="polite">
-    </div>
+      <div class="field">
 
+        <label for="name2">PLAYER 2 NAME</label>
 
+        <input id="name2" maxlength="20" placeholder="Player 2">
 
-    <!-- CONTROLS -->
-
-    <div class="controls">
-
-      <button
-        id="restartBtn"
-        type="button">
-        🔄 Restart Match
-      </button>
-
-
-      <button
-        id="settingsBtn"
-        type="button">
-        ⚙️ Change Settings
-      </button>
-
-
-      <button
-        id="gameBackBtn"
-        class="back-btn"
-        type="button">
-        ← Back to MC Game Hub
-      </button>
-
-    </div>
-
-  </section>
-
-
-
-  <!-- =========================================
-       MATCH RESULT SCREEN
-  ========================================== -->
-
-  <section
-    id="resultScreen"
-    class="screen hidden">
-
-    <h2>🏆 Match Finished!</h2>
-
-    <div class="winner-box">
-
-      <div
-        id="matchResult">
       </div>
 
     </div>
 
+
+
+    <div class="section-title">MATCH SCORE</div>
 
     <div class="scoreboard">
 
       <div class="score-card">
 
-        <div
-          id="resultPlayer1Name"
-          class="score-name">
-          Player
-        </div>
+        <div class="score-label" id="scoreLabel1">YOU</div>
 
-        <div
-          id="resultPlayer1Score"
-          class="score-number">
-          0
-        </div>
+        <div class="score-number" id="score1">0</div>
 
       </div>
 
+      <div class="score-card draw">
+
+        <div class="score-label">DRAWS</div>
+
+        <div class="score-number" id="draws">0</div>
+
+      </div>
 
       <div class="score-card">
 
-        <div
-          id="resultPlayer2Name"
-          class="score-name">
-          Bot
-        </div>
+        <div class="score-label" id="scoreLabel2">AI</div>
 
-        <div
-          id="resultPlayer2Score"
-          class="score-number">
-          0
-        </div>
+        <div class="score-number" id="score2">0</div>
 
       </div>
 
     </div>
 
 
-    <div class="controls">
 
-      <button
-        id="playAgainBtn"
-        class="primary-btn"
-        type="button">
-        🔄 Play Again
+    <div class="battle">
+
+      <div class="fighter">
+
+        <div class="fighter-name" id="fighterName1">YOU</div>
+
+        <div class="hand" id="hand1">❔</div>
+
+        <div class="choice-label" id="choice1">Choose below</div>
+
+      </div>
+
+      <div class="versus">VS</div>
+
+      <div class="fighter">
+
+        <div class="fighter-name" id="fighterName2">AI OPPONENT</div>
+
+        <div class="hand" id="hand2">🤖</div>
+
+        <div class="choice-label" id="choice2">Waiting...</div>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="result" aria-live="polite">
+
+      <div class="result-title" id="resultTitle">MAKE YOUR MOVE!</div>
+
+      <div class="result-detail" id="resultDetail">Choose rock, paper or scissors to begin.</div>
+
+    </div>
+
+
+
+    <div class="section-title" id="choiceHeading">CHOOSE YOUR WEAPON</div>
+
+
+
+    <div class="choices" id="choiceButtons">
+
+      <button class="choice-btn" data-choice="rock">
+
+        <span class="choice-emoji">🪨</span>
+
+        <span class="choice-name">ROCK</span>
+
+        <span class="choice-hint">Crush scissors</span>
+
       </button>
 
+      <button class="choice-btn" data-choice="paper">
 
-      <button
-        id="resultSettingsBtn"
-        type="button">
-        ⚙️ Change Settings
+        <span class="choice-emoji">📄</span>
+
+        <span class="choice-name">PAPER</span>
+
+        <span class="choice-hint">Cover rock</span>
+
       </button>
 
+      <button class="choice-btn" data-choice="scissors">
 
-      <button
-        id="resultBackBtn"
-        class="back-btn"
-        type="button">
-        ← Back to MC Game Hub
+        <span class="choice-emoji">✂️</span>
+
+        <span class="choice-name">SCISSORS</span>
+
+        <span class="choice-hint">Cut paper</span>
+
       </button>
 
     </div>
+
+
+
+    <div class="reward" id="rewardNote">
+
+      🏆 <strong>WIN REWARD: +10 XP</strong><br>
+
+      Only wins against AI earn profile XP.
+
+    </div>
+
+
+
+    <div class="actions">
+
+      <button class="action-btn primary" id="resetBtn">↻ Reset Match</button>
+
+      <button class="action-btn" id="resetScoresBtn">Reset Scores & Match</button>
+
+    </div>
+
+
+
+    <div class="status" id="accountStatus">Checking profile connection...</div>
 
   </section>
 
 
 
-  <script>
+  <footer class="footer">
 
-    /* =========================================
-       ELEMENTS
-    ========================================== */
+    MC GAME HUB · ROCK PAPER SCISSORS V2<br>
 
-    const setupScreen =
-      document.getElementById("setupScreen");
+    Play fair. Keep winning. Level up.
 
-    const gameScreen =
-      document.getElementById("gameScreen");
+  </footer>
 
-    const resultScreen =
-      document.getElementById("resultScreen");
+</main>
 
 
-    const botModeBtn =
-      document.getElementById("botModeBtn");
 
-    const friendModeBtn =
-      document.getElementById("friendModeBtn");
+<div id="achievementToast" role="status" aria-live="polite"><div class="achievement-kicker">🏆 ACHIEVEMENT UNLOCKED</div><div class="achievement-title" id="achievementToastTitle">Achievement</div><div class="achievement-desc" id="achievementToastDesc">New achievement unlocked!</div></div>
+<script>
 
+"use strict";
 
-    const roundButtons =
-      document.querySelectorAll(".round-btn");
 
 
-    const roundDescription =
-      document.getElementById("roundDescription");
+// ================================================
 
+// 1. SETTINGS & GAME STATE
 
-    const startBtn =
-      document.getElementById("startBtn");
+// ================================================
 
 
-    const roundValue =
-      document.getElementById("roundValue");
 
-    const modeValue =
-      document.getElementById("modeValue");
+const USERS_KEY = "mc_game_hub_users";
 
+const CURRENT_USER_KEY = "mc_current_user";
 
-    const player1Name =
-      document.getElementById("player1Name");
+const XP_PER_WIN = 10;
 
-    const player2Name =
-      document.getElementById("player2Name");
 
 
-    const player1Score =
-      document.getElementById("player1Score");
+const OPTIONS = {
 
-    const player2Score =
-      document.getElementById("player2Score");
+  rock: { emoji: "🪨", name: "Rock" },
 
+  paper: { emoji: "📄", name: "Paper" },
 
-    const player1Card =
-      document.getElementById("player1Card");
+  scissors: { emoji: "✂️", name: "Scissors" }
 
-    const player2Card =
-      document.getElementById("player2Card");
+};
 
 
-    const turnDisplay =
-      document.getElementById("turnDisplay");
 
+let mode = "ai";
 
-    const fighter1Name =
-      document.getElementById("fighter1Name");
+let score1 = 0;
 
-    const fighter2Name =
-      document.getElementById("fighter2Name");
+let score2 = 0;
 
+let draws = 0;
 
-    const fighter1Choice =
-      document.getElementById("fighter1Choice");
+let sessionXP = 0;
 
-    const fighter2Choice =
-      document.getElementById("fighter2Choice");
+let roundNumber = 0;
 
+let pendingPlayer1Choice = null;
 
-    const choicesTitle =
-      document.getElementById("choicesTitle");
 
 
-    const choiceButtons =
-      document.querySelectorAll(".choice-btn");
+// ================================================
 
+// 2. ELEMENTS
 
-    const privateMessage =
-      document.getElementById("privateMessage");
+// ================================================
 
 
-    const roundResult =
-      document.getElementById("roundResult");
 
+const $ = id => document.getElementById(id);
 
-    const matchResult =
-      document.getElementById("matchResult");
 
 
-    const resultPlayer1Name =
-      document.getElementById("resultPlayer1Name");
+const aiModeBtn = $("aiModeBtn");
 
-    const resultPlayer2Name =
-      document.getElementById("resultPlayer2Name");
+const twoModeBtn = $("twoModeBtn");
 
+const namesSection = $("namesSection");
 
-    const resultPlayer1Score =
-      document.getElementById("resultPlayer1Score");
+const name1Input = $("name1");
 
-    const resultPlayer2Score =
-      document.getElementById("resultPlayer2Score");
+const name2Input = $("name2");
 
+const choiceButtons = document.querySelectorAll("[data-choice]");
 
 
-    /* =========================================
-       GAME VARIABLES
-    ========================================== */
 
-    let gameMode = "bot";
+// ================================================
 
-    let totalRounds = 1;
+// 3. ACCOUNT STORAGE
 
-    let currentRound = 1;
+// ================================================
 
-    let scores = [0, 0];
 
-    let player1Choice = null;
 
-    let player2Choice = null;
+function getUsers() {
 
-    let waitingForPlayer2 = false;
+  try {
 
-    let roundLocked = false;
+    const data = localStorage.getItem(USERS_KEY);
 
+    const users = data ? JSON.parse(data) : [];
 
+    return Array.isArray(users) ? users : [];
 
-    /* =========================================
-       EMOJIS
-    ========================================== */
+  } catch (error) {
 
-    const choiceEmoji = {
+    console.error("Could not read users:", error);
 
-      rock: "🪨",
+    return [];
 
-      paper: "📄",
+  }
 
-      scissors: "✂️"
+}
 
-    };
 
 
+function getCurrentUsername() {
 
-    /* =========================================
-       MODE SELECTION
-    ========================================== */
+  try {
 
-    botModeBtn.addEventListener("click", () => {
+    const current = localStorage.getItem(CURRENT_USER_KEY);
 
-      gameMode = "bot";
+    if (!current) return null;
 
-      botModeBtn.classList.add("selected");
 
-      friendModeBtn.classList.remove("selected");
 
-      updateSetupDescription();
+    try {
 
-    });
+      const parsed = JSON.parse(current);
 
 
-    friendModeBtn.addEventListener("click", () => {
 
-      gameMode = "friend";
+      if (typeof parsed === "string") return parsed;
 
-      friendModeBtn.classList.add("selected");
+      if (parsed && typeof parsed === "object") {
 
-      botModeBtn.classList.remove("selected");
+        return parsed.username || parsed.email || null;
 
-      updateSetupDescription();
+      }
 
-    });
+    } catch (_) {
 
-
-
-    /* =========================================
-       ROUND SELECTION
-    ========================================== */
-
-    roundButtons.forEach(button => {
-
-      button.addEventListener("click", () => {
-
-        totalRounds =
-          Number(button.dataset.rounds);
-
-        roundButtons.forEach(item => {
-          item.classList.remove("selected");
-        });
-
-        button.classList.add("selected");
-
-        updateSetupDescription();
-
-      });
-
-    });
-
-
-
-    function updateSetupDescription() {
-
-      const modeText =
-        gameMode === "bot"
-          ? "Play against the Bot"
-          : "Play with a Friend";
-
-      roundDescription.textContent =
-        `${totalRounds} ${
-          totalRounds === 1 ? "round" : "rounds"
-        } match — ${modeText}.`;
+      // Supports a plain username string.
 
     }
 
 
 
-    /* =========================================
-       START GAME
-    ========================================== */
+    return current;
 
-    startBtn.addEventListener(
-      "click",
-      startMatch
+  } catch (error) {
+
+    console.error("Could not read current user:", error);
+
+    return null;
+
+  }
+
+}
+
+
+
+function getAccount() {
+
+  const current = getCurrentUsername();
+
+  if (!current) return null;
+
+
+
+  const users = getUsers();
+
+  const user = users.find(user =>
+
+    user.username === current || user.email === current
+
+  );
+
+
+
+  return user ? { users, user } : null;
+
+}
+
+
+
+function saveUsers(users) {
+
+  try {
+
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+
+    return true;
+
+  } catch (error) {
+
+    console.error("Could not save users:", error);
+
+    return false;
+
+  }
+
+}
+
+
+
+// ================================================
+
+// 4. LEVEL SYSTEM
+
+// ================================================
+
+
+
+function calculateLevel(totalXP) {
+
+  let remainingXP = Math.max(0, Number(totalXP) || 0);
+
+  let level = 1;
+
+
+
+  while (remainingXP >= level * 100) {
+
+    remainingXP -= level * 100;
+
+    level++;
+
+  }
+
+
+
+  return {
+
+    level,
+
+    currentXP: remainingXP,
+
+    nextLevelXP: level * 100
+
+  };
+
+}
+
+
+
+// ================================================
+
+// 5. PROFILE DISPLAY
+
+// ================================================
+
+
+
+function updateProfile() {
+
+  const account = getAccount();
+
+
+
+  if (!account) {
+
+    $("profileName").textContent = "Guest";
+
+    $("accountStatus").className = "status warning";
+
+    $("accountStatus").innerHTML =
+
+      "<strong>PROFILE NOT CONNECTED</strong><br>" +
+
+      "You can play, but profile XP and wins require signing in through MC Game Hub.";
+
+    return;
+
+  }
+
+
+
+  const user = account.user;
+
+  const info = calculateLevel(user.xp);
+
+
+
+  $("profileName").textContent = user.username || "Player";
+
+
+
+  $("accountStatus").className = "status";
+
+  $("accountStatus").innerHTML =
+
+    "<strong>✓ PROFILE CONNECTED</strong><br>" +
+
+    "Level " + info.level + " · " +
+
+    info.currentXP + " / " + info.nextLevelXP +
+
+    " XP toward next level<br>" +
+
+    "Total XP: " + (Number(user.xp) || 0) +
+
+    " · RPS wins: " + (Number(user.rpsWins) || 0) +
+
+    "<br>XP earned this match: " + sessionXP;
+
+}
+
+
+
+// ================================================
+
+// 6. XP REWARD
+
+// ================================================
+
+
+
+// MC GAME HUB: Achievement system (IDs match Profile V4)
+const ACHIEVEMENTS = [
+ {id:"first_memory",title:"Memory Rookie",description:"Complete your first Memory Game.",test:u=>(Number(u.memoryWins)||0)>=1},
+ {id:"memory_10",title:"Memory Master",description:"Complete 10 Memory Game wins.",test:u=>(Number(u.memoryWins)||0)>=10},
+ {id:"first_rps",title:"First Victory",description:"Win your first RPS round against the AI.",test:u=>(Number(u.rpsWins)||0)>=1},
+ {id:"rps_10",title:"RPS Champion",description:"Win 10 RPS rounds against the AI.",test:u=>(Number(u.rpsWins)||0)>=10},
+ {id:"level_2",title:"Level Up!",description:"Reach Level 2.",test:u=>(Number(u.level)||1)>=2},
+ {id:"level_5",title:"Rising Legend",description:"Reach Level 5.",test:u=>(Number(u.level)||1)>=5},
+ {id:"level_10",title:"Hub Legend",description:"Reach Level 10.",test:u=>(Number(u.level)||1)>=10},
+ {id:"snake_10",title:"Snake Starter",description:"Score at least 10 in Snake.",test:u=>(Number(u.snakeBest)||0)>=10},
+ {id:"snake_50",title:"Snake Expert",description:"Score at least 50 in Snake.",test:u=>(Number(u.snakeBest)||0)>=50},
+ {id:"points_100",title:"Point Collector",description:"Reach 100 total points.",test:u=>(Number(u.totalPoints)||0)>=100},
+ {id:"coins_100",title:"Coin Collector",description:"Collect 100 coins.",test:u=>(Number(u.coins)||0)>=100},
+ {id:"all_rounder",title:"All-Rounder",description:"Win Memory and RPS, and score 10 in Snake.",test:u=>(Number(u.memoryWins)||0)>=1&&(Number(u.rpsWins)||0)>=1&&(Number(u.snakeBest)||0)>=10},
+ {id:"games_3",title:"Explorer",description:"Unlock at least 3 games.",test:u=>Array.isArray(u.unlockedGames)&&u.unlockedGames.length>=3}
+];
+let achievementToastQueue=[]; let achievementToastBusy=false;
+function showAchievementToast(item){
+ achievementToastQueue.push(item); if(achievementToastBusy)return;
+ const next=()=>{const a=achievementToastQueue.shift();if(!a){achievementToastBusy=false;return;} achievementToastBusy=true;
+ const toast=document.getElementById("achievementToast"),title=document.getElementById("achievementToastTitle"),desc=document.getElementById("achievementToastDesc");
+ if(!toast||!title||!desc){achievementToastBusy=false;return;} title.textContent=a.title;desc.textContent=a.description;toast.classList.add("show");
+ setTimeout(()=>{toast.classList.remove("show");setTimeout(next,400);},3000);}; next();
+}
+function syncAchievements(user){if(!Array.isArray(user.achievements))user.achievements=[];const fresh=[];for(const a of ACHIEVEMENTS){if(!user.achievements.includes(a.id)&&a.test(user)){user.achievements.push(a.id);fresh.push(a);}}return fresh;}
+function notifyAchievements(items){items.forEach((item,index)=>setTimeout(()=>showAchievementToast(item),index*3500));}
+
+function awardWinXP() {
+
+  const account = getAccount();
+
+
+
+  if (!account) {
+
+    updateProfile();
+
+    return "Win recorded in this match, but sign in to save XP.";
+
+  }
+
+
+
+  const user = account.user;
+
+
+
+  user.xp = Math.max(0, Number(user.xp) || 0);
+
+  user.rpsWins = Math.max(0, Number(user.rpsWins) || 0);
+
+
+
+  user.xp += XP_PER_WIN;
+
+  user.rpsWins += 1;
+
+
+
+  user.level = calculateLevel(user.xp).level;
+  const newlyUnlocked = syncAchievements(user);
+
+  if (!saveUsers(account.users)) {
+    return "Profile saving failed. Please check browser storage.";
+  }
+
+  notifyAchievements(newlyUnlocked);
+  sessionXP += XP_PER_WIN;
+  updateProfile();
+
+
+
+  return "+" + XP_PER_WIN + " XP saved to your profile!";
+
+}
+
+
+
+// ================================================
+
+// 7. PLAYER NAMES
+
+// ================================================
+
+
+
+function getPlayer1Name() {
+
+  if (mode === "two") {
+
+    return name1Input.value.trim() || "Player 1";
+
+  }
+
+
+
+  const account = getAccount();
+
+  return account?.user?.username || "You";
+
+}
+
+
+
+function getPlayer2Name() {
+
+  if (mode === "two") {
+
+    return name2Input.value.trim() || "Player 2";
+
+  }
+
+
+
+  return "AI Opponent";
+
+}
+
+
+
+// ================================================
+
+// 8. SWITCH GAME MODE
+
+// ================================================
+
+
+
+function setMode(newMode) {
+
+  if (newMode !== "ai" && newMode !== "two") return;
+
+
+
+  mode = newMode;
+
+
+
+  aiModeBtn.classList.toggle("active", mode === "ai");
+
+  twoModeBtn.classList.toggle("active", mode === "two");
+
+
+
+  namesSection.classList.toggle("hidden", mode !== "two");
+
+
+
+  $("rewardNote").classList.toggle("hidden", mode !== "ai");
+
+
+
+  $("scoreLabel1").textContent = mode === "ai" ? "YOU" : "PLAYER 1";
+
+  $("scoreLabel2").textContent = mode === "ai" ? "AI" : "PLAYER 2";
+
+
+
+  $("choiceHeading").textContent =
+
+    mode === "ai" ? "CHOOSE YOUR WEAPON" : "PLAYER 1: CHOOSE YOUR WEAPON";
+
+
+
+  resetMatch();
+
+  updateProfile();
+
+}
+
+
+
+// ================================================
+
+// 9. RANDOM AI CHOICE
+
+// ================================================
+
+
+
+function getAIChoice() {
+
+  const choices = Object.keys(OPTIONS);
+
+  return choices[Math.floor(Math.random() * choices.length)];
+
+}
+
+
+
+// ================================================
+
+// 10. WINNER LOGIC
+
+// ================================================
+
+
+
+function getResult(a, b) {
+
+  if (a === b) return "draw";
+
+
+
+  const playerWins =
+
+    (a === "rock" && b === "scissors") ||
+
+    (a === "paper" && b === "rock") ||
+
+    (a === "scissors" && b === "paper");
+
+
+
+  return playerWins ? "win" : "loss";
+
+}
+
+
+
+// ================================================
+
+// 11. DISPLAY HELPERS
+
+// ================================================
+
+
+
+function displayChoice(player, choice) {
+
+  $("hand" + player).textContent = OPTIONS[choice].emoji;
+
+  $("choice" + player).textContent = OPTIONS[choice].name;
+
+}
+
+
+
+function updateScoreboard() {
+
+  $("score1").textContent = score1;
+
+  $("score2").textContent = score2;
+
+  $("draws").textContent = draws;
+
+}
+
+
+
+function showResult(title, detail, type = "") {
+
+  $("resultTitle").className = "result-title" + (type ? " " + type : "");
+
+  $("resultTitle").textContent = title;
+
+  $("resultDetail").textContent = detail;
+
+}
+
+
+
+// ================================================
+
+// 12. COMPLETE A ROUND
+
+// ================================================
+
+
+
+function finishRound(choice1, choice2) {
+
+  roundNumber++;
+
+
+
+  displayChoice(1, choice1);
+
+  displayChoice(2, choice2);
+
+
+
+  const result = getResult(choice1, choice2);
+
+
+
+  if (result === "draw") {
+
+    draws++;
+
+    showResult(
+
+      "🤝 IT'S A DRAW!",
+
+      getPlayer1Name() + " and " + getPlayer2Name() +
+
+      " both chose " + OPTIONS[choice1].name + ". No XP awarded.",
+
+      "draw"
+
+    );
+
+  } else if (result === "win") {
+
+    score1++;
+
+
+
+    let detail = getPlayer1Name() + " wins this round!";
+
+
+
+    if (mode === "ai") {
+
+      detail += " " + awardWinXP();
+
+    } else {
+
+      detail += " No profile XP in two-player mode.";
+
+    }
+
+
+
+    showResult("🏆 " + getPlayer1Name().toUpperCase() + " WINS!", detail);
+
+  } else {
+
+    score2++;
+
+
+
+    let detail = getPlayer2Name() + " wins this round!";
+
+
+
+    if (mode === "ai") {
+
+      detail = "AI wins this round. No XP awarded. Try again!";
+
+    } else {
+
+      detail += " No profile XP in two-player mode.";
+
+    }
+
+
+
+    showResult("⚔️ " + getPlayer2Name().toUpperCase() + " WINS!", detail, "loss");
+
+  }
+
+
+
+  updateScoreboard();
+
+}
+
+
+
+// ================================================
+
+// 13. SINGLE-PLAYER MODE
+
+// ================================================
+
+
+
+function playAI(choice) {
+
+  const aiChoice = getAIChoice();
+
+  finishRound(choice, aiChoice);
+
+}
+
+
+
+// ================================================
+
+// 14. TWO-PLAYER MODE
+
+// ================================================
+
+
+
+// Player 1 selects first. Their choice is not displayed.
+
+// Player 2 then selects. Only after that are both choices revealed.
+
+
+
+function playTwoPlayer(choice) {
+
+  if (!pendingPlayer1Choice) {
+
+    pendingPlayer1Choice = choice;
+
+
+
+    $("hand1").textContent = "🔒";
+
+    $("choice1").textContent = "Choice locked";
+
+
+
+    $("hand2").textContent = "❔";
+
+    $("choice2").textContent = "Player 2: choose now";
+
+
+
+    $("choiceHeading").textContent = "PLAYER 2: CHOOSE YOUR WEAPON";
+
+
+
+    showResult(
+
+      "🔒 PLAYER 1 READY",
+
+      "Player 1's choice is hidden. Pass the device to Player 2."
+
     );
 
 
-    document
-      .getElementById("restartBtn")
-      .addEventListener(
-        "click",
-        startMatch
-      );
 
+    // Keep the first player's selection secret.
 
-    document
-      .getElementById("playAgainBtn")
-      .addEventListener(
-        "click",
-        startMatch
-      );
+    return;
+
+  }
 
 
 
-    /* =========================================
-       SETTINGS
-    ========================================== */
+  const firstChoice = pendingPlayer1Choice;
 
-    document
-      .getElementById("settingsBtn")
-      .addEventListener(
-        "click",
-        showSetup
-      );
-
-
-    document
-      .getElementById("resultSettingsBtn")
-      .addEventListener(
-        "click",
-        showSetup
-      );
+  pendingPlayer1Choice = null;
 
 
 
-    function showSetup() {
-
-      setupScreen.classList.remove("hidden");
-
-      gameScreen.classList.add("hidden");
-
-      resultScreen.classList.add("hidden");
-
-    }
+  finishRound(firstChoice, choice);
 
 
 
-    /* =========================================
-       BACK TO HUB
-    ========================================== */
+  $("choiceHeading").textContent = "BOTH CHOICES REVEALED";
 
-    document
-      .getElementById("setupBackBtn")
-      .addEventListener(
-        "click",
-        goToHub
-      );
+}
 
 
-    document
-      .getElementById("gameBackBtn")
-      .addEventListener(
-        "click",
-        goToHub
-      );
+
+// ================================================
+
+// 15. BUTTON EVENTS
+
+// ================================================
 
 
-    document
-      .getElementById("resultBackBtn")
-      .addEventListener(
-        "click",
-        goToHub
-      );
+
+aiModeBtn.addEventListener("click", () => setMode("ai"));
+
+twoModeBtn.addEventListener("click", () => setMode("two"));
 
 
-    function goToHub() {
 
-      window.location.href =
-        "index.html";
+choiceButtons.forEach(button => {
+
+  button.addEventListener("click", () => {
+
+    const choice = button.dataset.choice;
+
+
+
+    if (mode === "ai") {
+
+      playAI(choice);
+
+    } else {
+
+      playTwoPlayer(choice);
 
     }
 
+  });
 
+});
 
-    /* =========================================
-       START MATCH
-    ========================================== */
 
-    function startMatch() {
 
-      setupScreen.classList.add("hidden");
+name1Input.addEventListener("input", () => {
 
-      resultScreen.classList.add("hidden");
+  if (mode === "two") {
 
-      gameScreen.classList.remove("hidden");
+    $("fighterName1").textContent = getPlayer1Name().toUpperCase();
 
+    $("scoreLabel1").textContent = getPlayer1Name();
 
-      currentRound = 1;
+  }
 
-      scores = [0, 0];
+});
 
-      player1Choice = null;
 
-      player2Choice = null;
 
-      waitingForPlayer2 = false;
+name2Input.addEventListener("input", () => {
 
-      roundLocked = false;
+  if (mode === "two") {
 
+    $("fighterName2").textContent = getPlayer2Name().toUpperCase();
 
-      modeValue.textContent =
-        gameMode === "bot"
-          ? "BOT"
-          : "FRIEND";
+    $("scoreLabel2").textContent = getPlayer2Name();
 
+  }
 
-      roundValue.textContent =
-        `${currentRound} / ${totalRounds}`;
+});
 
 
-      player1Score.textContent = "0";
 
-      player2Score.textContent = "0";
+$("resetBtn").addEventListener("click", resetMatch);
 
 
-      if (gameMode === "bot") {
 
-        player1Name.textContent =
-          "Player";
+$("resetScoresBtn").addEventListener("click", () => {
 
-        player2Name.textContent =
-          "Bot";
+  const confirmed = window.confirm(
 
-        fighter1Name.textContent =
-          "Player";
+    "Reset this match's scores? Previously earned profile XP and wins will remain saved."
 
-        fighter2Name.textContent =
-          "Bot";
+  );
 
-      } else {
 
-        player1Name.textContent =
-          "Player 1";
 
-        player2Name.textContent =
-          "Player 2";
+  if (confirmed) resetMatch();
 
-        fighter1Name.textContent =
-          "Player 1";
+});
 
-        fighter2Name.textContent =
-          "Player 2";
 
-      }
 
+// ================================================
 
-      fighter1Choice.textContent = "❔";
+// 16. RESET MATCH
 
-      fighter2Choice.textContent = "❔";
+// ================================================
 
 
-      roundResult.textContent = "";
 
+function resetMatch() {
 
-      privateMessage.classList.add("hidden");
+  score1 = 0;
 
+  score2 = 0;
 
-      player1Card.classList.add("active");
+  draws = 0;
 
-      player2Card.classList.remove("active");
+  sessionXP = 0;
 
+  roundNumber = 0;
 
-      enableChoiceButtons();
+  pendingPlayer1Choice = null;
 
 
-      updateTurnDisplay();
 
-    }
+  $("hand1").textContent = "❔";
 
+  $("hand2").textContent = mode === "ai" ? "🤖" : "❔";
 
 
-    /* =========================================
-       CHOICE BUTTONS
-    ========================================== */
 
-    choiceButtons.forEach(button => {
+  $("choice1").textContent = "Choose below";
 
-      button.addEventListener("click", () => {
+  $("choice2").textContent = "Waiting...";
 
-        const choice =
-          button.dataset.choice;
 
-        if (roundLocked) {
-          return;
-        }
 
-        if (gameMode === "bot") {
+  $("fighterName1").textContent = getPlayer1Name().toUpperCase();
 
-          playAgainstBot(choice);
+  $("fighterName2").textContent = getPlayer2Name().toUpperCase();
 
-        } else {
 
-          playWithFriend(choice);
 
-        }
+  $("choiceHeading").textContent =
 
-      });
+    mode === "ai" ? "CHOOSE YOUR WEAPON" : "PLAYER 1: CHOOSE YOUR WEAPON";
 
-    });
 
 
+  showResult(
 
-    /* =========================================
-       BOT GAME
-    ========================================== */
+    "MAKE YOUR MOVE!",
 
-    function playAgainstBot(choice) {
+    mode === "ai"
 
-      roundLocked = true;
+      ? "Choose rock, paper or scissors to begin."
 
-      disableChoiceButtons();
+      : "Player 1 chooses first. Player 2 chooses after the first selection is locked."
 
+  );
 
-      player1Choice = choice;
 
 
-      const botChoices = [
-        "rock",
-        "paper",
-        "scissors"
-      ];
+  updateScoreboard();
 
+  updateProfile();
 
-      const botChoice =
-        botChoices[
-          Math.floor(
-            Math.random() *
-            botChoices.length
-          )
-        ];
+}
 
 
-      player2Choice = botChoice;
 
+// ================================================
 
-      fighter1Choice.textContent =
-        choiceEmoji[player1Choice];
+// 17. INITIALIZE
 
+// ================================================
 
-      fighter2Choice.textContent =
-        choiceEmoji[player2Choice];
 
 
-      const winner =
-        getWinner(
-          player1Choice,
-          player2Choice
-        );
+function initializeGame() {
 
+  updateScoreboard();
 
-      if (winner === 1) {
+  updateProfile();
 
-        scores[0]++;
 
-        roundResult.textContent =
-          "🎉 You Win This Round!";
 
-      }
+  $("fighterName1").textContent = getPlayer1Name().toUpperCase();
 
-      else if (winner === 2) {
+  $("fighterName2").textContent = getPlayer2Name().toUpperCase();
 
-        scores[1]++;
+}
 
-        roundResult.textContent =
-          "🤖 Bot Wins This Round!";
 
-      }
 
-      else {
+initializeGame();
 
-        roundResult.textContent =
-          "🤝 This Round Is a Draw!";
-
-      }
-
-
-      updateScores();
-
-
-      setTimeout(
-        finishRound,
-        1200
-      );
-
-    }
-
-
-
-    /* =========================================
-       FRIEND GAME
-    ========================================== */
-
-    function playWithFriend(choice) {
-
-      if (!waitingForPlayer2) {
-
-        /* PLAYER 1 */
-
-        player1Choice = choice;
-
-        waitingForPlayer2 = true;
-
-
-        fighter1Choice.textContent =
-          "🔒";
-
-
-        fighter2Choice.textContent =
-          "❔";
-
-
-        privateMessage.classList.remove(
-          "hidden"
-        );
-
-
-        privateMessage.textContent =
-          "Player 1 has chosen. Now Player 2, choose your move.";
-
-
-        choicesTitle.textContent =
-          "Player 2 — Choose your move";
-
-
-        player1Card.classList.remove(
-          "active"
-        );
-
-        player2Card.classList.add(
-          "active"
-        );
-
-
-        turnDisplay.textContent =
-          "Player 2's turn";
-
-
-        return;
-
-      }
-
-
-      /* PLAYER 2 */
-
-      player2Choice = choice;
-
-      roundLocked = true;
-
-      disableChoiceButtons();
-
-
-      fighter1Choice.textContent =
-        choiceEmoji[player1Choice];
-
-
-      fighter2Choice.textContent =
-        choiceEmoji[player2Choice];
-
-
-      privateMessage.classList.add(
-        "hidden"
-      );
-
-
-      const winner =
-        getWinner(
-          player1Choice,
-          player2Choice
-        );
-
-
-      if (winner === 1) {
-
-        scores[0]++;
-
-        roundResult.textContent =
-          "🏆 Player 1 Wins This Round!";
-
-      }
-
-      else if (winner === 2) {
-
-        scores[1]++;
-
-        roundResult.textContent =
-          "🏆 Player 2 Wins This Round!";
-
-      }
-
-      else {
-
-        roundResult.textContent =
-          "🤝 This Round Is a Draw!";
-
-      }
-
-
-      updateScores();
-
-
-      setTimeout(
-        finishRound,
-        1200
-      );
-
-    }
-
-
-
-    /* =========================================
-       DETERMINE WINNER
-       
-       0 = DRAW
-       1 = PLAYER 1
-       2 = PLAYER 2
-    ========================================== */
-
-    function getWinner(
-      choice1,
-      choice2
-    ) {
-
-      if (choice1 === choice2) {
-        return 0;
-      }
-
-
-      if (
-
-        (choice1 === "rock" &&
-          choice2 === "scissors") ||
-
-        (choice1 === "paper" &&
-          choice2 === "rock") ||
-
-        (choice1 === "scissors" &&
-          choice2 === "paper")
-
-      ) {
-
-        return 1;
-
-      }
-
-
-      return 2;
-
-    }
-
-
-
-    /* =========================================
-       FINISH ROUND
-    ========================================== */
-
-    function finishRound() {
-
-      if (
-        currentRound >= totalRounds
-      ) {
-
-        finishMatch();
-
-        return;
-
-      }
-
-
-      currentRound++;
-
-
-      roundValue.textContent =
-        `${currentRound} / ${totalRounds}`;
-
-
-      player1Choice = null;
-
-      player2Choice = null;
-
-      waitingForPlayer2 = false;
-
-      roundLocked = false;
-
-
-      fighter1Choice.textContent =
-        "❔";
-
-      fighter2Choice.textContent =
-        "❔";
-
-
-      roundResult.textContent =
-        "";
-
-
-      privateMessage.classList.add(
-        "hidden"
-      );
-
-
-      choicesTitle.textContent =
-        gameMode === "bot"
-          ? "Choose your move"
-          : "Player 1 — Choose your move";
-
-
-      player1Card.classList.add(
-        "active"
-      );
-
-      player2Card.classList.remove(
-        "active"
-      );
-
-
-      enableChoiceButtons();
-
-
-      updateTurnDisplay();
-
-    }
-
-
-
-    /* =========================================
-       FINISH MATCH
-    ========================================== */
-
-    function finishMatch() {
-
-      gameScreen.classList.add(
-        "hidden"
-      );
-
-      resultScreen.classList.remove(
-        "hidden"
-      );
-
-
-      resultPlayer1Name.textContent =
-        gameMode === "bot"
-          ? "Player"
-          : "Player 1";
-
-
-      resultPlayer2Name.textContent =
-        gameMode === "bot"
-          ? "Bot"
-          : "Player 2";
-
-
-      resultPlayer1Score.textContent =
-        scores[0];
-
-
-      resultPlayer2Score.textContent =
-        scores[1];
-
-
-      if (scores[0] > scores[1]) {
-
-        if (gameMode === "bot") {
-
-          matchResult.innerHTML =
-            "🏆 You Win the Match! 🎉";
-
-        } else {
-
-          matchResult.innerHTML =
-            "🏆 Player 1 Wins the Match! 🎉";
-
-        }
-
-      }
-
-      else if (scores[1] > scores[0]) {
-
-        if (gameMode === "bot") {
-
-          matchResult.innerHTML =
-            "🤖 Bot Wins the Match!";
-
-        } else {
-
-          matchResult.innerHTML =
-            "🏆 Player 2 Wins the Match! 🎉";
-
-        }
-
-      }
-
-      else {
-
-        matchResult.innerHTML =
-          "🤝 The Match Is a Draw!";
-
-      }
-
-
-      resultScreen.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
-
-    }
-
-
-
-    /* =========================================
-       UPDATE SCORES
-    ========================================== */
-
-    function updateScores() {
-
-      player1Score.textContent =
-        scores[0];
-
-      player2Score.textContent =
-        scores[1];
-
-    }
-
-
-
-    /* =========================================
-       TURN DISPLAY
-    ========================================== */
-
-    function updateTurnDisplay() {
-
-      if (gameMode === "bot") {
-
-        turnDisplay.textContent =
-          "Your turn — choose your move!";
-
-        return;
-
-      }
-
-
-      if (!waitingForPlayer2) {
-
-        turnDisplay.textContent =
-          "Player 1's turn";
-
-      } else {
-
-        turnDisplay.textContent =
-          "Player 2's turn";
-
-      }
-
-    }
-
-
-
-    /* =========================================
-       BUTTON CONTROL
-    ========================================== */
-
-    function disableChoiceButtons() {
-
-      choiceButtons.forEach(button => {
-
-        button.classList.add(
-          "disabled"
-        );
-
-      });
-
-    }
-
-
-    function enableChoiceButtons() {
-
-      choiceButtons.forEach(button => {
-
-        button.classList.remove(
-          "disabled"
-        );
-
-      });
-
-    }
-
-
-
-    /* =========================================
-       INITIAL SETUP
-    ========================================== */
-
-    updateSetupDescription();
-
-  </script>
+</script>
 
 </body>
+
 </html>
