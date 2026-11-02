@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MC Game Hub | Shop V1</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --cyan: #00f5d4;
+  --bg: #050b10;
+  --panel: #0b171e;
+  --border: #17434c;
+  --muted: #829da5;
+  --gold: #ffd166;
+  --red: #ff7777;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  padding: 24px 15px 50px;
+  background:
+    radial-gradient(circle at top, #00f5d414, transparent 42%),
+    var(--bg);
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 4px;
+}
+
+.page {
+  max-width: 1180px;
+  margin: auto;
+}
+
+.brand {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.brand a {
+  color: var(--cyan);
+  text-decoration: none;
+  font: 800 clamp(23px, 5vw, 36px) Orbitron, sans-serif;
+  text-shadow: 0 0 22px #00f5d455;
+}
+
+.brand p {
+  color: var(--muted);
+  margin-top: 10px;
+  font-size: 11px;
+  letter-spacing: 3px;
+}
+
+.panel {
+  padding: 22px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  background: #0b171ef2;
+  box-shadow: 0 0 24px #00f5d407;
+}
+
+h2 {
+  color: var(--cyan);
+  font: 700 18px Orbitron, Arial, sans-serif;
+  margin-bottom: 17px;
+}
+
+h3 {
+  font-family: Orbitron, Arial, sans-serif;
+}
+
+button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.hero h1 {
+  font: 800 clamp(25px, 5vw, 42px) Orbitron, Arial, sans-serif;
+  color: white;
+}
+
+.hero h1 span {
+  color: var(--cyan);
+}
+
+.hero p {
+  color: var(--muted);
+  line-height: 1.7;
+  margin-top: 12px;
+  max-width: 610px;
+}
+
+.balance {
+  min-width: 185px;
+  padding: 20px;
+  border: 1px solid #00f5d466;
+  border-radius: 14px;
+  background: #00f5d409;
+  text-align: center;
+}
+
+.balance .coin {
+  font-size: 27px;
+}
+
+.balance strong {
+  display: block;
+  color: var(--gold);
+  font: 800 29px Orbitron, Arial, sans-serif;
+  margin: 9px 0;
+  overflow-wrap: anywhere;
+}
+
+.balance span {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.level-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.level-badge {
+  color: var(--cyan);
+  border: 1px solid var(--cyan);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-weight: bold;
+}
+
+.xp-text {
+  color: #b8cbd0;
+  font-size: 12px;
+}
+
+.progress-track {
+  height: 11px;
+  background: #020709;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #008f83, var(--cyan));
+  transition: width .3s;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.section-heading h2 {
+  margin-bottom: 0;
+}
+
+.count {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.filters {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.filter {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: #b8cbd0;
+  background: #050b10;
+  transition: .2s;
+}
+
+.filter:hover,
+.filter.active {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  box-shadow: 0 0 12px #00f5d411;
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.item-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 17px;
+  border: 1px solid #1b3b43;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #0c1b22, #061015);
+  transition: transform .2s, border-color .2s, box-shadow .2s;
+}
+
+.item-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--cyan);
+  box-shadow: 0 0 20px #00f5d412;
+}
+
+.item-art {
+  display: grid;
+  place-items: center;
+  min-height: 115px;
+  margin-bottom: 15px;
+  border: 1px solid #17434c;
+  border-radius: 11px;
+  background:
+    radial-gradient(circle, #00f5d41c, transparent 70%),
+    #050b10;
+  font-size: 53px;
+}
+
+.item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.item-card h3 {
+  font-size: 13px;
+  line-height: 1.6;
+  color: white;
+  overflow-wrap: anywhere;
+}
+
+.tag {
+  flex-shrink: 0;
+  font-size: 9px;
+  padding: 5px 7px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--cyan);
+}
+
+.tag.gold {
+  color: var(--gold);
+  border-color: #806c36;
+}
+
+.item-description {
+  flex: 1;
+  min-height: 55px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+  margin-bottom: 15px;
+}
+
+.requirement {
+  color: #b8cbd0;
+  font-size: 11px;
+  margin-bottom: 12px;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 13px;
+}
+
+.price {
+  color: var(--gold);
+  font: 700 16px Orbitron, Arial, sans-serif;
+}
+
+.price small {
+  font: 11px Arial, sans-serif;
+  color: var(--muted);
+}
+
+.btn {
+  padding: 11px 13px;
+  border: 1px solid var(--cyan);
+  border-radius: 8px;
+  background: var(--cyan);
+  color: #031014;
+  font-weight: bold;
+  transition: .2s;
+}
+
+.btn:hover:not(:disabled) {
+  box-shadow: 0 0 16px #00f5d433;
+  transform: translateY(-1px);
+}
+
+.btn.secondary {
+  background: transparent;
+  color: var(--cyan);
+}
+
+.btn.full {
+  width: 100%;
+}
+
+.btn.gold {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #171004;
+}
+
+.btn:disabled {
+  color: #a1b0b4;
+  background: #152329;
+  border-color: #263d43;
+}
+
+.empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 35px 15px;
+  color: var(--muted);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  line-height: 1.8;
+}
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.inventory-item {
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: #071117;
+}
+
+.inventory-item .item-art {
+  min-height: 75px;
+  font-size: 37px;
+}
+
+.inventory-item h3 {
+  font-size: 12px;
+  margin-bottom: 9px;
+}
+
+.inventory-item p {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.status {
+  color: var(--cyan) !important;
+}
+
+.notice {
+  display: none;
+  margin-bottom: 18px;
+  padding: 13px 15px;
+  border-radius: 9px;
+  line-height: 1.6;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.notice.success {
+  display: block;
+  color: var(--cyan);
+  border: 1px solid #00f5d455;
+  background: #00f5d410;
+}
+
+.notice.error {
+  display: block;
+  color: #ff9292;
+  border: 1px solid #ff404055;
+  background: #ff404010;
+}
+
+.notice.info {
+  display: block;
+  color: #c1d6db;
+  border: 1px solid var(--border);
+  background: #071117;
+}
+
+.auth-box {
+  max-width: 520px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.auth-box p {
+  color: var(--muted);
+  line-height: 1.8;
+  margin-bottom: 18px;
+}
+
+.footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 16px 0;
+  line-height: 2;
+}
+
+.footer a {
+  color: var(--cyan);
+  text-decoration: none;
+}
+
+@media (max-width: 850px) {
+  .shop-grid,
+  .inventory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  body { padding: 18px 10px 35px; }
+  .panel { padding: 16px; }
+  .shop-grid,
+  .inventory-grid {
+    grid-template-columns: 1fr;
+  }
+  .balance {
+    width: 100%;
+  }
+}
+</style>
+</head>
+
+<body>
+<main class="page">
+
+  <header class="brand">
+    <a href="index.html">MC GAME HUB</a>
+    <p>PLAYER MARKETPLACE · SHOP V1</p>
+  </header>
+
+  <div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+  <section id="loginRequired" class="panel auth-box hidden">
+    <h2>Login Required</h2>
+    <p>
+      Please log in to your existing MC Game Hub account first.
+      Your shop purchases are saved to that account in this browser.
+    </p>
+    <a class="btn" href="Profile_V6.html"
+       style="display:inline-block;text-decoration:none">
+      Open Player Profile
+    </a>
+  </section>
+
+  <div id="shopApp" class="hidden">
+
+    <section class="panel hero">
+      <div>
+        <h1>THE <span>SHOP</span></h1>
+        <p>
+          Customize your profile, unlock rewards, and collect exclusive items.
+          Your purchases belong to your current player account.
+        </p>
+      </div>
+
+      <div class="balance">
+        <div class="coin">🪙</div>
+        <strong id="coinBalance">0</strong>
+        <span>YOUR COINS</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="level-line">
+        <div class="level-badge">LEVEL <span id="playerLevel">1</span></div>
+        <div class="xp-text" id="xpText">0 / 100 XP</div>
+      </div>
+
+      <div class="progress-track" role="progressbar"
+           id="xpProgress" aria-valuemin="0"
+           aria-valuemax="100" aria-valuenow="0">
+        <div class="progress-fill" id="xpBar"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <h2>Marketplace</h2>
+        <span class="count" id="catalogCount"></span>
+      </div>
+
+      <div class="filters" id="filters">
+        <button class="filter active" data-filter="all">All Items</button>
+        <button class="filter" data-filter="cosmetic">Cosmetics</button>
+        <button class="filter" data-filter="title">Titles</button>
+        <button class="filter" data-filter="game">Game Unlocks</button>
+      </div>
+
+      <div class="shop-grid" id="shopGrid"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <h2>Your Inventory</h2>
+        <span class="count" id="inventoryCount">0 items</span>
+      </div>
+
+      <p class="item-description" style="margin-top:12px;margin-bottom:0">
+        Items you own appear here. Equip supported cosmetics or titles
+        to save your selection to your player account.
+      </p>
+
+      <div class="inventory-grid" id="inventoryGrid"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Quick Links</h2>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn secondary" href="Login.html"
+           style="text-decoration:none">Player Profile</a>
+        <a class="btn secondary" href="index.html"
+           style="text-decoration:none">Game Hub</a>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="footer">
+    © 2026 MC Game Hub · Shop V1<br>
+    <a href="index.html">Back to Game Hub</a>
+  </footer>
+</main>
+
+<script>
+"use strict";
+
+/*
+  MC GAME HUB SHOP V1
+
+  Existing storage keys are preserved:
+  mc_game_hub_users
+  mc_current_user
+
+  Additive account fields:
+  shopInventory: array of purchased item IDs
+  equippedCosmetics: object containing equipped item IDs
+
+  Existing account fields are not replaced or cleared.
+*/
+
+const USERS_KEY = "mc_game_hub_users";
+const CURRENT_USER_KEY = "mc_current_user";
+
+const $ = id => document.getElementById(id);
+
+const ITEMS = [
+  {
+    id: "cosmetic_cyan_theme",
+    name: "Cyber Cyan Theme",
+    category: "cosmetic",
+    icon: "🌌",
+    price: 100,
+    level: 1,
+    description: "A futuristic cyan profile theme for your player identity.",
+    effect: "theme",
+    tag: "POPULAR"
+  },
+  {
+    id: "cosmetic_gold_frame",
+    name: "Golden Avatar Frame",
+    category: "cosmetic",
+    icon: "🖼️",
+    price: 150,
+    level: 2,
+    description: "A premium golden frame effect for your profile avatar.",
+    effect: "frame",
+    tag: "RARE"
+  },
+  {
+    id: "cosmetic_neon_frame",
+    name: "Neon Avatar Frame",
+    category: "cosmetic",
+    icon: "💠",
+    price: 80,
+    level: 1,
+    description: "A bright cyan frame style for your profile identity.",
+    effect: "neonFrame",
+    tag: "COMMON"
+  },
+  {
+    id: "title_pro_gamer",
+    name: "Pro Gamer",
+    category: "title",
+    icon: "🎮",
+    price: 120,
+    level: 2,
+    description: "Show the Pro Gamer title on your player profile.",
+    effect: "title",
+    value: "Pro Gamer",
+    tag: "TITLE"
+  },
+  {
+    id: "title_elite_player",
+    name: "Elite Player",
+    category: "title",
+    icon: "👑",
+    price: 300,
+    level: 5,
+    description: "A prestigious title for experienced players.",
+    effect: "title",
+    value: "Elite Player",
+    tag: "ELITE"
+  },
+  {
+    id: "title_game_explorer",
+    name: "Game Explorer",
+    category: "title",
+    icon: "🧭",
+    price: 90,
+    level: 1,
+    description: "A title for players who explore the game hub.",
+    effect: "title",
+    value: "Game Explorer",
+    tag: "TITLE"
+  },
+  {
+    id: "game_memory_plus",
+    name: "Memory Bonus Pass",
+    category: "game",
+    icon: "🧠",
+    price: 180,
+    level: 2,
+    description: "Adds the Memory Bonus Pass to your account's game unlock list.",
+    effect: "game",
+    value: "memory_bonus",
+    tag: "GAME PASS"
+  },
+  {
+    id: "game_snake_plus",
+    name: "Snake Bonus Pass",
+    category: "game",
+    icon: "🐍",
+    price: 220,
+    level: 3,
+    description: "Adds the Snake Bonus Pass to your account's game unlock list.",
+    effect: "game",
+    value: "snake_bonus",
+    tag: "GAME PASS"
+  },
+  {
+    id: "game_rps_plus",
+    name: "RPS Bonus Pass",
+    category: "game",
+    icon: "⚔️",
+    price: 160,
+    level: 2,
+    description: "Adds the RPS Bonus Pass to your account's game unlock list.",
+    effect: "game",
+    value: "rps_bonus",
+    tag: "GAME PASS"
+  },
+  {
+  id: "game_sudoku",
+  name: "Sudoku Unlock",
+  description: "Unlock Sudoku and start playing.",
+  icon: "🧩",
+  category: "game",
+  effect: "game",
+  value: "sudoku",
+  price: 50,
+  level: 3
+},
+{
+  id: "game_racing_car",
+  name: "Racing Car Unlock",
+  description: "Unlock Racing Car and hit the road.",
+  icon: "🏎️",
+  category: "game",
+  effect: "game",
+  value: "racing_car",
+  price: 125,
+  level: 7
+},
+{
+  id: "game_block_blast",
+  name: "Block Blast Unlock",
+  description: "Unlock Block Blast and test your skills.",
+  icon: "🧱",
+  category: "game",
+  effect: "game",
+  value: "block_blast",
+  price: 180,
+  level: 8
+},
+{
+  id: "game_temple_run",
+  name: "Temple Run Unlock",
+  description: "Unlock Temple Run and start running.",
+  icon: "🏃",
+  category: "game",
+  effect: "game",
+  value: "temple_run",
+  price: 220,
+  level: 10
+}
+];
+
+let activeFilter = "all";
+let currentUsername = null;
+let busy = false;
+
+function num(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+}
+
+function readUsers() {
+  const raw = localStorage.getItem(USERS_KEY);
+
+  if (!raw) return [];
+
+  const parsed = JSON.parse(raw);
+
+  if (!Array.isArray(parsed)) {
+    throw new Error("The saved user list has an unexpected format.");
+  }
+
+  return parsed.filter(user => user && typeof user === "object");
+}
+
+function saveUsers(users) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+}
+
+function calculateLevel(totalXP) {
+  let remaining = num(totalXP);
+  let level = 1;
+  let required = 100;
+
+  while (remaining >= required && level < 10000) {
+    remaining -= required;
+    level++;
+    required = level * 100;
+  }
+
+  return { level, remaining, required };
+}
+
+function normalizeShopFields(user) {
+  let changed = false;
+
+  if (!Array.isArray(user.shopInventory)) {
+    user.shopInventory = [];
+    changed = true;
+  }
+
+  if (!user.equippedCosmetics ||
+      typeof user.equippedCosmetics !== "object" ||
+      Array.isArray(user.equippedCosmetics)) {
+    user.equippedCosmetics = {};
+    changed = true;
+  }
+
+  if (!Array.isArray(user.unlockedGames)) {
+    user.unlockedGames = [];
+    changed = true;
+  }
+
+  if (user.coins === undefined || user.coins === null ||
+      !Number.isFinite(Number(user.coins))) {
+    user.coins = 0;
+    changed = true;
+  } else {
+    const cleanCoins = num(user.coins);
+    if (user.coins !== cleanCoins) {
+      user.coins = cleanCoins;
+      changed = true;
+    }
+  }
+
+  const xp = calculateLevel(user.xp);
+  if (num(user.level) !== xp.level) {
+    user.level = xp.level;
+    changed = true;
+  }
+
+  return changed;
+}
+
+function getUserAndIndex(users) {
+  const username = localStorage.getItem(CURRENT_USER_KEY);
+
+  if (!username) return { user: null, index: -1 };
+
+  const index = users.findIndex(
+    user => user.username === username
+  );
+
+  if (index < 0) return { user: null, index: -1 };
+
+  return { user: users[index], index };
+}
+
+function persistUser(user, index, users) {
+  users[index] = user;
+  saveUsers(users);
+}
+
+function setNotice(message, type = "info") {
+  const notice = $("notice");
+  notice.textContent = message;
+  notice.className = "notice " + type;
+}
+
+function clearNotice() {
+  $("notice").className = "notice";
+  $("notice").textContent = "";
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, character => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[character]);
+}
+
+function owned(user, itemId) {
+  return user.shopInventory.includes(itemId);
+}
+
+function getOwnedItems(user) {
+  return ITEMS.filter(item => owned(user, item.id));
+}
+
+function renderHeader(user) {
+  const xp = calculateLevel(user.xp);
+
+  $("coinBalance").textContent = num(user.coins).toLocaleString();
+  $("playerLevel").textContent = xp.level;
+  $("xpText").textContent =
+    xp.remaining + " / " + xp.required + " XP";
+
+  const percentage = Math.min(
+    100,
+    Math.floor((xp.remaining / xp.required) * 100)
+  );
+
+  $("xpBar").style.width = percentage + "%";
+  $("xpProgress").setAttribute("aria-valuenow", String(percentage));
+}
+
+function renderShop(user) {
+  const grid = $("shopGrid");
+  grid.replaceChildren();
+
+  const visibleItems = ITEMS.filter(item =>
+    activeFilter === "all" || item.category === activeFilter
+  );
+
+  $("catalogCount").textContent =
+    visibleItems.length + " items";
+
+  if (visibleItems.length === 0) {
+    grid.innerHTML = '<div class="empty">No items in this category.</div>';
+    return;
+  }
+
+  for (const item of visibleItems) {
+    const isOwned = owned(user, item.id);
+    const level = calculateLevel(user.xp).level;
+    const levelOK = level >= item.level;
+    const coinsOK = num(user.coins) >= item.price;
+
+    let buttonText = "Buy Item";
+    let disabled = false;
+
+    if (isOwned) {
+      buttonText = "Owned";
+      disabled = true;
+    } else if (!levelOK) {
+      buttonText = "Level " + item.level + " Required";
+      disabled = true;
+    } else if (!coinsOK) {
+      buttonText = "Not Enough Coins";
+      disabled = true;
+    }
+
+    const card = document.createElement("article");
+    card.className = "item-card";
+
+    card.innerHTML = `
+      <div class="item-art" aria-hidden="true">${item.icon}</div>
+      <div class="item-top">
+        <h3>${escapeHTML(item.name)}</h3>
+        <span class="tag ${item.category === "title" ? "gold" : ""}">
+          ${escapeHTML(item.tag)}
+        </span>
+      </div>
+      <p class="item-description">${escapeHTML(item.description)}</p>
+      <p class="requirement">Required Level: ${item.level}</p>
+      <div class="price-row">
+        <span class="price">${item.price} <small>COINS</small></span>
+      </div>
+      <button class="btn full ${isOwned ? "secondary" : ""}"
+              data-buy="${escapeHTML(item.id)}"
+              ${disabled ? "disabled" : ""}>
+        ${escapeHTML(buttonText)}
+      </button>
+    `;
+
+    grid.append(card);
+  }
+}
+
+function renderInventory(user) {
+  const grid = $("inventoryGrid");
+  grid.replaceChildren();
+
+  const items = getOwnedItems(user);
+  $("inventoryCount").textContent =
+    items.length + (items.length === 1 ? " item" : " items");
+
+  if (!items.length) {
+    grid.innerHTML = `
+      <div class="empty">
+        Your inventory is empty.<br>
+        Buy an item from the Marketplace to get started.
+      </div>
+    `;
+    return;
+  }
+
+  for (const item of items) {
+    const card = document.createElement("article");
+    card.className = "inventory-item";
+
+    let actionHTML = "";
+    let status = "OWNED";
+
+    if (item.effect === "title") {
+      const equipped = user.playerTitle === item.value;
+      status = equipped ? "EQUIPPED" : "OWNED";
+
+      actionHTML = `
+        <button class="btn full ${equipped ? "secondary" : ""}"
+                data-equip="${escapeHTML(item.id)}"
+                ${equipped ? "disabled" : ""}>
+          ${equipped ? "Equipped" : "Equip Title"}
+        </button>
+      `;
+    } else if (
+      item.effect === "theme" ||
+      item.effect === "frame" ||
+      item.effect === "neonFrame"
+    ) {
+      const equipped =
+        user.equippedCosmetics &&
+        user.equippedCosmetics[item.effect] === item.id;
+
+      status = equipped ? "EQUIPPED" : "OWNED";
+
+      actionHTML = `
+        <button class="btn full ${equipped ? "secondary" : ""}"
+                data-equip="${escapeHTML(item.id)}"
+                ${equipped ? "disabled" : ""}>
+          ${equipped ? "Equipped" : "Equip Item"}
+        </button>
+      `;
+    } else if (item.effect === "game") {
+      const unlocked = user.unlockedGames.includes(item.value);
+      status = unlocked ? "UNLOCKED" : "OWNED";
+      actionHTML = `
+        <p class="status">
+          ${unlocked ? "✓ Added to game unlocks" : "Owned game pass"}
+        </p>
+      `;
+    }
+
+    card.innerHTML = `
+      <div class="item-art" aria-hidden="true">${item.icon}</div>
+      <h3>${escapeHTML(item.name)}</h3>
+      <p>${escapeHTML(item.description)}</p>
+      <p class="status" style="margin-bottom:12px">${status}</p>
+      ${actionHTML}
+    `;
+
+    grid.append(card);
+  }
+}
+
+function refresh() {
+  let users;
+
+  try {
+    users = readUsers();
+  } catch (error) {
+    $("loginRequired").classList.remove("hidden");
+    $("shopApp").classList.add("hidden");
+    setNotice(
+      "Could not read the saved account list. Your stored data was not overwritten.",
+      "error"
+    );
+    return;
+  }
+
+  const result = getUserAndIndex(users);
+
+  if (!result.user) {
+    currentUsername = null;
+    $("loginRequired").classList.remove("hidden");
+    $("shopApp").classList.add("hidden");
+    return;
+  }
+
+  currentUsername = result.user.username;
+  $("loginRequired").classList.add("hidden");
+  $("shopApp").classList.remove("hidden");
+
+  try {
+    const changed = normalizeShopFields(result.user);
+
+    if (changed) {
+      persistUser(result.user, result.index, users);
+    }
+
+    renderHeader(result.user);
+    renderShop(result.user);
+    renderInventory(result.user);
+  } catch (error) {
+    console.error(error);
+    setNotice(
+      "Something went wrong while loading the shop. Please check the browser console.",
+      "error"
+    );
+  }
+}
+
+function buyItem(itemId) {
+  if (busy) return;
+
+  const item = ITEMS.find(entry => entry.id === itemId);
+
+  if (!item) {
+    setNotice("This item could not be found.", "error");
+    return;
+  }
+
+  let users;
+
+  try {
+    users = readUsers();
+  } catch {
+    setNotice("Could not read saved accounts. No purchase was made.", "error");
+    return;
+  }
+
+  const result = getUserAndIndex(users);
+  const user = result.user;
+
+  if (!user || user.username !== currentUsername) {
+    setNotice("Your active account could not be verified. Reload the shop.", "error");
+    refresh();
+    return;
+  }
+
+  normalizeShopFields(user);
+
+  if (owned(user, item.id)) {
+    setNotice("You already own this item.", "info");
+    refresh();
+    return;
+  }
+
+  const level = calculateLevel(user.xp).level;
+
+  if (level < item.level) {
+    setNotice("You need Level " + item.level + " to buy this item.", "error");
+    return;
+  }
+
+  if (num(user.coins) < item.price) {
+    setNotice("You don't have enough Coins for this item.", "error");
+    return;
+  }
+
+  const previousCoins = num(user.coins);
+  const previousInventory = [...user.shopInventory];
+  const previousGames = [...user.unlockedGames];
+
+  busy = true;
+
+  try {
+    user.coins = previousCoins - item.price;
+    user.shopInventory.push(item.id);
+
+    if (item.effect === "game" &&
+        !user.unlockedGames.includes(item.value)) {
+      user.unlockedGames.push(item.value);
+    }
+
+    persistUser(user, result.index, users);
+
+    setNotice(
+      "Purchase successful! " + item.name + " was added to your account.",
+      "success"
+    );
+
+    refresh();
+  } catch (error) {
+    /*
+      Best-effort rollback if saving fails.
+      Do not clear or reset any existing account data.
+    */
+    try {
+      const freshUsers = readUsers();
+      const freshIndex = freshUsers.findIndex(
+        entry => entry.username === currentUsername
+      );
+
+      if (freshIndex >= 0) {
+        freshUsers[freshIndex].coins = previousCoins;
+        freshUsers[freshIndex].shopInventory = previousInventory;
+        freshUsers[freshIndex].unlockedGames = previousGames;
+        saveUsers(freshUsers);
+      }
+    } catch (rollbackError) {
+      console.error("Rollback failed:", rollbackError);
+    }
+
+    setNotice(
+      "The purchase could not be saved. Please check your browser storage.",
+      "error"
+    );
+  } finally {
+    busy = false;
+    refresh();
+  }
+}
+
+function equipItem(itemId) {
+  if (busy) return;
+
+  let users;
+
+  try {
+    users = readUsers();
+  } catch {
+    setNotice("Could not read saved accounts.", "error");
+    return;
+  }
+
+  const result = getUserAndIndex(users);
+  const user = result.user;
+
+  if (!user || user.username !== currentUsername) {
+    setNotice("Your active account could not be verified.", "error");
+    refresh();
+    return;
+  }
+
+  normalizeShopFields(user);
+
+  const item = ITEMS.find(entry => entry.id === itemId);
+
+  if (!item || !owned(user, itemId)) {
+    setNotice("You must own this item before equipping it.", "error");
+    return;
+  }
+
+  if (item.effect === "title") {
+    user.playerTitle = item.value;
+  } else if (
+    item.effect === "theme" ||
+    item.effect === "frame" ||
+    item.effect === "neonFrame"
+  ) {
+    user.equippedCosmetics[item.effect] = item.id;
+  } else {
+    setNotice("This item does not need to be equipped.", "info");
+    return;
+  }
+
+  try {
+    persistUser(user, result.index, users);
+    setNotice(item.name + " equipped successfully!", "success");
+    refresh();
+  } catch {
+    setNotice("Could not save your equipped item.", "error");
+  }
+}
+
+$("filters").addEventListener("click", event => {
+  const button = event.target.closest("[data-filter]");
+  if (!button) return;
+
+  activeFilter = button.dataset.filter;
+
+  document.querySelectorAll("[data-filter]").forEach(filter => {
+    filter.classList.toggle("active", filter === button);
+  });
+
+  clearNotice();
+  refresh();
+});
+
+$("shopGrid").addEventListener("click", event => {
+  const button = event.target.closest("[data-buy]");
+  if (!button || button.disabled) return;
+
+  buyItem(button.dataset.buy);
+});
+
+$("inventoryGrid").addEventListener("click", event => {
+  const button = event.target.closest("[data-equip]");
+  if (!button || button.disabled) return;
+
+  equipItem(button.dataset.equip);
+});
+
+window.addEventListener("storage", event => {
+  if (
+    event.key === USERS_KEY ||
+    event.key === CURRENT_USER_KEY
+  ) {
+    refresh();
+  }
+});
+
+refresh();
+</script>
+</body>
+</html>
