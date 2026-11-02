@@ -1,660 +1,928 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MC Game Hub | Global Leaderboard</title>
 
-    <title>MC Game Hub - Leaderboard</title>
+<style>
+:root {
+  --bg: #05090d;
+  --turq: #00f5d4;
+  --muted: #9bb3bc;
+  --line: rgba(0,245,212,.25);
+  --gold: #ffd166;
+}
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-        body {
-            min-height: 100vh;
-            background: #050b10;
-            color: white;
-            font-family: Tahoma, Arial, sans-serif;
-            padding: 30px 15px;
-        }
+body {
+  min-height: 100vh;
+  padding: 22px 15px 45px;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(0,245,212,.12), transparent 32%),
+    #05090d;
+  color: #effcff;
+  font-family: Arial, Helvetica, sans-serif;
+}
 
-        .container {
-            width: 100%;
-            max-width: 1100px;
-            margin: auto;
-        }
+.page {
+  width: min(1050px, 100%);
+  margin: auto;
+}
 
-        /* =========================
-           HEADER
-        ========================= */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  padding: 12px 0 24px;
+  border-bottom: 1px solid var(--line);
+}
 
-        .header {
-            text-align: center;
-            margin-bottom: 35px;
-        }
+.brand {
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: white;
+  text-decoration: none;
+  letter-spacing: 1px;
+}
 
-        .header h1 {
-            color: #00f5d4;
-            font-size: 42px;
-            text-shadow:
-                0 0 10px #00f5d4,
-                0 0 25px #00f5d4;
-            margin-bottom: 10px;
-        }
+.brand span,
+h1 span {
+  color: var(--turq);
+  text-shadow: 0 0 20px rgba(0,245,212,.35);
+}
 
-        .header p {
-            color: #9fb5bd;
-            font-size: 15px;
-        }
+nav {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+}
 
-        /* =========================
-           SEASON BOX
-        ========================= */
+nav a,
+.btn {
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(0,245,212,.04);
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+}
 
-        .season-box {
-            background: #0b171e;
-            border: 1px solid #00f5d4;
-            border-radius: 18px;
-            padding: 22px;
-            margin-bottom: 25px;
+nav a:hover,
+.btn:hover {
+  border-color: var(--turq);
+  box-shadow: 0 0 15px rgba(0,245,212,.15);
+}
 
-            box-shadow:
-                0 0 15px rgba(0, 245, 212, 0.15);
-        }
+.hero {
+  text-align: center;
+  margin: 38px 0 25px;
+}
 
-        .season-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
+.eyebrow {
+  font-size: .75rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--turq);
+  font-weight: bold;
+}
 
-        .season-title {
-            color: #00f5d4;
-            font-size: 22px;
-            font-weight: bold;
-        }
+h1 {
+  font-size: clamp(2.2rem, 6vw, 3.6rem);
+  margin: 12px 0;
+}
 
-        .season-time {
-            color: #ffffff;
-            background: #071117;
-            border: 1px solid #17434c;
-            padding: 9px 15px;
-            border-radius: 10px;
-        }
+.subtitle {
+  color: var(--muted);
+  line-height: 1.7;
+}
 
-        /* =========================
-           LEADERBOARD
-        ========================= */
+.notice {
+  margin: 24px 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(255,209,102,.35);
+  background: rgba(255,209,102,.07);
+  border-radius: 12px;
+  color: #f6e7bd;
+  line-height: 1.6;
+  font-size: .92rem;
+}
 
-        .leaderboard {
-            background: #0b171e;
-            border: 1px solid #17434c;
-            border-radius: 20px;
-            overflow: hidden;
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 13px;
+  margin: 25px 0;
+}
 
-            box-shadow:
-                0 0 20px rgba(0, 245, 212, 0.08);
-        }
+.stat,
+.board,
+.your-card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: linear-gradient(145deg, #101e27, #080e13);
+  box-shadow: 0 12px 35px #0004;
+}
 
-        .table-header,
-        .player-row {
-            display: grid;
-            grid-template-columns:
-                80px
-                minmax(180px, 1fr)
-                140px
-                140px
-                160px
-                140px;
-            align-items: center;
-        }
+.stat {
+  text-align: center;
+  padding: 18px;
+}
 
-        .table-header {
-            background: #071117;
-            min-height: 60px;
-            color: #7f9da5;
-            font-size: 13px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
+.stat strong {
+  display: block;
+  color: var(--turq);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  margin-bottom: 6px;
+  overflow-wrap: anywhere;
+}
 
-        .table-header div,
-        .player-row div {
-            padding: 15px;
-        }
+.stat span {
+  font-size: .85rem;
+  color: var(--muted);
+}
 
-        .player-row {
-            min-height: 75px;
-            border-top: 1px solid #12313a;
-            transition: 0.2s;
-        }
+.your-card {
+  display: none;
+  padding: 18px;
+  margin-bottom: 20px;
+  line-height: 1.7;
+}
 
-        .player-row:hover {
-            background: rgba(0, 245, 212, 0.05);
-        }
+.your-card h2 {
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+}
 
-        /* =========================
-           RANK
-        ========================= */
+.your-card strong {
+  color: var(--turq);
+}
 
-        .rank {
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-        }
+.your-card p {
+  color: var(--muted);
+}
 
-        .rank-1 {
-            color: #ffd700;
-            text-shadow: 0 0 10px #ffd700;
-        }
+.board {
+  overflow: hidden;
+}
 
-        .rank-2 {
-            color: #c0c0c0;
-            text-shadow: 0 0 8px #c0c0c0;
-        }
+.board-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 19px;
+  border-bottom: 1px solid var(--line);
+}
 
-        .rank-3 {
-            color: #cd7f32;
-            text-shadow: 0 0 8px #cd7f32;
-        }
+.board-top h2 span {
+  color: var(--turq);
+}
 
-        /* =========================
-           PLAYER
-        ========================= */
+.controls {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+}
 
-        .player-name {
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-        }
+input,
+select {
+  background: #071117;
+  color: white;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 10px 12px;
+  outline: none;
+}
 
-        .player-name.current {
-            color: #00f5d4;
-            text-shadow: 0 0 8px #00f5d4;
-        }
+input:focus,
+select:focus {
+  border-color: var(--turq);
+}
 
-        .number {
-            color: #d9e5e8;
-        }
+option {
+  background: #071117;
+}
 
-        .points {
-            color: #00f5d4;
-            font-size: 18px;
-            font-weight: bold;
-        }
+.table-wrap {
+  overflow-x: auto;
+}
 
-        .coins {
-            color: #ffd84d;
-            font-weight: bold;
-        }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 650px;
+}
 
-        /* =========================
-           EMPTY
-        ========================= */
+th,
+td {
+  text-align: left;
+  padding: 14px 16px;
+  border-bottom: 1px solid #9bb3bc18;
+}
 
-        .empty {
-            text-align: center;
-            padding: 60px 20px;
-            color: #78919a;
-        }
+th {
+  font-size: .7rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
 
-        .empty-icon {
-            font-size: 50px;
-            margin-bottom: 15px;
-        }
+td {
+  font-size: .92rem;
+}
 
-        .empty h2 {
-            color: white;
-            margin-bottom: 8px;
-        }
+tbody tr:hover {
+  background: #00f5d40b;
+}
 
-        /* =========================
-           BACK BUTTON
-        ========================= */
+tbody tr.me {
+  background: #00f5d416;
+}
 
-        .bottom {
-            text-align: center;
-            margin-top: 30px;
-        }
+tbody tr.me td:first-child {
+  border-left: 3px solid var(--turq);
+}
 
-        .back-btn {
-            border: 1px solid #00f5d4;
-            background: transparent;
-            color: #00f5d4;
-            padding: 13px 25px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 15px;
-            transition: 0.25s;
-        }
+.player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 160px;
+}
 
-        .back-btn:hover {
-            background: #00f5d4;
-            color: #031014;
+.avatar {
+  width: 37px;
+  height: 37px;
+  flex: 0 0 37px;
+  border: 1px solid var(--turq);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #00f5d417;
+  color: var(--turq);
+  font-weight: bold;
+}
 
-            box-shadow:
-                0 0 15px #00f5d4,
-                0 0 30px rgba(0, 245, 212, 0.5);
-        }
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
-        /* =========================
-           MOBILE
-        ========================= */
+.name {
+  font-weight: bold;
+  overflow-wrap: anywhere;
+}
 
-        @media (max-width: 800px) {
+.you {
+  font-size: .7rem;
+  color: var(--turq);
+  margin-left: 5px;
+}
 
-            body {
-                padding: 20px 10px;
-            }
+.rank {
+  font-weight: 900;
+  color: var(--muted);
+}
 
-            .header h1 {
-                font-size: 32px;
-            }
+.gold {
+  color: var(--gold);
+}
 
-            .leaderboard {
-                overflow-x: auto;
-            }
+.silver {
+  color: #d6e1e7;
+}
 
-            .table-header,
-            .player-row {
-                min-width: 850px;
-            }
-        }
-    </style>
+.bronze {
+  color: #d99a6c;
+}
+
+.level {
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  padding: 5px 8px;
+  font-size: .8rem;
+  white-space: nowrap;
+}
+
+.xp {
+  color: var(--turq);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.empty {
+  padding: 42px 20px;
+  text-align: center;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.empty strong {
+  display: block;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.footer-note {
+  text-align: center;
+  color: var(--muted);
+  font-size: .82rem;
+  line-height: 1.7;
+  margin: 20px auto;
+  max-width: 760px;
+}
+
+.toast {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  max-width: calc(100vw - 36px);
+  padding: 13px 16px;
+  background: #10242b;
+  border: 1px solid var(--turq);
+  border-radius: 12px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: .25s;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 650px) {
+  body {
+    padding: 14px 10px 30px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .stat {
+    padding: 14px;
+  }
+
+  .controls {
+    width: 100%;
+  }
+
+  .controls input,
+  .controls select {
+    width: 100%;
+    flex: 1;
+  }
+
+  .board-top {
+    padding: 15px;
+  }
+}
+
+#seasonTimer {
+  margin: 20px 0;
+  border-color: var(--turq);
+  box-shadow: 0 0 22px rgba(0,245,212,.12);
+}
+
+#seasonTimer strong {
+  font-size: clamp(2rem, 6vw, 3rem);
+  letter-spacing: 2px;
+}
+</style>
 </head>
 
 <body>
+<div class="page">
 
-<div class="container">
+  <header>
+    <a class="brand" href="index.html">
+      MC <span>GAME HUB</span>
+    </a>
 
-    <!-- HEADER -->
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="Profile.html">Profile</a>
+      <a href="Games.html">Games</a>
+    </nav>
+  </header>
 
-    <div class="header">
-        <h1>🏆 LEADERBOARD</h1>
-        <p>Compete. Win. Climb to the top.</p>
+  <main>
+    <section class="hero">
+      <div class="eyebrow">The competition starts here</div>
+      <h1>Global <span>Leaderboard</span></h1>
+      <p class="subtitle">
+        Check the rankings, track your progress, and climb to the top.
+      </p>
+    </section>
+
+    <section class="stat" id="seasonTimer">
+      <span>🏆 SEASON ENDS IN</span>
+      <strong id="countdown">10d 00h 00m</strong>
+      <span>Rewards are paid when the season ends</span>
+    </section>
+
+    <div class="notice">
+      <strong>Prototype notice:</strong>
+      This version reads accounts saved in this browser's localStorage.
+      It is not an online global leaderboard and cannot combine scores
+      from other devices or browsers.
     </div>
 
+    <section class="stats">
+      <div class="stat">
+        <strong id="playersCount">0</strong>
+        <span>Players on this browser</span>
+      </div>
 
-    <!-- SEASON -->
+      <div class="stat">
+        <strong id="topPlayer">—</strong>
+        <span>Top player by XP</span>
+      </div>
 
-    <div class="season-box">
+      <div class="stat">
+        <strong id="totalXP">0</strong>
+        <span>Total XP recorded</span>
+      </div>
+    </section>
 
-        <div class="season-top">
+    <section class="your-card" id="yourCard">
+      <h2>Your current rank: <strong id="yourRank">—</strong></h2>
+      <p id="yourSummary"></p>
+    </section>
 
-            <div class="season-title">
-                ⚡ Season 1
-            </div>
+    <section class="board">
+      <div class="board-top">
+        <h2>🏆 Player <span>Rankings</span></h2>
 
-            <div class="season-time" id="seasonTime">
-                10 Days Season
-            </div>
+        <div class="controls">
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Search players..."
+            aria-label="Search players"
+          >
 
+          <select id="sortSelect" aria-label="Sort leaderboard">
+            <option value="xp">Sort by XP</option>
+            <option value="level">Sort by Level</option>
+            <option value="points">Sort by Total Points</option>
+            <option value="wins">Sort by Wins</option>
+            <option value="snake">Sort by Snake Best</option>
+          </select>
+
+          <button class="btn" id="refreshBtn" type="button">
+            Refresh
+          </button>
         </div>
+      </div>
 
-    </div>
+      <div class="table-wrap" id="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Player</th>
+              <th>Level</th>
+              <th>XP</th>
+              <th>Total points</th>
+              <th>Wins</th>
+            </tr>
+          </thead>
 
+          <tbody id="leaderboardBody"></tbody>
+        </table>
+      </div>
 
-    <!-- LEADERBOARD -->
+      <div class="empty" id="emptyState" hidden>
+        <strong>No players found</strong>
+        Try a different search, or create an account in MC Game Hub
+        on this browser.
+      </div>
+    </section>
 
-    <div class="leaderboard">
-
-        <!-- HEADER -->
-
-        <div class="table-header">
-
-            <div>Rank</div>
-
-            <div>Player</div>
-
-            <div>Memory Wins</div>
-
-            <div>RPS Wins</div>
-
-            <div>Snake Best</div>
-
-            <div>Total Points</div>
-
-        </div>
-
-
-        <!-- PLAYERS -->
-
-        <div id="leaderboardList"></div>
-
-    </div>
-
-
-    <!-- BACK -->
-
-    <div class="bottom">
-
-        <button class="back-btn" onclick="goBack()">
-            ← Back to MC Game Hub
-        </button>
-
-    </div>
-
+    <p class="footer-note">
+      Ranking data is read from <code>mc_game_hub_users</code>.
+      Refresh after playing a game to read the latest saved stats.
+      If your project uses different filenames, update the navigation
+      links near the top of this file.
+    </p>
+  </main>
 </div>
 
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
+"use strict";
 
-    /* =========================================
-       LOCAL STORAGE
-    ========================================= */
+const USERS_KEY = "mc_game_hub_users";
+const CURRENT_USER_KEY = "mc_current_user";
 
-    const STORAGE_KEY = "mc_game_hub_users";
+const $ = id => document.getElementById(id);
 
+let allPlayers = [];
+let currentUsername = "";
 
-    /* =========================================
-       GET USERS
-    ========================================= */
+function readJSON(key, fallback) {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch (error) {
+    console.error("Could not read localStorage:", error);
+    return fallback;
+  }
+}
 
-    function getUsers() {
+function num(value) {
+  const n = Number(value);
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+}
 
-        const data = localStorage.getItem(STORAGE_KEY);
+/* Calculate the player's level using progressive XP requirements. */
+function calculateLevel(xp) {
+  let remaining = num(xp);
+  let level = 1;
 
-        if (!data) {
-            return [];
-        }
+  while (remaining >= level * 100) {
+    remaining -= level * 100;
+    level++;
+  }
 
-        try {
-            return JSON.parse(data);
-        }
+  return level;
+}
 
-        catch (error) {
+/* Read the currently logged-in username. */
+function getCurrentUsername() {
+  const value = localStorage.getItem(CURRENT_USER_KEY);
 
-            console.error(
-                "Could not read leaderboard data:",
-                error
-            );
+  if (!value) return "";
 
-            return [];
-        }
+  try {
+    const parsed = JSON.parse(value);
+
+    if (typeof parsed === "string") return parsed;
+
+    if (parsed && typeof parsed.username === "string") {
+      return parsed.username;
+    }
+  } catch (_) {
+    // Some project versions store the username as plain text.
+  }
+
+  return value;
+}
+
+/* Convert each saved account into the format used by the leaderboard. */
+function normalize(user, index) {
+  const xp = num(user.xp);
+  const memoryWins = num(user.memoryWins);
+  const rpsWins = num(user.rpsWins);
+
+  return {
+    username: String(user.username || user.name || `Player ${index + 1}`),
+    xp: xp,
+    level: num(user.level) || calculateLevel(xp),
+    points: num(user.totalPoints),
+    wins: num(user.totalWins) || memoryWins + rpsWins,
+    snake: num(user.snakeBest),
+    picture: typeof user.profilePicture === "string"
+      ? user.profilePicture
+      : ""
+  };
+}
+
+/* Escape user-provided text before inserting it into HTML. */
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+/* Show a small message at the bottom of the page. */
+function toast(message) {
+  $("toast").textContent = message;
+  $("toast").classList.add("show");
+
+  clearTimeout(toast.timer);
+
+  toast.timer = setTimeout(() => {
+    $("toast").classList.remove("show");
+  }, 2500);
+}
+
+/* Load all accounts saved in this browser. */
+function loadPlayers() {
+  const users = readJSON(USERS_KEY, []);
+
+  currentUsername = getCurrentUsername();
+
+  if (!Array.isArray(users)) {
+    allPlayers = [];
+    toast("Player data format was not recognized.");
+    render();
+    return;
+  }
+
+  allPlayers = users
+    .filter(user => user && typeof user === "object")
+    .map(normalize);
+
+  $("playersCount").textContent =
+    allPlayers.length.toLocaleString();
+
+  $("totalXP").textContent =
+    allPlayers.reduce((sum, player) => sum + player.xp, 0)
+      .toLocaleString();
+
+  const top = [...allPlayers].sort(
+    (a, b) => b.xp - a.xp || b.level - a.level
+  )[0];
+
+  $("topPlayer").textContent = top ? top.username : "—";
+
+  render();
+}
+
+/* Return the selected ranking value for a player. */
+function sortValue(player, sort) {
+  if (sort === "level") return player.level;
+  if (sort === "points") return player.points;
+  if (sort === "wins") return player.wins;
+  if (sort === "snake") return player.snake;
+
+  return player.xp;
+}
+
+/* Display the leaderboard table. */
+function render() {
+  const query = $("searchInput").value.trim().toLowerCase();
+  const sort = $("sortSelect").value;
+
+  const sorted = [...allPlayers].sort((a, b) =>
+    sortValue(b, sort) - sortValue(a, sort) ||
+    b.xp - a.xp ||
+    a.username.localeCompare(b.username)
+  );
+
+  const filtered = sorted.filter(player =>
+    player.username.toLowerCase().includes(query)
+  );
+
+  const body = $("leaderboardBody");
+  body.innerHTML = "";
+
+  filtered.forEach(player => {
+    const rank = sorted.indexOf(player) + 1;
+
+    const isMe = currentUsername &&
+      player.username.toLowerCase() === currentUsername.toLowerCase();
+
+    const rankClass =
+      rank === 1 ? "gold" :
+      rank === 2 ? "silver" :
+      rank === 3 ? "bronze" : "";
+
+    const rankText =
+      rank === 1 ? "🥇" :
+      rank === 2 ? "🥈" :
+      rank === 3 ? "🥉" : "#" + rank;
+
+    const avatar = player.picture
+      ? `<img src="${escapeHTML(player.picture)}" alt="">`
+      : escapeHTML((player.username.trim()[0] || "?").toUpperCase());
+
+    const row = document.createElement("tr");
+
+    if (isMe) row.classList.add("me");
+
+    row.innerHTML = `
+      <td>
+        <span class="rank ${rankClass}">${rankText}</span>
+      </td>
+
+      <td>
+        <div class="player">
+          <div class="avatar">${avatar}</div>
+          <div>
+            <span class="name">${escapeHTML(player.username)}</span>
+            ${isMe ? '<span class="you">YOU</span>' : ""}
+          </div>
+        </div>
+      </td>
+
+      <td>
+        <span class="level">Lv. ${player.level.toLocaleString()}</span>
+      </td>
+
+      <td>
+        <span class="xp">${player.xp.toLocaleString()}</span>
+      </td>
+
+      <td>${player.points.toLocaleString()}</td>
+      <td>${player.wins.toLocaleString()}</td>
+    `;
+
+    body.appendChild(row);
+  });
+
+  $("emptyState").hidden = filtered.length > 0;
+  $("tableWrap").hidden = filtered.length === 0;
+
+  /* Show the current user's rank and stats. */
+  const meIndex = sorted.findIndex(player =>
+    currentUsername &&
+    player.username.toLowerCase() === currentUsername.toLowerCase()
+  );
+
+  if (meIndex >= 0) {
+    const me = sorted[meIndex];
+
+    $("yourRank").textContent = "#" + (meIndex + 1);
+
+    $("yourSummary").innerHTML = `
+      You're level <strong>${me.level}</strong> with
+      <strong>${me.xp.toLocaleString()} XP</strong>,
+      <strong>${me.points.toLocaleString()} total points</strong>,
+      and <strong>${me.wins.toLocaleString()} wins</strong>.
+    `;
+
+    $("yourCard").style.display = "block";
+  } else {
+    $("yourCard").style.display = "none";
+  }
+}
+
+/* Search and sorting controls. */
+$("searchInput").addEventListener("input", render);
+$("sortSelect").addEventListener("change", render);
+
+/* Reload saved account data when Refresh is clicked. */
+$("refreshBtn").addEventListener("click", () => {
+  loadPlayers();
+  toast("Leaderboard refreshed from this browser's saved data.");
+});
+
+/* Update the table if another tab changes the saved accounts. */
+window.addEventListener("storage", event => {
+  if (
+    event.key === USERS_KEY ||
+    event.key === CURRENT_USER_KEY
+  ) {
+    loadPlayers();
+  }
+});
+
+const SEASON_KEY = "mc_leaderboard_season";
+const SEASON_LENGTH = 10 * 24 * 60 * 60 * 1000;
+
+let seasonTimerInterval = null;
+
+function getSeason() {
+  let season = readJSON(SEASON_KEY, null);
+
+  if (
+    !season ||
+    !Number.isFinite(season.start) ||
+    !Number.isFinite(season.end)
+  ) {
+    const now = Date.now();
+
+    season = {
+      start: now,
+      end: now + SEASON_LENGTH,
+      paid: false
+    };
+
+    localStorage.setItem(SEASON_KEY, JSON.stringify(season));
+  }
+
+  return season;
+}
+
+function saveSeason(season) {
+  localStorage.setItem(SEASON_KEY, JSON.stringify(season));
+}
+
+/* Rank players by Total Points and pay each reward once. */
+function finishSeason() {
+  const season = getSeason();
+
+  if (season.paid || Date.now() < season.end) return;
+
+  const users = readJSON(USERS_KEY, []);
+
+  if (!Array.isArray(users)) return;
+
+  const ranked = users
+    .filter(user => user && typeof user === "object")
+    .map((user, index) => ({
+      user,
+      index,
+      points: num(user.totalPoints),
+      xp: num(user.xp),
+      username: String(user.username || user.name || "")
+    }))
+    .sort((a, b) =>
+      b.points - a.points ||
+      b.xp - a.xp ||
+      a.username.localeCompare(b.username)
+    );
+
+  ranked.forEach((entry, index) => {
+    const rank = index + 1;
+    const total = ranked.length;
+
+    let reward = 0;
+
+    if (rank === 1) {
+      reward = 200;
+    } else if (rank === 2) {
+      reward = 190;
+    } else if (rank === 3) {
+      reward = 180;
+    } else if (rank === total) {
+      reward = 20;
+    } else if (rank >= 4) {
+      reward = 100;
     }
 
-
-    /* =========================================
-       SAVE USERS
-    ========================================= */
-
-    function saveUsers(users) {
-
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(users)
-        );
+    if (reward > 0) {
+      entry.user.coins = num(entry.user.coins) + reward;
     }
+  });
 
+  /*
+    Mark this season as paid before starting the next one.
+    This prevents repeat payouts on ordinary page refreshes.
+  */
+  season.paid = true;
+  saveSeason(season);
 
-    /* =========================================
-       CREATE DEMO DATA
-       فقط برای تست اولیه
-    ========================================= */
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
 
-    function createDemoUsers() {
+  const now = Date.now();
 
-        const users = getUsers();
+  saveSeason({
+    start: now,
+    end: now + SEASON_LENGTH,
+    paid: false
+  });
 
-        if (users.length > 0) {
-            return;
-        }
+  loadPlayers();
+  toast("Season ended! Rewards have been distributed.");
+}
 
+/* Update the countdown display. */
+function updateSeasonTimer() {
+  let season = getSeason();
 
-        const demoUsers = [
+  if (Date.now() >= season.end) {
+    finishSeason();
+    season = getSeason();
+  }
 
-            {
-                username: "Shadow",
-                memoryWins: 18,
-                rpsWins: 14,
-                snakeBest: 920,
-                totalPoints: 2740,
-                coins: 500
-            },
+  const remaining = Math.max(0, season.end - Date.now());
 
-            {
-                username: "Kiyan",
-                memoryWins: 15,
-                rpsWins: 12,
-                snakeBest: 780,
-                totalPoints: 2340,
-                coins: 350
-            },
+  const days = Math.floor(remaining / 86400000);
+  const hours = Math.floor((remaining % 86400000) / 3600000);
+  const minutes = Math.floor((remaining % 3600000) / 60000);
 
-            {
-                username: "DarkWolf",
-                memoryWins: 12,
-                rpsWins: 10,
-                snakeBest: 650,
-                totalPoints: 1900,
-                coins: 250
-            },
+  $("countdown").textContent =
+    `${days}d ${String(hours).padStart(2, "0")}h ${String(minutes).padStart(2, "0")}m`;
+}
 
-            {
-                username: "Phoenix",
-                memoryWins: 9,
-                rpsWins: 8,
-                snakeBest: 520,
-                totalPoints: 1530,
-                coins: 180
-            },
+/* Start the countdown. */
+function startSeasonTimer() {
+  updateSeasonTimer();
 
-            {
-                username: "Player5",
-                memoryWins: 5,
-                rpsWins: 4,
-                snakeBest: 300,
-                totalPoints: 940,
-                coins: 100
-            }
+  if (seasonTimerInterval) {
+    clearInterval(seasonTimerInterval);
+  }
 
-        ];
+  seasonTimerInterval = setInterval(updateSeasonTimer, 1000);
+}
 
-
-        saveUsers(demoUsers);
-    }
-
-
-    /* =========================================
-       SORT LEADERBOARD
-    ========================================= */
-
-    function sortUsers(users) {
-
-        return users.sort(
-            (a, b) => b.totalPoints - a.totalPoints
-        );
-
-    }
-
-
-    /* =========================================
-       DISPLAY LEADERBOARD
-    ========================================= */
-
-    function displayLeaderboard() {
-
-        const list =
-            document.getElementById(
-                "leaderboardList"
-            );
-
-
-        let users = getUsers();
-
-        users = sortUsers(users);
-
-
-        /* No players */
-
-        if (users.length === 0) {
-
-            list.innerHTML = `
-
-                <div class="empty">
-
-                    <div class="empty-icon">
-                        🏆
-                    </div>
-
-                    <h2>No Players Yet</h2>
-
-                    <p>
-                        Create an account and start playing!
-                    </p>
-
-                </div>
-
-            `;
-
-            return;
-        }
-
-
-        /* Current player */
-
-        const currentUser =
-            localStorage.getItem(
-                "mc_current_user"
-            );
-
-
-        list.innerHTML = "";
-
-
-        users.forEach(
-            (user, index) => {
-
-                const rank =
-                    index + 1;
-
-
-                let rankDisplay =
-                    rank;
-
-
-                if (rank === 1) {
-                    rankDisplay = "🥇";
-                }
-
-                else if (rank === 2) {
-                    rankDisplay = "🥈";
-                }
-
-                else if (rank === 3) {
-                    rankDisplay = "🥉";
-                }
-
-
-                const isCurrent =
-                    currentUser &&
-                    currentUser === user.username;
-
-
-                const row =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                row.className =
-                    "player-row";
-
-
-                row.innerHTML = `
-
-                    <div class="rank rank-${rank}">
-                        ${rankDisplay}
-                    </div>
-
-
-                    <div class="
-                        player-name
-                        ${isCurrent ? "current" : ""}
-                    ">
-                        ${escapeHTML(user.username)}
-                        ${isCurrent ? " ⭐" : ""}
-                    </div>
-
-
-                    <div class="number">
-                        ${user.memoryWins || 0}
-                    </div>
-
-
-                    <div class="number">
-                        ${user.rpsWins || 0}
-                    </div>
-
-
-                    <div class="number">
-                        ${user.snakeBest || 0}
-                    </div>
-
-
-                    <div class="points">
-                        ${user.totalPoints || 0}
-                    </div>
-
-                `;
-
-
-                list.appendChild(row);
-
-            }
-        );
-
-    }
-
-
-    /* =========================================
-       SECURITY
-       جلوگیری از HTML داخل Username
-    ========================================= */
-
-    function escapeHTML(text) {
-
-        return String(text)
-
-            .replaceAll("&", "&amp;")
-
-            .replaceAll("<", "&lt;")
-
-            .replaceAll(">", "&gt;")
-
-            .replaceAll('"', "&quot;")
-
-            .replaceAll("'", "&#039;");
-
-    }
-
-
-    /* =========================================
-       BACK TO HUB
-    ========================================= */
-
-    function goBack() {
-
-        window.location.href =
-            "index.html";
-
-    }
-
-
-    /* =========================================
-       START
-    ========================================= */
-
-    createDemoUsers();
-
-    displayLeaderboard();
-
+/* Initial page load. */
+loadPlayers();
+startSeasonTimer();
 </script>
-
 </body>
 </html>
