@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Racing Car V2 - Neon Nitro</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --cyan: #00f7ff;
+  --pink: #ff287d;
+  --bg: #03060b;
+}
+
+body {
+  background: var(--bg);
+  color: white;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+}
+
+#game {
+  width: 100%;
+  height: 100dvh;
+  position: relative;
+  overflow: hidden;
+  background: #050b13;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.top {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.logo {
+  color: var(--cyan);
+  font-weight: 900;
+  font-size: clamp(18px, 3vw, 30px);
+  letter-spacing: 2px;
+  text-shadow: 0 0 18px var(--cyan);
+}
+
+.logo small {
+  display: block;
+  color: white;
+  font-size: 10px;
+  letter-spacing: 5px;
+  margin-top: 5px;
+}
+
+.stats {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.stat {
+  min-width: 76px;
+  text-align: center;
+  padding: 9px;
+  background: rgba(3, 12, 22, .88);
+  border: 1px solid #00cbd9;
+  border-radius: 10px;
+  box-shadow: 0 0 12px #00eaff22;
+}
+
+.stat small {
+  display: block;
+  color: #a3bacb;
+  font-size: 9px;
+  margin-bottom: 5px;
+}
+
+.stat strong {
+  color: var(--cyan);
+  font-size: 20px;
+}
+
+.nitro-box {
+  position: absolute;
+  left: 18px;
+  top: 115px;
+  width: 155px;
+  padding: 10px;
+  background: #07101ddd;
+  border: 1px solid #ff9c24;
+  border-radius: 10px;
+}
+
+.nitro-box small {
+  color: #ffb74c;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.bar {
+  height: 8px;
+  margin-top: 7px;
+  background: #26303a;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#nitroFill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #ff5b16, #ffe34d);
+  box-shadow: 0 0 12px #ff9c24;
+}
+
+.bottom {
+  position: absolute;
+  left: 15px;
+  bottom: 15px;
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+button {
+  cursor: pointer;
+  font-weight: bold;
+  color: var(--cyan);
+  background: #05111deF;
+  border: 1px solid var(--cyan);
+  border-radius: 9px;
+  padding: 11px 14px;
+}
+
+button:hover {
+  color: #001014;
+  background: var(--cyan);
+  box-shadow: 0 0 15px var(--cyan);
+}
+
+.controls {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  pointer-events: auto;
+}
+
+.group {
+  display: flex;
+  gap: 6px;
+}
+
+.control {
+  width: 55px;
+  height: 55px;
+  padding: 0;
+  font-size: 21px;
+  touch-action: none;
+  user-select: none;
+}
+
+.control.active {
+  color: #001014;
+  background: var(--cyan);
+}
+
+#nitroBtn {
+  color: #ffb54b;
+  border-color: #ff9c24;
+  height: 60px;
+  font-size: 11px;
+}
+
+.help {
+  position: absolute;
+  left: 50%;
+  bottom: 88px;
+  transform: translateX(-50%);
+  text-align: center;
+  color: #b8d5e5;
+  font-size: 11px;
+  white-space: nowrap;
+  text-shadow: 0 0 8px #00f7ff;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 18px;
+  background: #02060bd9;
+  backdrop-filter: blur(8px);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.dialog {
+  width: min(440px, 100%);
+  padding: 30px 22px;
+  text-align: center;
+  background: #06111ef5;
+  border: 1px solid var(--cyan);
+  border-radius: 18px;
+  box-shadow: 0 0 45px #00eaff2c;
+}
+
+.dialog h1 {
+  color: var(--cyan);
+  font-size: clamp(28px, 6vw, 43px);
+  margin-bottom: 12px;
+  text-shadow: 0 0 20px var(--cyan);
+}
+
+.dialog p {
+  color: #c2d5e3;
+  font-size: 14px;
+  line-height: 1.9;
+  margin-bottom: 20px;
+}
+
+#startBtn, #againBtn {
+  font-size: 15px;
+  padding: 14px 24px;
+}
+
+@media(max-width: 600px) {
+  .top { top: 9px; left: 8px; right: 8px; }
+  .stat { min-width: 56px; padding: 7px 4px; }
+  .stat strong { font-size: 15px; }
+  .stat small { font-size: 8px; }
+  .nitro-box { top: 94px; left: 8px; width: 120px; }
+  .bottom { left: 8px; bottom: 9px; }
+  .bottom button { padding: 9px; font-size: 10px; }
+  .controls { right: 8px; bottom: 9px; gap: 5px; }
+  .control { width: 42px; height: 47px; font-size: 18px; }
+  #nitroBtn { width: 48px; height: 52px; font-size: 9px; }
+  .help { bottom: 67px; font-size: 9px; }
+}
+</style>
+</head>
+
+<body>
+<div id="game">
+  <canvas id="canvas"></canvas>
+
+  <div class="hud">
+    <div class="top">
+      <div class="logo">
+        NEON RACING
+        <small>V2 • NITRO HIGHWAY</small>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <small>SPEED</small>
+          <strong id="speed">0</strong>
+          <small>KM/H</small>
+        </div>
+        <div class="stat">
+          <small>POSITION</small>
+          <strong id="position">4/4</strong>
+        </div>
+        <div class="stat">
+          <small>DISTANCE</small>
+          <strong id="distance">0</strong>
+          <small>M</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="nitro-box">
+      <small>NITRO POWER</small>
+      <div class="bar"><div id="nitroFill"></div></div>
+    </div>
+
+    <div class="bottom">
+      <button id="pauseBtn">PAUSE</button>
+      <button id="restartBtn">RESTART</button>
+    </div>
+
+    <div class="help">
+      W: GAS &nbsp; S: BRAKE &nbsp; D: LEFT &nbsp; A: RIGHT &nbsp; SPACE: NITRO
+    </div>
+
+    <div class="controls">
+      <div class="group">
+        <button class="control" data-key="a">◀</button>
+        <button class="control" data-key="d">▶</button>
+      </div>
+      <div class="group">
+        <button class="control" data-key="s">▼</button>
+        <button class="control" data-key="w">▲</button>
+      </div>
+      <button class="control" id="nitroBtn" data-key="space">NITRO</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <div class="dialog">
+      <h1>NEON NITRO</h1>
+      <p>
+        Three rivals. One finish line.<br>
+        Use nitro, master the curves, and take first place.<br>
+        Rivals keep racing even when you brake.
+      </p>
+      <button id="startBtn">START RACE</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="pauseOverlay">
+    <div class="dialog">
+      <h1>PAUSED</h1>
+      <p>Catch your breath. The race is waiting.</p>
+      <button id="resumeBtn">RESUME</button>
+      <button id="pauseRestartBtn">RESTART</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <div class="dialog">
+      <h1 id="endTitle">RACE OVER</h1>
+      <p id="endText"></p>
+      <button id="againBtn">RACE AGAIN</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const $ = id => document.getElementById(id);
+
+let W = 0, H = 0, dpr = 1;
+let lastTime = 0;
+let running = false;
+let paused = false;
+let finished = false;
+
+const keys = Object.create(null);
+
+let playerX = 0;
+let speed = 0;
+let distance = 0;
+let nitro = 100;
+let elapsed = 0;
+let shake = 0;
+
+const FINISH_DISTANCE = 5000;
+const MAX_SPEED = 270;
+const NITRO_SPEED = 340;
+
+const opponents = [
+  { name: "RIVAL 1", color: "#ff287d",
+    progress: 300, lane: -0.48, pace: 178, wobble: 0 },
+  { name: "RIVAL 2", color: "#ffb52e",
+    progress: 430, lane: 0, pace: 190, wobble: 1.7 },
+  { name: "RIVAL 3", color: "#a36bff",
+    progress: 560, lane: 0.48, pace: 202, wobble: 3.2 }
+];
+
+function resize() {
+  W = innerWidth;
+  H = innerHeight;
+  dpr = Math.min(devicePixelRatio || 1, 2);
+  canvas.width = Math.floor(W * dpr);
+  canvas.height = Math.floor(H * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  draw();
+}
+
+addEventListener("resize", resize);
+
+function curveAt(t) {
+  return Math.sin(t * 0.00085) * 0.75
+       + Math.sin(t * 0.0017 + 1.4) * 0.32;
+}
+
+function roadPoint(p) {
+  p = Math.max(0, Math.min(1, p));
+  const horizon = H * 0.35;
+  const bend = curveAt(distance + (1 - p) * 1600);
+  return {
+    x: W * 0.5 + bend * W * 0.28 * (1 - p),
+    y: horizon + p * (H - horizon),
+    half: W * (0.045 + p * 0.48),
+    p
+  };
+}
+
+function polygon(points, color) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  points.forEach((pt, i) =>
+    i ? ctx.lineTo(pt.x, pt.y) : ctx.moveTo(pt.x, pt.y)
+  );
+  ctx.closePath();
+  ctx.fill();
+}
+
+function line(x1, y1, x2, y2, color, width = 1) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+}
+
+function roundRect(x, y, w, h, r, color) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+  ctx.fill();
+}
+
+function drawBackground() {
+  const sky = ctx.createLinearGradient(0, 0, 0, H);
+  sky.addColorStop(0, "#020611");
+  sky.addColorStop(0.48, "#142943");
+  sky.addColorStop(1, "#050b10");
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, W, H);
+
+  polygon([
+    {x: 0, y: H * 0.43},
+    {x: W * 0.16, y: H * 0.30},
+    {x: W * 0.28, y: H * 0.40},
+    {x: W * 0.44, y: H * 0.27},
+    {x: W * 0.61, y: H * 0.40},
+    {x: W * 0.80, y: H * 0.29},
+    {x: W, y: H * 0.43},
+    {x: W, y: H},
+    {x: 0, y: H}
+  ], "#101d2c");
+
+  for (let i = 0; i < 36; i++) {
+    const x = (i * 137) % Math.max(W, 1);
+    const y = H * (0.25 + (i % 7) * 0.022);
+    const bw = 5 + i % 4 * 3;
+    const bh = 10 + i % 5 * 7;
+
+    ctx.fillStyle = i % 3 === 0 ? "#123d51" : "#0a1726";
+    ctx.fillRect(x, y, bw, bh);
+
+    if (i % 2 === 0) {
+      ctx.fillStyle = "#00eaff";
+      ctx.fillRect(x + 2, y + 4, 2, 3);
+    }
+  }
+
+  ctx.fillStyle = "#050b10";
+  ctx.fillRect(0, H * 0.48, W, H * 0.52);
+}
+
+function drawRoad() {
+  const steps = 65;
+
+  for (let i = 0; i < steps; i++) {
+    const a = roadPoint(i / steps);
+    const b = roadPoint((i + 1) / steps);
+    const stripe = Math.floor(distance / 45 + i) % 2 === 0;
+
+    polygon([
+      {x: a.x - a.half * 1.15, y: a.y},
+      {x: a.x + a.half * 1.15, y: a.y},
+      {x: b.x + b.half * 1.15, y: b.y},
+      {x: b.x - b.half * 1.15, y: b.y}
+    ], stripe ? "#17232d" : "#101820");
+
+    polygon([
+      {x: a.x - a.half, y: a.y},
+      {x: a.x + a.half, y: a.y},
+      {x: b.x + b.half, y: b.y},
+      {x: b.x - b.half, y: b.y}
+    ], stripe ? "#2a3039" : "#202630");
+
+    const edgeColor = stripe ? "#00f7ff" : "#087b88";
+    line(a.x - a.half, a.y, b.x - b.half, b.y, edgeColor, 2);
+    line(a.x + a.half, a.y, b.x + b.half, b.y, edgeColor, 2);
+  }
+
+  for (let side of [-1, 1]) {
+    for (let i = 0; i < 18; i++) {
+      const p = ((i / 18) + (distance / 190) % 1) % 1;
+      const q = Math.min(1, p + 0.025);
+      const a = roadPoint(p);
+      const b = roadPoint(q);
+      const x1 = a.x + a.half * side * 1.2;
+      const x2 = b.x + b.half * side * 1.2;
+      const hh = 5 + p * 40;
+
+      line(x1, a.y, x2, b.y, "#00eaff", 1 + p * 2);
+      line(x1, a.y, x1, a.y - hh, "#00eaff", 1 + p);
+      ctx.fillStyle = "#00eaff";
+      ctx.fillRect(x1 - hh * 0.12, a.y - hh, hh * 0.24, hh * 0.15);
+    }
+  }
+
+  for (let lane of [-1, 1]) {
+    for (let i = 0; i < 18; i++) {
+      const p = ((i / 18) + (distance / 190) % 1) % 1;
+      const q = Math.min(1, p + 0.025);
+      const a = roadPoint(p);
+      const b = roadPoint(q);
+      line(
+        a.x + a.half * lane * 0.33, a.y,
+        b.x + b.half * lane * 0.33, b.y,
+        "#e2f3f6", 1.5 + p * 2
+      );
+    }
+  }
+}
+
+function drawCar(x, y, scale, color, player = false) {
+  const w = scale * (player ? 0.72 : 0.65);
+  const h = scale * 1.25;
+
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.shadowBlur = player ? 24 : 12;
+  ctx.shadowColor = player ? "#00f7ff" : color;
+
+  roundRect(-w * 0.62, -h * 0.06,
+    w * 1.24, h * 0.18, w * 0.15,
+    player ? "#15465b" : color);
+
+  ctx.shadowBlur = 0;
+
+  const wheels = [
+    [-w * 0.55, -h * 0.73, w * 0.22, h * 0.35],
+    [w * 0.33, -h * 0.73, w * 0.22, h * 0.35],
+    [-w * 0.55, -h * 0.25, w * 0.22, h * 0.30],
+    [w * 0.33, -h * 0.25, w * 0.22, h * 0.30]
+  ];
+
+  wheels.forEach(v =>
+    roundRect(v[0], v[1], v[2], v[3], 2, "#030508")
+  );
+
+  polygon([
+    {x: -w * 0.48, y: 0},
+    {x: -w * 0.58, y: -h * 0.22},
+    {x: -w * 0.42, y: -h * 0.82},
+    {x: -w * 0.22, y: -h},
+    {x: w * 0.22, y: -h},
+    {x: w * 0.42, y: -h * 0.82},
+    {x: w * 0.58, y: -h * 0.22},
+    {x: w * 0.48, y: 0}
+  ], color);
+
+  polygon([
+    {x: -w * 0.32, y: -h * 0.68},
+    {x: -w * 0.20, y: -h * 0.88},
+    {x: w * 0.20, y: -h * 0.88},
+    {x: w * 0.32, y: -h * 0.68}
+  ], "#102b40");
+
+  polygon([
+    {x: -w * 0.20, y: -h * 0.50},
+    {x: -w * 0.16, y: -h * 0.64},
+    {x: w * 0.16, y: -h * 0.64},
+    {x: w * 0.20, y: -h * 0.50}
+  ], "#182d3d");
+
+  roundRect(-w * 0.43, -h * 0.12,
+    w * 0.22, h * 0.07, 2, "#fff0b0");
+  roundRect(w * 0.21, -h * 0.12,
+    w * 0.22, h * 0.07, 2, "#fff0b0");
+
+  if (player) {
+    ctx.fillStyle = "#00f7ff";
+    ctx.fillRect(-w * 0.045, -h * 0.58, w * 0.09, h * 0.40);
+  }
+
+  ctx.restore();
+}
+
+function drawOpponents() {
+  const sorted = [...opponents].sort((a, b) => b.progress - a.progress);
+
+  for (const o of sorted) {
+    const rel = o.progress - distance;
+
+    // Rivals stay at their actual race positions.
+    // They are only hidden when outside the camera view.
+    if (rel < -1250 || rel > 1850) continue;
+
+    const p = 0.78 - rel / 3400;
+    if (p < 0.08 || p > 0.94) continue;
+
+    const g = roadPoint(p);
+    const x = g.x + g.half * o.lane;
+    const y = g.y + 10 * p;
+    const scale = 18 + p * 82;
+
+    drawCar(x, y, scale, o.color, false);
+  }
+}
+
+function drawPlayer() {
+  const road = roadPoint(1);
+  const x = road.x + playerX * road.half * 0.75;
+  const y = H * 0.94;
+  const scale = Math.min(W * 0.18, 120);
+
+  ctx.save();
+
+  if (shake > 0) {
+    ctx.translate(
+      (Math.random() - 0.5) * shake,
+      (Math.random() - 0.5) * shake
+    );
+  }
+
+  if (keys.space && nitro > 0 && running && !paused) {
+    const flame = 20 + Math.random() * 25;
+    polygon([
+      {x: x - 20, y: y - 5},
+      {x: x - 12, y: y + flame},
+      {x: x - 5, y: y - 5}
+    ], "#00f7ff");
+    polygon([
+      {x: x + 5, y: y - 5},
+      {x: x + 12, y: y + flame},
+      {x: x + 20, y: y - 5}
+    ], "#00f7ff");
+  }
+
+  drawCar(x, y, scale, "#00bfff", true);
+  ctx.restore();
+}
+
+function drawFinishLine() {
+  const remaining = FINISH_DISTANCE - distance;
+  if (remaining < 0 || remaining > 1600) return;
+
+  const p = 1 - remaining / 1600;
+  if (p < 0 || p > 1) return;
+
+  const g = roadPoint(p);
+  const blocks = 16;
+  const blockW = g.half * 2 / blocks;
+  const blockH = 5 + p * 20;
+
+  for (let i = 0; i < blocks; i++) {
+    ctx.fillStyle = i % 2 === 0 ? "#fff" : "#101010";
+    ctx.fillRect(
+      g.x - g.half + i * blockW,
+      g.y, blockW, blockH
+    );
+  }
+
+  ctx.fillStyle = "#fff";
+  ctx.font = `bold ${10 + p * 18}px Arial`;
+  ctx.textAlign = "center";
+  ctx.fillText("FINISH", g.x, g.y - 10 - p * 10);
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  drawBackground();
+  drawRoad();
+  drawFinishLine();
+  drawOpponents();
+  drawPlayer();
+}
+
+function updateHUD() {
+  $("speed").textContent = Math.round(speed);
+  const ahead = opponents.filter(o => o.progress > distance).length;
+  $("position").textContent = `${1 + ahead}/4`;
+  $("distance").textContent = Math.floor(distance);
+  $("nitroFill").style.width = `${nitro}%`;
+}
+
+function clearKeys() {
+  Object.keys(keys).forEach(k => keys[k] = false);
+  document.querySelectorAll("[data-key]").forEach(btn =>
+    btn.classList.remove("active")
+  );
+}
+
+function reset() {
+  playerX = 0;
+  speed = 0;
+  distance = 0;
+  nitro = 100;
+  elapsed = 0;
+  shake = 0;
+
+  opponents[0].progress = 300;
+  opponents[1].progress = 430;
+  opponents[2].progress = 560;
+
+  opponents.forEach((o, i) => {
+    o.lane = [-0.48, 0, 0.48][i];
+    o.pace = [178, 190, 202][i];
+    o.wobble = i * 1.7;
+  });
+
+  finished = false;
+  paused = false;
+  running = false;
+  clearKeys();
+
+  $("startOverlay").classList.remove("hidden");
+  $("pauseOverlay").classList.add("hidden");
+  $("endOverlay").classList.add("hidden");
+  $("pauseBtn").textContent = "PAUSE";
+
+  updateHUD();
+  draw();
+}
+
+function startRace() {
+  $("startOverlay").classList.add("hidden");
+  $("pauseOverlay").classList.add("hidden");
+  $("endOverlay").classList.add("hidden");
+
+  running = true;
+  paused = false;
+  finished = false;
+  lastTime = performance.now();
+
+  requestAnimationFrame(loop);
+}
+
+function pauseRace() {
+  if (!running || finished) return;
+  running = false;
+  paused = true;
+  clearKeys();
+  $("pauseOverlay").classList.remove("hidden");
+  $("pauseBtn").textContent = "RESUME";
+}
+
+function resumeRace() {
+  if (!paused || finished) return;
+  $("pauseOverlay").classList.add("hidden");
+  paused = false;
+  running = true;
+  lastTime = performance.now();
+  $("pauseBtn").textContent = "PAUSE";
+  requestAnimationFrame(loop);
+}
+
+function finishRace() {
+  running = false;
+  finished = true;
+  clearKeys();
+
+  const place = Number($("position").textContent.split("/")[0]);
+  $("endTitle").textContent = place === 1 ? "YOU WIN!" : "RACE FINISHED";
+  $("endText").textContent = place === 1
+    ? "Amazing driving! You won the race!"
+    : `You finished in position ${place}/4. Try again and take the lead!`;
+
+  $("endOverlay").classList.remove("hidden");
+}
+
+function update(dt) {
+  elapsed += dt;
+
+  // W = gas, S = brake, D = left, A = right.
+  const accelerating = keys.w;
+  const braking = keys.s;
+    const left = keys.a;
+    const right = keys.d;
+    
+  const nitroPressed = keys.space;
+
+  const maxSpeed = nitroPressed && nitro > 0
+    ? NITRO_SPEED
+    : MAX_SPEED;
+
+  if (accelerating) speed += 115 * dt;
+  else speed -= 24 * dt;
+
+  if (braking) speed -= 170 * dt;
+
+  if (nitroPressed && nitro > 0 && speed > 20) {
+    speed += 180 * dt;
+    nitro -= 27 * dt;
+  } else {
+    nitro += 8 * dt;
+  }
+
+  speed = Math.max(0, Math.min(maxSpeed, speed));
+  nitro = Math.max(0, Math.min(100, nitro));
+
+  if (left) playerX -= dt * (1.35 + speed / 170);
+  if (right) playerX += dt * (1.35 + speed / 170);
+
+  if (playerX < -0.9 || playerX > 0.9) {
+    speed = Math.max(0, speed - 65 * dt);
+    shake = Math.max(shake, 2);
+  }
+
+  playerX = Math.max(-1.15, Math.min(1.15, playerX));
+
+  // Player progress depends on the player's own speed.
+  distance += speed * dt * 1.45;
+
+  // Rivals progress independently of player speed.
+  // No teleporting or resetting their positions.
+  for (const o of opponents) {
+    const gap = distance - o.progress;
+
+    // Gradual catch-up if the player gets far ahead.
+    // This changes speed, never the rival's position instantly.
+    const catchUp = Math.max(0, Math.min(65, gap * 0.025));
+    const rivalSpeed = o.pace + catchUp;
+
+    o.progress += rivalSpeed * dt;
+
+    // Smooth lane movement only.
+    o.lane += Math.sin(elapsed * 0.8 + o.wobble) * dt * 0.015;
+    o.lane = Math.max(-0.72, Math.min(0.72, o.lane));
+  }
+
+  // Collision slows the player; rivals continue moving.
+  for (const o of opponents) {
+    const gap = o.progress - distance;
+    if (Math.abs(gap) < 55 && Math.abs(o.lane - playerX) < 0.3) {
+      speed = Math.max(0, speed - 80 * dt);
+      shake = 8;
+      o.lane += o.lane < playerX ? -0.12 : 0.12;
+      o.lane = Math.max(-0.72, Math.min(0.72, o.lane));
+    }
+  }
+
+  const curve = curveAt(distance);
+  if (speed > 150 && Math.abs(curve) > 0.6 && Math.abs(playerX) > 0.45) {
+    speed = Math.max(0, speed - 12 * dt);
+  }
+
+  shake = Math.max(0, shake - dt * 15);
+  updateHUD();
+
+  if (distance >= FINISH_DISTANCE) {
+    distance = FINISH_DISTANCE;
+    updateHUD();
+    finishRace();
+  }
+}
+
+function loop(now) {
+  if (!running || paused || finished) return;
+
+  const dt = Math.min((now - lastTime) / 1000, 0.035);
+  lastTime = now;
+
+  update(dt);
+  draw();
+
+  if (running && !paused && !finished) {
+    requestAnimationFrame(loop);
+  }
+}
+
+// Keyboard controls.
+const keyMap = {
+  KeyW: "w",
+  KeyS: "s",
+  KeyA: "a",
+  KeyD: "d",
+  Space: "space",
+  ArrowUp: "w",
+  ArrowDown: "s",
+  ArrowLeft: "a",
+  ArrowRight: "d"
+};
+
+document.addEventListener("keydown", e => {
+  const key = keyMap[e.code];
+
+  if (key) {
+    e.preventDefault();
+    keys[key] = true;
+  }
+
+  if (e.code === "Escape") {
+    e.preventDefault();
+    if (running) pauseRace();
+    else if (paused) resumeRace();
+  }
+}, true);
+
+document.addEventListener("keyup", e => {
+  const key = keyMap[e.code];
+  if (key) {
+    e.preventDefault();
+    keys[key] = false;
+  }
+}, true);
+
+window.addEventListener("blur", clearKeys);
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) clearKeys();
+});
+
+// On-screen controls.
+document.querySelectorAll("[data-key]").forEach(btn => {
+  const key = btn.dataset.key;
+
+  function press(e) {
+    e.preventDefault();
+    keys[key] = true;
+    btn.classList.add("active");
+
+    if (btn.setPointerCapture && e.pointerId !== undefined) {
+      try { btn.setPointerCapture(e.pointerId); } catch (_) {}
+    }
+  }
+
+  function release(e) {
+    e.preventDefault();
+    keys[key] = false;
+    btn.classList.remove("active");
+  }
+
+  btn.addEventListener("pointerdown", press);
+  btn.addEventListener("pointerup", release);
+  btn.addEventListener("pointercancel", release);
+  btn.addEventListener("lostpointercapture", release);
+  btn.addEventListener("contextmenu", e => e.preventDefault());
+});
+
+// Buttons.
+$("startBtn").addEventListener("click", startRace);
+$("resumeBtn").addEventListener("click", resumeRace);
+$("pauseRestartBtn").addEventListener("click", reset);
+$("restartBtn").addEventListener("click", reset);
+$("againBtn").addEventListener("click", reset);
+
+$("pauseBtn").addEventListener("click", () => {
+  if (running) pauseRace();
+  else if (paused) resumeRace();
+});
+
+resize();
+reset();
+</script>
+</body>
+</html>
