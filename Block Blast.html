@@ -1,0 +1,927 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Block Blast V2 | MC Game Hub</title>
+
+  <style>
+    :root {
+      --cyan: #00eaff;
+      --bg: #050b15;
+      --panel: #0a1728;
+      --cell: #102136;
+      --muted: #9bb9cc;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at top, #0b2337 0%, transparent 55%),
+        var(--bg);
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 18px 12px 28px;
+    }
+
+    button {
+      font: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .game {
+      width: 100%;
+      max-width: 460px;
+      min-width: 0;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    header {
+      padding: 17px 8px;
+      border: 1px solid var(--cyan);
+      border-radius: 15px;
+      box-shadow: 0 0 20px #00d9ff25, inset 0 0 18px #00d9ff0b;
+      margin-bottom: 15px;
+    }
+
+    header h1 {
+      color: var(--cyan);
+      font-size: clamp(27px, 7vw, 39px);
+      letter-spacing: 2px;
+      text-shadow: 0 0 14px #00eaff77;
+    }
+
+    header p {
+      color: #a8c9df;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      margin-top: 7px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat {
+      padding: 10px 5px;
+      border: 1px solid #174c69;
+      border-radius: 11px;
+      background: #0b192b;
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 5px;
+      letter-spacing: 1px;
+    }
+
+    .stat strong {
+      font-size: 24px;
+      color: var(--cyan);
+    }
+
+    /* Responsive 8 x 8 board */
+    #board {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      grid-template-rows: repeat(8, minmax(0, 1fr));
+      gap: clamp(2px, 0.65vw, 4px);
+      padding: clamp(5px, 1.6vw, 8px);
+      background: #071322;
+      border: 1px solid var(--cyan);
+      border-radius: 12px;
+      box-shadow: 0 0 20px #00eaff22;
+      touch-action: manipulation;
+    }
+
+    .cell {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-width: 0;
+      min-height: 0;
+      padding: 0;
+      border: 1px solid #1a3650;
+      border-radius: clamp(2px, 0.8vw, 5px);
+      background: var(--cell);
+      cursor: pointer;
+      transition: background 0.1s, box-shadow 0.1s;
+    }
+
+    .cell.filled {
+      border-color: #ffffff55;
+      box-shadow: inset 0 0 5px #ffffff33;
+    }
+
+    .cell.preview-valid {
+      background: #00eaff99 !important;
+      border-color: #ffffff !important;
+      box-shadow: inset 0 0 7px #ffffff77, 0 0 6px #00eaff66 !important;
+    }
+
+    .cell.preview-invalid {
+      background: #ff334f88 !important;
+      border-color: #ff6677 !important;
+    }
+
+    .pieces-title {
+      margin: 20px 0 11px;
+      color: #b8d6e8;
+      font-size: 15px;
+      letter-spacing: 2px;
+    }
+
+    #pieces {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .piece {
+      width: 100%;
+      min-width: 0;
+      min-height: 104px;
+      padding: 8px 4px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid #174c69;
+      border-radius: 12px;
+      background: linear-gradient(145deg, #0c1d30, #081321);
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: border-color .15s, background .15s, box-shadow .15s;
+    }
+
+    .piece.selected {
+      border: 2px solid var(--cyan);
+      background: #10273b;
+      box-shadow: 0 0 14px #00eaff44;
+    }
+
+    .piece:disabled {
+      opacity: .25;
+      cursor: default;
+    }
+
+    /* Each preview uses the actual dimensions of its shape */
+    .mini-grid {
+      display: grid;
+      gap: 3px;
+      justify-content: center;
+      align-content: center;
+      width: max-content;
+      height: max-content;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .mini-cell {
+      width: var(--mini-size, 16px);
+      height: var(--mini-size, 16px);
+      border-radius: 3px;
+      background: transparent;
+    }
+
+    .mini-cell.occupied {
+      background: var(--piece-color);
+      box-shadow: 0 0 5px color-mix(in srgb, var(--piece-color), transparent 35%);
+      border: 1px solid #ffffff35;
+    }
+
+    #message {
+      min-height: 42px;
+      margin: 14px 0 8px;
+      padding: 10px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #174c6933;
+      border-radius: 9px;
+      color: #ffe45c;
+      font-size: 13px;
+      font-weight: bold;
+      line-height: 1.5;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    button.action {
+      min-width: 0;
+      min-height: 44px;
+      padding: 10px 5px;
+      border: 1px solid #00cde8;
+      border-radius: 9px;
+      background: #0a2134;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background .2s, box-shadow .2s;
+    }
+
+    button.action:hover {
+      background: #123a50;
+      box-shadow: 0 0 12px #00eaff22;
+    }
+
+    .sound-settings {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      margin: 14px 0;
+      color: #b8d6e8;
+      font-size: 12px;
+    }
+
+    .sound-settings label {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+      accent-color: var(--cyan);
+    }
+
+    .instructions {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.8;
+      margin: 12px 0;
+    }
+
+    footer {
+      margin-top: 18px;
+      color: #00cde8;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+    }
+
+    @media (max-width: 360px) {
+      body {
+        padding: 10px 8px 22px;
+      }
+
+      .piece {
+        min-height: 86px;
+      }
+
+      .mini-grid {
+        gap: 2px;
+      }
+
+      .mini-cell {
+        width: var(--mini-size, 13px);
+        height: var(--mini-size, 13px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="game">
+    <header>
+      <h1>BLOCK BLAST</h1>
+      <p>MC GAME HUB • THINK • MATCH • BLAST</p>
+    </header>
+
+    <section class="stats">
+      <div class="stat">
+        <span>SCORE</span>
+        <strong id="score">0</strong>
+      </div>
+      <div class="stat">
+        <span>BEST</span>
+        <strong id="best">0</strong>
+      </div>
+    </section>
+
+    <section id="board" aria-label="Game board"></section>
+
+    <h2 class="pieces-title">CHOOSE A PIECE</h2>
+    <section id="pieces" aria-label="Available pieces"></section>
+
+    <p id="message" aria-live="polite">Choose a piece to begin!</p>
+
+    <div class="buttons">
+      <button class="action" id="restart" type="button">↻ NEW GAME</button>
+      <button class="action" id="back" type="button">⌂ BACK TO HUB</button>
+    </div>
+
+    <div class="sound-settings">
+      <label>
+        <input type="checkbox" id="sound" checked>
+        Sound effects
+      </label>
+      <label>
+        <input type="checkbox" id="music">
+        Background music
+      </label>
+    </div>
+
+    <p class="instructions">
+      Select a piece, then click the cell where its top-left corner should go.<br>
+      Complete a row or column to clear it and earn points!
+    </p>
+
+    <footer>MC GAME HUB • BLOCK BLAST V2</footer>
+  </main>
+
+  <script>
+    "use strict";
+
+    const SIZE = 8;
+
+    const COLORS = [
+      "#ff334f",
+      "#00eaff",
+      "#ffe13b",
+      "#28f06b",
+      "#ff941f",
+      "#ff55bd",
+      "#3485ff",
+      "#a94dff"
+    ];
+
+    // Coordinates are [row, column], starting at [0, 0].
+    const SHAPES = [
+      [[0,0]],
+      [[0,0],[0,1]],
+      [[0,0],[1,0]],
+      [[0,0],[0,1],[0,2]],
+      [[0,0],[1,0],[2,0]],
+      [[0,0],[0,1],[1,0],[1,1]],
+      [[0,0],[1,0],[1,1]],
+      [[0,0],[0,1],[1,1]],
+      [[0,0],[1,0],[2,0],[2,1]],
+      [[0,0],[0,1],[0,2],[1,2]],
+      [[0,0],[1,0],[1,1],[2,1]],
+      [[0,0],[1,0],[2,0],[1,1]],
+      [[0,0],[0,1],[1,0],[1,1],[2,0]],
+      [[0,0],[1,0],[2,0],[3,0]],
+      [[0,0],[0,1],[0,2],[0,3]],
+      [[0,0],[1,0],[2,0],[2,1],[2,2]]
+    ];
+
+    const boardElement = document.getElementById("board");
+    const piecesElement = document.getElementById("pieces");
+    const scoreElement = document.getElementById("score");
+    const bestElement = document.getElementById("best");
+    const messageElement = document.getElementById("message");
+    const soundCheckbox = document.getElementById("sound");
+    const musicCheckbox = document.getElementById("music");
+
+    const bestKey = "mcgh_block_blast_best";
+    const settingsKey = "mcgh_audio_settings_block_blast";
+
+    let board = [];
+    let pieces = [];
+    let selectedPiece = -1;
+    let score = 0;
+    let best = Number(localStorage.getItem(bestKey)) || 0;
+    let gameOver = false;
+
+    let audioContext = null;
+    let musicTimer = null;
+    let musicStep = 0;
+
+    const audioDefaults = {
+      sound: true,
+      music: false,
+      volume: 0.35
+    };
+
+    let audioSettings = { ...audioDefaults };
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(settingsKey));
+      if (saved && typeof saved === "object") {
+        audioSettings = { ...audioDefaults, ...saved };
+      }
+    } catch (error) {
+      console.warn("Audio settings could not be loaded.");
+    }
+
+    function saveAudioSettings() {
+      try {
+        localStorage.setItem(settingsKey, JSON.stringify(audioSettings));
+      } catch (error) {
+        console.warn("Audio settings could not be saved.");
+      }
+    }
+
+    function initAudio() {
+      const AudioClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioClass) return null;
+
+      if (!audioContext) audioContext = new AudioClass();
+
+      if (audioContext.state === "suspended") {
+        audioContext.resume().catch(() => {});
+      }
+
+      return audioContext;
+    }
+
+    function tone(frequency, duration = 0.08, type = "sine", volume = 0.3) {
+      if (!audioSettings.sound) return;
+
+      const context = initAudio();
+      if (!context) return;
+
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(frequency, context.currentTime);
+
+      gain.gain.setValueAtTime(
+        Math.max(0.0001, volume * audioSettings.volume),
+        context.currentTime
+      );
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        context.currentTime + duration
+      );
+
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.start();
+      oscillator.stop(context.currentTime + duration);
+    }
+
+    function playSound(name) {
+      const sounds = {
+        click: [420, 0.05, "sine"],
+        place: [540, 0.07, "triangle"],
+        clear: [780, 0.15, "sawtooth"],
+        gameover: [180, 0.3, "triangle"],
+        start: [620, 0.1, "sine"]
+      };
+
+      const sound = sounds[name];
+      if (sound) tone(sound[0], sound[1], sound[2]);
+    }
+
+    function startMusic() {
+      stopMusic();
+      if (!audioSettings.music) return;
+
+      if (!initAudio()) return;
+
+      const notes = [261.63, 329.63, 392, 493.88, 392, 329.63];
+
+      musicTimer = setInterval(() => {
+        if (!audioSettings.music) {
+          stopMusic();
+          return;
+        }
+
+        const context = initAudio();
+        if (!context) return;
+
+        const frequency = notes[musicStep % notes.length];
+        musicStep++;
+
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+
+        oscillator.type = "triangle";
+        oscillator.frequency.value = frequency;
+        gain.gain.setValueAtTime(0.0001, context.currentTime);
+        gain.gain.exponentialRampToValueAtTime(
+          0.025 * audioSettings.volume,
+          context.currentTime + 0.03
+        );
+        gain.gain.exponentialRampToValueAtTime(
+          0.0001,
+          context.currentTime + 0.25
+        );
+
+        oscillator.connect(gain);
+        gain.connect(context.destination);
+        oscillator.start();
+        oscillator.stop(context.currentTime + 0.26);
+      }, 300);
+    }
+
+    function stopMusic() {
+      if (musicTimer !== null) {
+        clearInterval(musicTimer);
+        musicTimer = null;
+      }
+    }
+
+    function makeEmptyBoard() {
+      return Array.from(
+        { length: SIZE },
+        () => Array(SIZE).fill(null)
+      );
+    }
+
+    function randomColor() {
+      return COLORS[Math.floor(Math.random() * COLORS.length)];
+    }
+
+    function randomPiece() {
+      const source = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+
+      return {
+        shape: source.map(([row, col]) => [row, col]),
+        color: randomColor()
+      };
+    }
+
+    function getShapeBounds(shape) {
+      const rows = shape.map(cell => cell[0]);
+      const cols = shape.map(cell => cell[1]);
+
+      const minRow = Math.min(...rows);
+      const minCol = Math.min(...cols);
+      const maxRow = Math.max(...rows);
+      const maxCol = Math.max(...cols);
+
+      return {
+        minRow,
+        minCol,
+        height: maxRow - minRow + 1,
+        width: maxCol - minCol + 1
+      };
+    }
+
+    // Create each board button once; keep row/column coordinates stable.
+    const boardCells = [];
+
+    function buildBoard() {
+      boardElement.innerHTML = "";
+      boardCells.length = 0;
+
+      for (let row = 0; row < SIZE; row++) {
+        for (let col = 0; col < SIZE; col++) {
+          const cell = document.createElement("button");
+          cell.type = "button";
+          cell.className = "cell";
+          cell.setAttribute(
+            "aria-label",
+            `Row ${row + 1}, column ${col + 1}`
+          );
+
+          cell.addEventListener("click", () => placePiece(row, col));
+
+          // Desktop preview: show where the selected piece would land.
+          cell.addEventListener("mouseenter", () => {
+            if (selectedPiece !== -1 && !gameOver) {
+              showPreview(row, col);
+            }
+          });
+
+          cell.addEventListener("focus", () => {
+            if (selectedPiece !== -1 && !gameOver) {
+              showPreview(row, col);
+            }
+          });
+
+          boardElement.appendChild(cell);
+          boardCells.push(cell);
+        }
+      }
+    }
+
+    function renderBoard() {
+      clearPreview();
+
+      for (let row = 0; row < SIZE; row++) {
+        for (let col = 0; col < SIZE; col++) {
+          const cell = boardCells[row * SIZE + col];
+          const color = board[row][col];
+
+          cell.classList.toggle("filled", Boolean(color));
+          cell.style.background = color || "";
+          cell.style.boxShadow = color
+            ? `inset 0 0 7px #ffffff44, 0 0 5px ${color}55`
+            : "";
+        }
+      }
+    }
+
+    function renderPieces() {
+      piecesElement.innerHTML = "";
+
+      pieces.forEach((piece, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "piece";
+        button.setAttribute("aria-label", `Choose piece ${index + 1}`);
+
+        if (selectedPiece === index) button.classList.add("selected");
+
+        if (!piece || gameOver) button.disabled = true;
+
+        if (piece) {
+          const bounds = getShapeBounds(piece.shape);
+          const miniGrid = document.createElement("div");
+          miniGrid.className = "mini-grid";
+
+          // Normalize coordinates so every shape starts at [0, 0].
+          miniGrid.style.gridTemplateColumns =
+            `repeat(${bounds.width}, var(--mini-size, 16px))`;
+          miniGrid.style.gridTemplateRows =
+            `repeat(${bounds.height}, var(--mini-size, 16px))`;
+          miniGrid.style.setProperty("--piece-color", piece.color);
+
+          const occupied = new Set(
+            piece.shape.map(([row, col]) =>
+              `${row - bounds.minRow},${col - bounds.minCol}`
+            )
+          );
+
+          // Use the actual bounding box, not a forced 4 x 4 grid.
+          for (let row = 0; row < bounds.height; row++) {
+            for (let col = 0; col < bounds.width; col++) {
+              const miniCell = document.createElement("div");
+              miniCell.className = "mini-cell";
+
+              if (occupied.has(`${row},${col}`)) {
+                miniCell.classList.add("occupied");
+              }
+
+              miniGrid.appendChild(miniCell);
+            }
+          }
+
+          button.appendChild(miniGrid);
+        }
+
+        button.addEventListener("click", () => {
+          if (!piece || gameOver) return;
+
+          selectedPiece = index;
+          playSound("click");
+          renderPieces();
+          clearPreview();
+          messageElement.textContent =
+            "Piece selected! Click the cell where its top-left corner should go.";
+        });
+
+        piecesElement.appendChild(button);
+      });
+    }
+
+    function canPlace(piece, row, col) {
+      if (!piece) return false;
+
+      return piece.shape.every(([r, c]) => {
+        const newRow = row + r;
+        const newCol = col + c;
+
+        return (
+          newRow >= 0 &&
+          newRow < SIZE &&
+          newCol >= 0 &&
+          newCol < SIZE &&
+          board[newRow][newCol] === null
+        );
+      });
+    }
+
+    function clearPreview() {
+      boardCells.forEach(cell => {
+        cell.classList.remove("preview-valid", "preview-invalid");
+      });
+    }
+
+    function showPreview(row, col) {
+      clearPreview();
+
+      const piece = pieces[selectedPiece];
+      if (!piece) return;
+
+      const valid = canPlace(piece, row, col);
+
+      piece.shape.forEach(([r, c]) => {
+        const targetRow = row + r;
+        const targetCol = col + c;
+
+        if (
+          targetRow < 0 || targetRow >= SIZE ||
+          targetCol < 0 || targetCol >= SIZE
+        ) {
+          return;
+        }
+
+        boardCells[targetRow * SIZE + targetCol].classList.add(
+          valid ? "preview-valid" : "preview-invalid"
+        );
+      });
+    }
+
+    function placePiece(row, col) {
+      if (gameOver) return;
+
+      if (selectedPiece < 0 || !pieces[selectedPiece]) {
+        messageElement.textContent = "Choose a piece first!";
+        playSound("click");
+        return;
+      }
+
+      const piece = pieces[selectedPiece];
+
+      if (!canPlace(piece, row, col)) {
+        messageElement.textContent =
+          "It doesn't fit there! Try another starting cell.";
+        playSound("click");
+        showPreview(row, col);
+        return;
+      }
+
+      piece.shape.forEach(([r, c]) => {
+        board[row + r][col + c] = piece.color;
+      });
+
+      score += piece.shape.length;
+      pieces[selectedPiece] = null;
+      selectedPiece = -1;
+
+      const cleared = clearCompletedLines();
+
+      if (cleared > 0) {
+        score += cleared * 10;
+        messageElement.textContent =
+          `Great! ${cleared} line${cleared === 1 ? "" : "s"} cleared!`;
+        playSound("clear");
+      } else {
+        messageElement.textContent = "Nice move!";
+        playSound("place");
+      }
+
+      // Give three new pieces after all current pieces are used.
+      if (pieces.every(piece => piece === null)) {
+        pieces = [randomPiece(), randomPiece(), randomPiece()];
+      }
+
+      updateScore();
+      renderBoard();
+      renderPieces();
+      checkGameOver();
+    }
+
+    function clearCompletedLines() {
+      const fullRows = [];
+      const fullCols = [];
+
+      for (let row = 0; row < SIZE; row++) {
+        if (board[row].every(cell => cell !== null)) {
+          fullRows.push(row);
+        }
+      }
+
+      for (let col = 0; col < SIZE; col++) {
+        if (board.every(row => row[col] !== null)) {
+          fullCols.push(col);
+        }
+      }
+
+      // Clear all completed rows and columns simultaneously.
+      fullRows.forEach(row => {
+        board[row] = Array(SIZE).fill(null);
+      });
+
+      fullCols.forEach(col => {
+        for (let row = 0; row < SIZE; row++) {
+          board[row][col] = null;
+        }
+      });
+
+      return fullRows.length + fullCols.length;
+    }
+
+    function updateScore() {
+      scoreElement.textContent = score;
+
+      if (score > best) {
+        best = score;
+
+        try {
+          localStorage.setItem(bestKey, String(best));
+        } catch (error) {
+          console.warn("Best score could not be saved.");
+        }
+      }
+
+      bestElement.textContent = best;
+    }
+
+    function checkGameOver() {
+      const available = pieces.filter(Boolean);
+
+      if (available.length === 0) return;
+
+      const anyMoveExists = available.some(piece => {
+        for (let row = 0; row < SIZE; row++) {
+          for (let col = 0; col < SIZE; col++) {
+            if (canPlace(piece, row, col)) return true;
+          }
+        }
+        return false;
+      });
+
+      if (!anyMoveExists) {
+        gameOver = true;
+        selectedPiece = -1;
+        stopMusic();
+        playSound("gameover");
+
+        messageElement.textContent = `GAME OVER! Final score: ${score}`;
+        renderPieces();
+      }
+    }
+
+    function newGame() {
+      stopMusic();
+
+      board = makeEmptyBoard();
+      pieces = [randomPiece(), randomPiece(), randomPiece()];
+      selectedPiece = -1;
+      score = 0;
+      gameOver = false;
+
+      updateScore();
+      renderBoard();
+      renderPieces();
+
+      messageElement.textContent = "Choose a piece to begin!";
+      playSound("start");
+
+      if (audioSettings.music) startMusic();
+    }
+
+    document.getElementById("restart").addEventListener("click", () => {
+      playSound("click");
+      newGame();
+    });
+
+    document.getElementById("back").addEventListener("click", () => {
+      playSound("click");
+      window.location.href = "index.html";
+    });
+
+    soundCheckbox.checked = audioSettings.sound;
+    musicCheckbox.checked = audioSettings.music;
+
+    soundCheckbox.addEventListener("change", event => {
+      audioSettings.sound = event.target.checked;
+      saveAudioSettings();
+
+      if (audioSettings.sound) playSound("click");
+    });
+
+    musicCheckbox.addEventListener("change", event => {
+      audioSettings.music = event.target.checked;
+      saveAudioSettings();
+
+      if (audioSettings.music) {
+        startMusic();
+      } else {
+        stopMusic();
+      }
+    });
+
+    // Build the board once, then initialize the game.
+    buildBoard();
+    bestElement.textContent = best;
+    newGame();
+  </script>
+</body>
+</html>
